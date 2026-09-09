@@ -69,17 +69,18 @@
   /* ── top bar ─────────────────────────────────────────────── */
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 22px; border-bottom: 1px solid var(--line);
+    padding: 11px 22px; border-bottom: 1px solid var(--line);
     transition: border-color .25s;
   }
-  .home { display: flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; }
+  .home { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; min-height: 34px; }
+  /* LOGO — upload your image as logo.png next to this file. Optionally also upload
+     logo-dark.png (a light version) and it's used automatically in grey/dark mode. */
+  .homelogo { display: block; height: 32px; width: auto; max-width: 250px; object-fit: contain; }
   .bemark {
     display: grid; place-items: center; width: 34px; height: 34px;
     border-radius: 10px; background: var(--accent); color: var(--on-accent);
     font-family: var(--f-serif); font-weight: 700; font-size: 15px;
-    transition: transform .18s, background .25s;
   }
-  .home:hover .bemark { transform: translateY(-1px); }
   .bt { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
   .themebtn {
     display: flex; align-items: center; gap: 8px;
@@ -109,6 +110,7 @@
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
     padding: 10px 16px; border-bottom: 1px solid var(--line);
   }
+  .card.on-themes .toolbar { display: none; }   /* the month/year changer is Calendar/List only */
   .tb-side { display: flex; align-items: center; }
   .tb-side.r { justify-content: flex-end; }
   .tb-center { display: flex; align-items: center; gap: 8px; }
@@ -136,11 +138,11 @@
   .pane { display: none; }
   .pane.active { display: block; }
 
-  /* calendar: the scrolling timeline */
+  /* calendar: the scrolling timeline — stretchy height, internal scrollbars */
   .tl-wrap { position: relative; }
   .tl {
     position: relative; overflow: auto;
-    height: min(64vh, 720px); min-height: 340px;
+    height: clamp(340px, calc(100vh - 270px), 1000px);
   }
   .tl-inner { position: relative; }
   .tl-head {
@@ -241,7 +243,7 @@
     font-size: 12.5px; color: var(--muted);
   }
   .list-acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .list-body { height: min(calc(64vh - 44px), 676px); min-height: 296px; overflow: auto; padding: 4px 0 12px; }
+  .list-body { height: clamp(300px, calc(100vh - 314px), 956px); overflow: auto; padding: 4px 0 12px; }
   .sortseg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
   .sortseg button { padding: 4px 12px; font-size: 11.5px; font-weight: 600; color: var(--muted); }
   .sortseg button + button { border-left: 1px solid var(--line); }
@@ -323,13 +325,24 @@
   .sw i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--card); transition: left .2s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
   .sw input:checked + i { background: var(--accent); }
   .sw input:checked + i::after { left: 21px; }
-  .cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2px 18px; }
+  .csub { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 16px 0 4px; }
+  .csub b { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .csub-acts { display: flex; align-items: center; gap: 4px; }
+  .csub-lab { font-family: var(--f-mono); font-size: 9.5px; color: var(--muted); margin-right: 2px; }
+  .cgrid, .crow { }
   .crow { display: flex; align-items: center; gap: 10px; padding: 6px 2px; border-radius: 8px; }
   .csw { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid transparent; position: relative; }
   .csw:hover { border-color: var(--ink); }
   .csw.auto { border-style: dashed; border-color: var(--muted); opacity: .75; }
   .cn { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .crow .ov { margin-left: auto; font-family: var(--f-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .ovbtn {
+    margin-left: auto; font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 3px 11px;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .ovbtn:hover { color: var(--ink); border-color: var(--line2); }
+  .ovbtn.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .mini2 { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 2px 6px; border-radius: 6px; }
   .mini2:hover { color: var(--accent); background: var(--accent-soft); }
   .lorow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -346,6 +359,8 @@
     padding: 6px 10px; width: 220px;
   }
   .loinput input:focus { outline: none; border-color: var(--accent); }
+  #loStatus { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+  #loStatus.warn { color: var(--warn); }
   .dhint { font-size: 12.5px; line-height: 1.7; color: var(--muted); }
   .dhint b { color: var(--ink); }
   .dhint code { font-family: var(--f-mono); font-size: 11px; background: var(--accent-soft); border-radius: 5px; padding: 1px 5px; }
@@ -497,6 +512,7 @@
   @media (max-width: 760px) {
     .view-count, .datachip { display: none; }
     .bt { display: none; }
+    .homelogo { max-width: 56vw; height: 28px; }
     #filterBtn { margin-right: auto; }
     .wrap { padding: 14px 12px 30px; }
     .toolbar { grid-template-columns: auto 1fr; row-gap: 8px; }
@@ -511,7 +527,8 @@
 
 <header class="topbar">
   <a class="home" href="index.html" title="Bigfarm Explorer — home">
-    <span class="bemark">BE</span>
+    <img class="homelogo" id="homeLogo" src="logo.png" alt="Bigfarm Explorer">
+    <span class="bemark" id="homeMark" hidden>BE</span>
     <span class="bt">Bigfarm Calendar</span>
   </a>
   <button class="themebtn" id="themeBtn"><span id="themeIc"></span><span id="themeLb">Light</span></button>
@@ -591,10 +608,11 @@
 <div class="drop" id="drop">
   <div class="drop-in">
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"/></svg>
-    <b>Drop your events file</b><span>.jsonl — Datepress Machine output</span>
+    <b>Drop your file</b><span>events .jsonl · colour layouts .json</span>
   </div>
 </div>
 <input type="file" id="fileInput" accept=".jsonl,.json,.txt" hidden>
+<input type="file" id="colImport" accept=".json" hidden>
 
 <script>
 (function () {
@@ -608,7 +626,12 @@
   const DATA_FILE = 'events.jsonl';
   const LS_KEY = 'bigfarm-calendar-v1';
   const MS = 86400000;
-  const BUF_MONTHS = 6;          // scrollable months kept on either side of the view
+  const BUF_MONTHS = 6;
+
+  /* The built-in "Default" colour layout for the Reset colours button.
+     Leave null for now — instead, save a load-out named "Default" from the
+     Themes tab and Reset colours will use that automatically.             */
+  const DEFAULT_LAYOUT = null;   // e.g. { sections:{ "Co-op":{t:'p',i:2} }, events:{...}, secOverride:{} }
 
   const SAMPLE_JSONL = [
     '{"start":"2025-09-01","end":"2025-09-02","event":"Co-op Challenge","section":"Co-op"}',
@@ -650,6 +673,7 @@
   const normMonth = (y, m) => { const d = new Date(Date.UTC(y, m, 1)); return { y: d.getUTCFullYear(), m: d.getUTCMonth() }; };
   const monthAddT = (t, n) => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1); };
   const todayUTC = () => { const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); };
+  const clone = o => JSON.parse(JSON.stringify(o));
 
   function fmtD(ts) { const d = new Date(ts); return d.getUTCDate() + ' ' + M_S[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
   function fmtRange(ev) {
@@ -676,8 +700,9 @@
     tab: 'calendar', density: 'comfortable', weekends: true, labels: true,
     sort: 'date', scale: 1,
     listFormat: 'informal', tsort: { col: 'start', dir: 'asc' },
-    colors: {}, loadouts: {}, lastLoadout: '',
-    filters: { sections: [], items: [], years: [] }   // lists of things turned OFF
+    colors: { sections: {}, events: {}, secOverride: {} },
+    loadouts: {}, lastLoadout: '',
+    filters: { sections: [], items: [], years: [] }
   };
   let events = [], sections = [], items = [], years = [], secIdx = new Map();
   let filtered = [], source = 'sample', fileName = '', skipped = 0;
@@ -688,9 +713,7 @@
   const tl = $('#tl');
   let bufStartT = 0, bufEndT = 0, dayW = 20, savedScroll = 0, lastW = 0;
   let laneRows = new Map(), secCounts = new Map();
-  let scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0;
-
-  const clone = o => JSON.parse(JSON.stringify(o));
+  let scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0, loStatusTimer = 0;
 
   function save() {
     try { localStorage.setItem(LS_KEY, JSON.stringify({
@@ -701,6 +724,30 @@
       colors: state.colors, loadouts: state.loadouts, lastLoadout: state.lastLoadout,
       filters: state.filters
     })); } catch (e) {}
+  }
+
+  /* colour layouts: { sections:{name:{t,i}|{t,v}}, events:{...}, secOverride:{name:true} }
+     — also accepts the older flat format { eventName: colour } */
+  function normVal(v) {
+    if (!v || typeof v !== 'object') return null;
+    if (v.t === 'h' && /^#[0-9a-fA-F]{6}$/.test(v.v || '')) return { t: 'h', v: v.v };
+    if (v.t === 'p' && Number.isInteger(v.i) && v.i >= 0 && v.i <= 7) return { t: 'p', i: v.i };
+    return null;
+  }
+  function normalizeLayout(raw) {
+    const out = { sections: {}, events: {}, secOverride: {} };
+    if (!raw || typeof raw !== 'object') return out;
+    if (raw.sections || raw.events || raw.secOverride) {
+      ['sections', 'events'].forEach(k => {
+        if (raw[k] && typeof raw[k] === 'object')
+          for (const [key, v] of Object.entries(raw[k])) { const r = normVal(v); if (r) out[k][key] = r; }
+      });
+      if (raw.secOverride && typeof raw.secOverride === 'object')
+        for (const [k, v] of Object.entries(raw.secOverride)) if (v) out.secOverride[k] = true;
+    } else {
+      for (const [key, v] of Object.entries(raw)) { const r = normVal(v); if (r) out.events[key] = r; }
+    }
+    return out;
   }
   function loadSettings() {
     try {
@@ -718,9 +765,13 @@
       if (s.tsort && ['event','section','start','end','days'].includes(s.tsort.col))
         state.tsort = { col: s.tsort.col, dir: s.tsort.dir === 'desc' ? 'desc' : 'asc' };
       if (s.anchor && isFinite(s.anchor.y)) state.anchor = { y: s.anchor.y, m: s.anchor.m || 0 };
-      if (s.colors && typeof s.colors === 'object') state.colors = s.colors;
-      if (s.loadouts && typeof s.loadouts === 'object') state.loadouts = s.loadouts;
-      if (typeof s.lastLoadout === 'string') state.lastLoadout = s.lastLoadout;
+      if (s.colors) state.colors = normalizeLayout(s.colors);
+      if (s.loadouts && typeof s.loadouts === 'object') {
+        const lo = {};
+        for (const [n, v] of Object.entries(s.loadouts)) if (n && v && typeof v === 'object') lo[n] = normalizeLayout(v);
+        state.loadouts = lo;
+      }
+      if (typeof s.lastLoadout === 'string' && state.loadouts[s.lastLoadout]) state.lastLoadout = s.lastLoadout;
       if (s.filters) state.filters = s.filters;
     } catch (e) {}
   }
@@ -778,6 +829,19 @@
     fileName = label; dataLoaded = true;
     deriveAll(); buildDrawer(); updateNotice(); updateChip(); refresh();
   }
+  /* route dropped/loaded files: colour layouts (.json) vs events (.jsonl) */
+  function applyAnyText(text, label) {
+    const s = text.trim();
+    if (s.startsWith('{')) {
+      try {
+        const o = JSON.parse(s);
+        if (o && (o.format === 'bigfarm-colours' || o.loadouts || o.current || o.sections || o.events)) {
+          importColoursText(text, true); return;
+        }
+      } catch (e) {}
+    }
+    applyText(text, label);
+  }
   async function loadData() {
     try {
       const res = await fetch(DATA_FILE);
@@ -801,8 +865,6 @@
   function offCount() {
     return state.filters.sections.length + state.filters.items.length + state.filters.years.length;
   }
-  /* pack events into stable sub-rows across the WHOLE timeline,
-     so lane heights never jump while you scroll */
   function recomputeLanes() {
     laneRows = new Map(); secCounts = new Map();
     sections.forEach(sec => {
@@ -818,7 +880,7 @@
     });
   }
 
-  /* ── palette (read from the theme's CSS) ── */
+  /* ── colours ── */
   let palCache = { theme: null, vals: [] };
   function palette() {
     if (palCache.theme === state.theme) return palCache.vals;
@@ -826,11 +888,19 @@
     palCache = { theme: state.theme, vals: [0,1,2,3,4,5,6,7].map(i => cs.getPropertyValue('--bar-' + i).trim()) };
     return palCache.vals;
   }
+  function resolveColour(o) { return o.t === 'h' ? o.v : palette()[o.i]; }
+  function sectionColor(sec) {
+    const ov = state.colors.sections[sec];
+    return ov ? resolveColour(ov) : palette()[secIdx.get(sec) % 8];
+  }
   function barColor(ev) {
-    const ov = state.colors[ev.name];
-    if (ov) return ov.t === 'h' ? ov.v : palette()[ov.i];
+    const c = state.colors;
+    if (c.secOverride[ev.section]) return sectionColor(ev.section);
+    const eo = c.events[ev.name];
+    if (eo) return resolveColour(eo);
+    if (c.sections[ev.section]) return sectionColor(ev.section);
     if (ev.color) return ev.color;
-    return palette()[secIdx.get(ev.section) % 8];
+    return sectionColor(ev.section);
   }
 
   /* ── range helpers ── */
@@ -842,10 +912,7 @@
   }
   function dateAtLeft() { return bufStartT + (savedScroll / dayW) * MS; }
   function chartViewMs() { return (Math.max(tl.clientWidth - laneW(), 0) / dayW) * MS; }
-  function visibleRange() {
-    const a = dateAtLeft();
-    return [a, a + chartViewMs()];
-  }
+  function visibleRange() { const a = dateAtLeft(); return [a, a + chartViewMs()]; }
   function deriveAnchor() {
     const t = Math.min(Math.max(dateAtLeft(), bufStartT), bufEndT - 1);
     const d = new Date(t);
@@ -956,7 +1023,6 @@
     if (todayT >= bufStartT && todayT < bufEndT)
       grid += `<div class="gtoday" style="left:${Math.round(xOf(todayT))}px"></div>`;
 
-    /* bars only for the buffered span; lane heights come from the global packing */
     const inBuf = filtered.filter(ev => ev.end >= bufStartT && ev.start < bufEndT);
     const bySec = new Map(sections.map(s => [s, []]));
     inBuf.forEach(ev => { if (bySec.has(ev.section)) bySec.get(ev.section).push(ev); });
@@ -978,7 +1044,7 @@
       });
       lanesHTML += `<div class="lane">
         <div class="lane-label" style="width:${LANE_W}px">
-          <span class="dot" style="background:${palette()[si % 8]}"></span>
+          <span class="dot" style="background:${sectionColor(sec)}"></span>
           <span class="ltxt"><b>${esc(sec)}</b><small>${total
             ? total + ' event' + (total > 1 ? 's' : '') + (rows > 1 ? ' · ' + rows + ' lines' : '')
             : 'hidden'}</small></span>
@@ -1003,7 +1069,6 @@
     tl.scrollLeft = savedScroll;
   }
 
-  /* empty / loading overlay — pinned to the viewport */
   function updateEmptyOverlay() {
     const el = $('#tlEmpty');
     if (!dataLoaded) { el.hidden = false; el.innerHTML = '<p>loading events…</p>'; return; }
@@ -1018,7 +1083,7 @@
     }
   }
 
-  /* ── buffer management: seamless extension while scrolling ── */
+  /* ── buffer management ── */
   function handleScrollFrame() {
     savedScroll = tl.scrollLeft;
     const rightGap = tl.scrollWidth - tl.clientWidth - savedScroll;
@@ -1030,15 +1095,14 @@
   }
   function extendRight() {
     bufEndT = monthAddT(bufEndT, 6);
-    renderTimeline();           // chart origin unchanged → view doesn't move
+    renderTimeline();
   }
   function extendLeft() {
     const old = bufStartT;
     bufStartT = monthAddT(bufStartT, -6);
-    savedScroll += (old - bufStartT) / MS * dayW;   // compensate for the shifted origin
+    savedScroll += (old - bufStartT) / MS * dayW;
     renderTimeline();
   }
-  /* quietly drop far-away months so the scrollbar stays a sensible size */
   function maybeTrim() {
     const viewL = dateAtLeft(), viewR = viewL + chartViewMs();
     const KEEP = 18 * 30.4375 * MS, STEP = 6 * 30.4375 * MS;
@@ -1059,8 +1123,6 @@
     clearTimeout(anchorSaveTimer);
     anchorSaveTimer = setTimeout(save, 500);
   }
-
-  /* jump / glide to a date, extending the buffer first so nothing jerks */
   function goToDate(t, smooth) {
     const viewMs = Math.max(chartViewMs(), 30.4375 * dayW * MS);
     const marginMs = 2.5 * 30.4375 * MS;
@@ -1069,7 +1131,7 @@
     while (bufEndT < t + viewMs + marginMs) { bufEndT = monthAddT(bufEndT, 6); changed = true; }
     if (changed) { savedScroll += delta; renderTimeline(); }
     const x = Math.max(0, (t - bufStartT) / MS * dayW);
-    if (smooth && Math.abs(x - savedScroll) > 3000) smooth = false;  // long hops: jump, don't crawl
+    if (smooth && Math.abs(x - savedScroll) > 3000) smooth = false;
     if (smooth) tl.scrollTo({ left: x, behavior: 'smooth' });
     else { savedScroll = x; tl.scrollLeft = x; }
     maybeTrim();
@@ -1163,16 +1225,31 @@
       ['serif', 'Fraunces', 'bookish serif'],
       ['mono', 'IBM Plex Mono', 'technical mono']
     ];
+    const c = state.colors;
     const loNames = Object.keys(state.loadouts).sort((a, b) => a.localeCompare(b));
     const loSel = loNames.includes(state.lastLoadout) ? state.lastLoadout : '';
-    const colorRows = items.map(nm => {
-      const ev = events.find(e => e.name === nm);
-      const si = ev ? secIdx.get(ev.section) : 0;
-      const ov = state.colors[nm];
-      const bg = ov ? (ov.t === 'h' ? ov.v : palette()[ov.i]) : palette()[si % 8];
-      return `<div class="crow"><button class="csw${ov ? '' : ' auto'}" data-cname="${esc(nm)}" style="background:${bg}" title="Set colour"></button>
-        <span class="cn">${esc(nm)}</span>${ov ? '<span class="ov">custom</span>' : ''}</div>`;
+
+    const secRows = sections.map(sec => {
+      const ov = c.sections[sec];
+      const on = !!c.secOverride[sec];
+      return `<div class="crow">
+        <button class="csw${ov ? '' : ' auto'}" data-secname="${esc(sec)}" style="background:${sectionColor(sec)}" title="Set section colour"></button>
+        <span class="cn">${esc(sec)}</span>
+        <button class="ovbtn${on ? ' on' : ''}" data-ovsec="${esc(sec)}"
+          title="${on ? 'Events in this section are using the section colour — click to release them' : 'Make every event in this section use the section colour'}">${on ? 'overriding' : 'override events'}</button>
+      </div>`;
     }).join('');
+
+    const evRows = items.map(nm => {
+      const ev0 = events.find(e => e.name === nm);
+      const own = c.events[nm];
+      const col = ev0 ? barColor(ev0) : palette()[0];
+      return `<div class="crow">
+        <button class="csw${own ? '' : ' auto'}" data-cname="${esc(nm)}" style="background:${col}" title="Set colour"></button>
+        <span class="cn">${esc(nm)}</span>${own ? '<span class="ov">custom</span>' : ''}
+      </div>`;
+    }).join('');
+
     $('#pane-themes').innerHTML = `<div class="settings">
       <div class="set-group"><h3>Font <span class="h-note">applies to the whole page, remembered</span></h3>
         <div class="fontopts">${fonts.map(f => `<button class="fontopt${state.font === f[0] ? ' on' : ''}" data-font="${f[0]}">
@@ -1188,8 +1265,8 @@
           <label class="sw"><input type="checkbox" id="lblSw" ${state.labels ? 'checked' : ''}><i></i></label></div>
       </div>
       <div class="set-group">
-        <h3>Event colours <span class="h-note">overrides the section colour</span>
-          <button class="mini2" id="clearColors" style="margin-left:auto">clear all</button></h3>
+        <h3>Colours <span class="h-note">sections &amp; events, saved as load-outs</span>
+          <button class="mini2" id="resetColours" style="margin-left:auto" title="Return to the Default layout">Reset colours</button></h3>
         <div class="lorow">
           <select class="loselect" id="loSelect" ${loNames.length ? '' : 'disabled'}>
             ${loNames.length
@@ -1200,13 +1277,25 @@
           <button class="mini" id="loUpdate" ${loSel ? '' : 'disabled'}>update</button>
           <button class="mini" id="loDelete" ${loSel ? '' : 'disabled'}>delete</button>
         </div>
+        <div class="lorow">
+          <button class="mini" id="loExport" title="Download your current colours + every saved load-out as a file">export file</button>
+          <button class="mini" id="loImport" title="Load colour layouts from an exported file">import file…</button>
+          <span id="loStatus"></span>
+        </div>
         <div class="lorow loinput" id="loInputRow" hidden>
           <input id="loName" type="text" placeholder="load-out name — e.g. Default" maxlength="24">
           <button class="mini" id="loConfirm">save</button>
           <button class="mini" id="loCancel">cancel</button>
         </div>
-        ${colorRows || '<p class="dhint">No events loaded yet.</p>'}
-        <p class="dhint" style="margin-top:10px">Load-outs are stored in this browser — a page can’t write files back into the site itself.</p>
+        <div class="csub"><b>sections</b>
+          <span class="csub-acts"><span class="csub-lab">event override:</span>
+            <button class="mini2" data-ovall="1" title="Every section’s colour overrides its events">all</button>
+            <button class="mini2" data-ovnone="1" title="No section overrides its events">none</button></span></div>
+        ${secRows || '<p class="dhint">No sections loaded yet.</p>'}
+        <div class="csub"><b>events</b></div>
+        ${evRows || '<p class="dhint">No events loaded yet.</p>'}
+        <p class="dhint" style="margin-top:12px">A section colour tints the whole lane; an event colour beats it unless that section is set to override.
+        Load-outs live in this browser — use export / import to move them between devices.</p>
       </div>
       <div class="set-group"><h3>Data</h3>
         <p class="dhint">The calendar reads <b>${DATA_FILE}</b> from the same folder — the <b>Machine</b> output of Datepress, one event per line.
@@ -1233,14 +1322,72 @@
       const on = b.dataset.tab === t;
       b.classList.toggle('active', on); b.setAttribute('aria-selected', on);
     });
+    $('#card').classList.toggle('on-themes', t === 'themes');
     ['calendar', 'list', 'themes'].forEach(p =>
       $('#pane-' + p).classList.toggle('active', p === t));
     if (t === 'calendar') {
       const old = dayW;
       refitDayW();
-      savedScroll = savedScroll / old * dayW;   // keep the same date under the view
+      savedScroll = savedScroll / old * dayW;
     }
     renderPane(t);
+  }
+
+  /* ── colour load-outs: save / apply / export / import ── */
+  function loStatus(msg, warn) {
+    const el = $('#loStatus'); if (!el) return;
+    el.textContent = msg; el.classList.toggle('warn', !!warn);
+    clearTimeout(loStatusTimer);
+    loStatusTimer = setTimeout(() => { if (el.isConnected) el.textContent = ''; }, 3200);
+  }
+  function resetColours() {
+    if (state.loadouts['Default']) {
+      state.colors = clone(state.loadouts['Default']);
+      state.lastLoadout = 'Default';
+      loStatus('reset to the Default load-out');
+    } else if (DEFAULT_LAYOUT) {
+      state.colors = clone(DEFAULT_LAYOUT);
+      state.lastLoadout = '';
+      loStatus('reset to the Default layout');
+    } else {
+      state.colors = { sections: {}, events: {}, secOverride: {} };
+      state.lastLoadout = '';
+      loStatus('colours reset to automatic');
+    }
+    save(); buildDrawer(); renderPane('themes');
+  }
+  function exportColours() {
+    const data = {
+      format: 'bigfarm-colours', version: 1,
+      exported: new Date().toISOString(),
+      current: state.colors, loadouts: state.loadouts
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url; a.download = 'bigfarm-colours.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    loStatus('exported colours + load-outs');
+  }
+  function importColoursText(text, fromDrop) {
+    let obj;
+    try { obj = JSON.parse(text); } catch (e) { loStatus("couldn't read that as JSON", true); return; }
+    let applied = false, imported = 0;
+    if (obj && typeof obj === 'object') {
+      if (obj.loadouts && typeof obj.loadouts === 'object') {
+        for (const [n, v] of Object.entries(obj.loadouts)) {
+          if (n && v && typeof v === 'object') { state.loadouts[n] = normalizeLayout(v); imported++; }
+        }
+      }
+      const cur = obj.current || ((obj.sections || obj.events || obj.secOverride) ? obj : null);
+      if (cur) { state.colors = normalizeLayout(cur); applied = true; }
+    }
+    if (!applied && !imported) { loStatus('no colour layouts found in that file', true); return; }
+    if (!state.loadouts[state.lastLoadout]) state.lastLoadout = '';
+    save(); buildDrawer();
+    setTab('themes');
+    loStatus('imported' + (imported ? ' ' + imported + ' load-out' + (imported > 1 ? 's' : '') : '') + (applied ? ' + current colours' : ''));
   }
 
   /* ── tooltip ── */
@@ -1296,21 +1443,24 @@
         goToDate(Date.UTC(+b.dataset.y, 0, 1), true);
         closePop(); });
   }
-  function openColorPop(name, anchor) {
-    openPop(anchor, 'colour · ' + name,
+  /* colour picker for a single event or section */
+  function openColorPop(kind, key, anchor) {   // kind: 'event' | 'section'
+    const store = state.colors[kind === 'event' ? 'events' : 'sections'];
+    const cur = store[key];
+    openPop(anchor, 'colour · ' + key,
       `<div class="swrow">${palette().map((c, i) =>
         `<button class="swb" data-p="${i}" style="background:${c}" title="palette"></button>`).join('')}</div>
-       <div class="custom-row"><input type="color" id="cPick" value="${(state.colors[name] && state.colors[name].t === 'h') ? state.colors[name].v : '#C25B3C'}">
-       <span class="lbl">custom</span><button class="mini2" id="cReset" style="margin-left:auto">use section colour</button></div>`,
+       <div class="custom-row"><input type="color" id="cPick" value="${cur && cur.t === 'h' ? cur.v : '#C25B3C'}">
+       <span class="lbl">custom</span><button class="mini2" id="cReset" style="margin-left:auto">${kind === 'event' ? 'use section colour' : 'use default colour'}</button></div>`,
       e => {
         const sw = e.target.closest('[data-p]');
-        if (sw) { state.colors[name] = { t: 'p', i: +sw.dataset.p }; after(); return; }
-        if (e.target.closest('#cReset')) { delete state.colors[name]; after(); return; }
+        if (sw) { store[key] = { t: 'p', i: +sw.dataset.p }; after(); return; }
+        if (e.target.closest('#cReset')) { delete store[key]; after(); return; }
       });
     pop.querySelector('#cPick').addEventListener('input', e => {
-      state.colors[name] = { t: 'h', v: e.target.value }; after(true);
+      store[key] = { t: 'h', v: e.target.value }; after(true);
     });
-    function after(keepOpen) { save(); renderPane('themes'); updateChip(); if (!keepOpen) closePop(); }
+    function after(keepOpen) { save(); buildDrawer(); renderPane('themes'); if (!keepOpen) closePop(); }
   }
 
   /* ── filter drawer ── */
@@ -1328,7 +1478,7 @@
     body.innerHTML =
       dGroup('sections', 'Sections', sections.map(s =>
         `<label class="drow"><input type="checkbox" data-g="sections" value="${esc(s)}" ${filtersLive.sec.has(s) ? 'checked' : ''}>
-         <span class="dot" style="background:${palette()[secIdx.get(s) % 8]}"></span><span class="dv">${esc(s)}</span><span class="cnt">${cntSec(s)}</span></label>`).join('')) +
+         <span class="dot" style="background:${sectionColor(s)}"></span><span class="dv">${esc(s)}</span><span class="cnt">${cntSec(s)}</span></label>`).join('')) +
       dGroup('items', 'Items', items.map(i =>
         `<label class="drow"><input type="checkbox" data-g="items" value="${esc(i)}" ${filtersLive.it.has(i) ? 'checked' : ''}>
          <span class="dv">${esc(i)}</span><span class="cnt">${cntIt(i)}</span></label>`).join(''), true) +
@@ -1351,11 +1501,30 @@
     buildFilterSets(); computeFiltered(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
   }
 
+  /* ── logo: logo.png everywhere, logo-dark.png in grey/dark if you upload one ── */
+  const homeLogo = $('#homeLogo'), homeMark = $('#homeMark');
+  let darkLogoOK = false;
+  const logoProbe = new Image();
+  logoProbe.onload = () => { darkLogoOK = true; syncLogo(); };
+  logoProbe.src = 'logo-dark.png';
+  function syncLogo() {
+    if (!homeLogo || homeLogo.hidden) return;
+    const want = (state.theme !== 'light' && darkLogoOK) ? 'logo-dark.png' : 'logo.png';
+    if (homeLogo.getAttribute('src') !== want) homeLogo.src = want;
+  }
+  homeLogo.addEventListener('error', () => {
+    if (homeLogo.getAttribute('src') === 'logo-dark.png') { homeLogo.src = 'logo.png'; return; }
+    homeLogo.hidden = true; homeMark.hidden = false;
+  });
+  if (homeLogo.complete && homeLogo.naturalWidth === 0 && homeLogo.getAttribute('src') === 'logo.png') {
+    homeLogo.hidden = true; homeMark.hidden = false;
+  }
+
   /* ── interactions ── */
   $('#tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) setTab(b.dataset.tab); });
   $('#themeBtn').addEventListener('click', () => {
     state.theme = { light: 'grey', grey: 'dark', dark: 'light' }[state.theme];
-    applyTheme(); palCache.theme = null; save();
+    applyTheme(); palCache.theme = null; syncLogo(); save();
     buildDrawer(); refresh();
   });
   function applyTheme() {
@@ -1367,6 +1536,7 @@
     };
     $('#themeIc').innerHTML = icons[state.theme];
     $('#themeLb').textContent = state.theme[0].toUpperCase() + state.theme.slice(1);
+    syncLogo();
   }
   function applyFont() { document.body.dataset.font = state.font; }
 
@@ -1391,8 +1561,6 @@
     savedScroll = (aT - bufStartT) / MS * dayW;
     renderTimeline(); renderToolbar(); updateEmptyOverlay();
   }
-
-  /* slight manual zoom (× the fitted width), view centre preserved */
   function setScale(f) {
     const center = dateAtLeft() + chartViewMs() / 2;
     state.scale = Math.min(3, Math.max(0.4, +(state.scale * f).toFixed(3)));
@@ -1429,9 +1597,8 @@
     });
   });
 
-  /* timeline: scroll → keep the buffer fed, labels & count follow */
   tl.addEventListener('scroll', () => {
-    hideTip(); pinned = false;   // a pinned pop-up can't drift from its bar
+    hideTip(); pinned = false;
     if (scrollRaf) return;
     scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; handleScrollFrame(); });
   }, { passive: true });
@@ -1451,13 +1618,10 @@
       buildFilterSets(); computeFiltered(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
     }
   });
-
-  /* the event pop-up disappears when anything else on the page is clicked */
   document.addEventListener('click', e => {
     if (!e.target.closest('.bar')) { pinned = false; hideTip(); }
   });
 
-  /* list view: format toggle, sorting, jump-to-calendar */
   $('#pane-list').addEventListener('click', e => {
     const th = e.target.closest('.atable th[data-col]');
     if (th) {
@@ -1492,6 +1656,7 @@
 
   /* themes pane */
   $('#pane-themes').addEventListener('click', e => {
+    /* colour load-outs */
     if (e.target.closest('#loSave')) { $('#loInputRow').hidden = false; $('#loName').focus(); return; }
     if (e.target.closest('#loCancel')) { $('#loInputRow').hidden = true; return; }
     if (e.target.closest('#loConfirm')) {
@@ -1512,13 +1677,36 @@
       if (state.lastLoadout) { delete state.loadouts[state.lastLoadout]; state.lastLoadout = ''; save(); renderPane('themes'); }
       return;
     }
+    if (e.target.closest('#loExport')) { exportColours(); return; }
+    if (e.target.closest('#loImport')) { $('#colImport').click(); return; }
+    if (e.target.closest('#resetColours')) { resetColours(); return; }
+
+    /* section colour overrides */
+    const ovT = e.target.closest('[data-ovsec]');
+    if (ovT) {
+      const sec = ovT.dataset.ovsec;
+      if (state.colors.secOverride[sec]) delete state.colors.secOverride[sec];
+      else state.colors.secOverride[sec] = true;
+      save(); buildDrawer(); renderPane('themes'); return;
+    }
+    if (e.target.closest('[data-ovall]')) {
+      sections.forEach(s => state.colors.secOverride[s] = true);
+      save(); buildDrawer(); renderPane('themes'); return;
+    }
+    if (e.target.closest('[data-ovnone]')) {
+      state.colors.secOverride = {};
+      save(); buildDrawer(); renderPane('themes'); return;
+    }
+    const ssw = e.target.closest('[data-secname]');
+    if (ssw) { openColorPop('section', ssw.dataset.secname, ssw); return; }
+
+    /* everything else */
     const f = e.target.closest('.fontopt');
     if (f) { state.font = f.dataset.font; applyFont(); renderPane('themes'); refresh(); save(); return; }
     const d = e.target.closest('[data-density]');
     if (d) { state.density = d.dataset.density; renderPane('themes'); save(); return; }
-    const sw = e.target.closest('.csw');
-    if (sw) { openColorPop(sw.dataset.cname, sw); return; }
-    if (e.target.closest('#clearColors')) { state.colors = {}; renderPane('themes'); save(); return; }
+    const sw = e.target.closest('[data-cname]');
+    if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
     if (e.target.closest('#reloadBtn')) { loadData(); return; }
     if (e.target.closest('#loadFileBtn')) { $('#fileInput').click(); return; }
     if (e.target.closest('#resetBtn')) {
@@ -1541,23 +1729,24 @@
   $('#pane-themes').addEventListener('keydown', e => {
     if (e.target.id === 'loName' && e.key === 'Enter') { e.preventDefault(); $('#loConfirm').click(); }
   });
+  $('#colImport').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then(t => importColoursText(t, false)); e.target.value = '';
+  });
 
-  /* data chip → themes data section */
   $('#dataChip').addEventListener('click', () => {
     setTab('themes');
     $('#pane-themes').querySelector('.settings').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  /* notice strip buttons (delegated, since it's re-rendered) */
   document.addEventListener('click', e => {
     if (e.target.closest('#noticeLoad')) $('#fileInput').click();
     if (e.target.closest('#noticeClose')) { noticeDismissed = true; updateNotice(); }
   });
 
-  /* file loading: button + drag & drop */
   $('#fileInput').addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return;
-    f.text().then(t => applyText(t, f.name)); e.target.value = '';
+    f.text().then(t => applyAnyText(t, f.name)); e.target.value = '';
   });
   let dragDepth = 0;
   addEventListener('dragenter', e => { e.preventDefault(); if (++dragDepth === 1) $('#drop').classList.add('on'); });
@@ -1565,15 +1754,13 @@
   addEventListener('dragleave', e => { e.preventDefault(); if (--dragDepth <= 0) { dragDepth = 0; $('#drop').classList.remove('on'); } });
   addEventListener('drop', e => {
     e.preventDefault(); dragDepth = 0; $('#drop').classList.remove('on');
-    const f = e.dataTransfer.files[0]; if (f) f.text().then(t => applyText(t, f.name));
+    const f = e.dataTransfer.files[0]; if (f) f.text().then(t => applyAnyText(t, f.name));
   });
 
-  /* keyboard */
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { pinned = false; hideTip(); closePop(); document.body.classList.remove('drawer-open'); }
   });
 
-  /* keep the chart fitted on resize, view centre preserved */
   new ResizeObserver(() => {
     if (state.tab !== 'calendar') return;
     cancelAnimationFrame(roTimer);
