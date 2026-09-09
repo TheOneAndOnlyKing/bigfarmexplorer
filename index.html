@@ -38,25 +38,20 @@
     position: relative;
   }
   .mast { text-align: center; transform: translateY(-6vh); transition: transform .8s cubic-bezier(.2,.7,.2,1); }
-  .eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px; letter-spacing: .34em; text-transform: uppercase;
-    color: var(--muted);
-    display: flex; align-items: center; gap: 14px; justify-content: center;
+  /* LOGO — upload your image as logo.png next to this file (GitHub → Add file → Upload files).
+     A transparent-background PNG (or SVG) looks best on the cream paper. */
+  .logo {
+    display: block; margin: 0 auto;
+    height: clamp(64px, 11vw, 128px); width: auto; max-width: 88vw;
+    object-fit: contain;
   }
-  .eyebrow::before, .eyebrow::after { content: ""; width: 34px; height: 1px; background: var(--line); }
-  h1 {
-    margin-top: 18px;
-    font-size: clamp(3rem, 8vw, 5.2rem);
+  /* shown only if logo.png hasn't been uploaded yet, so the page never looks broken */
+  .logo-fallback {
+    font-size: clamp(2.7rem, 7.5vw, 5rem);
     font-weight: 600; letter-spacing: -.015em; line-height: 1;
   }
-  h1 .dot { color: var(--green); }
-  .tagline {
-    margin-top: 16px;
-    font-style: italic; font-size: clamp(1rem, 2.4vw, 1.2rem);
-    color: var(--muted); max-width: 44ch;
-  }
-  .entries { margin-top: 54px; width: min(460px, 92vw); transform: translateY(-4vh); }
+  .logo-fallback .dot { color: var(--green); }
+  .entries { margin-top: 58px; width: min(460px, 92vw); transform: translateY(-4vh); }
   .entry {
     display: flex; align-items: center; gap: 16px;
     padding: 16px 20px;
@@ -80,11 +75,6 @@
   }
   .entry-ar { flex: none; transition: transform .18s; }
   .entry:hover .entry-ar { transform: translateX(5px); }
-  .soon {
-    margin-top: 16px; text-align: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
-  }
   /* the field horizon */
   .horizon {
     position: absolute; left: 0; right: 0; bottom: 0; height: 150px;
@@ -104,10 +94,8 @@
 <main class="cover">
 
   <header class="mast" id="mast">
-    <p class="eyebrow">field notes · schedules · data</p>
-    <!-- Change the text below to rename the site (also change <title> above) -->
-    <h1>Bigfarm Explorer<span class="dot">.</span></h1>
-    <p class="tagline">An almanac for the farm — what’s on, and when.</p>
+    <img class="logo" id="logoImg" src="logo.png" alt="Bigfarm Explorer">
+    <h1 class="logo-fallback" id="logoFallback" hidden>Bigfarm Explorer<span class="dot">.</span></h1>
   </header>
 
   <nav class="entries" aria-label="Sections of Bigfarm Explorer">
@@ -121,7 +109,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
       </span>
     </a>
-    <p class="soon">more sections as they’re written</p>
   </nav>
 
   <div class="horizon" aria-hidden="true">
@@ -147,6 +134,12 @@
 <script>
 (function () {
   'use strict';
+  // if logo.png isn't uploaded yet, swap in the styled text title instead of a broken image
+  var img = document.getElementById('logoImg'), fb = document.getElementById('logoFallback');
+  function useFallback() { img.hidden = true; fb.hidden = false; }
+  img.addEventListener('error', useFallback);
+  if (img.complete && img.naturalWidth === 0) useFallback();
+
   // little deterministic prng so the sprout field is the same every visit
   let seed = 7;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
