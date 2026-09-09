@@ -85,8 +85,7 @@
     display: flex; align-items: center; gap: 8px;
     padding: 7px 13px; border: 1px solid var(--line); border-radius: 10px;
     font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-    color: var(--muted);
-    transition: color .15s, border-color .15s;
+    color: var(--muted); transition: color .15s, border-color .15s;
   }
   .themebtn:hover { color: var(--ink); border-color: var(--line2); }
 
@@ -137,7 +136,8 @@
   .pane { display: none; }
   .pane.active { display: block; }
 
-  /* calendar: the timeline */
+  /* calendar: the scrolling timeline */
+  .tl-wrap { position: relative; }
   .tl {
     position: relative; overflow: auto;
     height: min(64vh, 720px); min-height: 340px;
@@ -196,7 +196,6 @@
   .ltxt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
   .ltxt b { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ltxt small { font-family: var(--f-mono); font-size: 9.5px; color: var(--muted); white-space: nowrap; }
-  .ltxt small.dim { opacity: .7; }
   .lane-chart { position: relative; flex: none; overflow: hidden; }
   .bar {
     position: absolute; border-radius: 6px; overflow: hidden;
@@ -212,27 +211,37 @@
     30%, 60% { box-shadow: 0 0 0 3px transparent; }
   }
   .bar.flash { animation: flash 1.4s ease; }
-  .tl-empty, .tl-loading {
-    position: absolute; inset: 0; z-index: 4;
+
+  /* empty / loading overlay — pinned to the viewport, never to the content */
+  .tl-empty {
+    position: absolute; inset: 0; z-index: 5;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
     color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem;
+    background: var(--card);
+    background: color-mix(in srgb, var(--card) 86%, transparent);
+    pointer-events: none;
   }
+  .tl-empty[hidden] { display: none; }
+  .tl-empty p { text-align: center; padding: 0 20px; }
   .tl-empty-btns { display: flex; gap: 8px; }
+  .tl-empty .mini { pointer-events: auto; font-style: normal; }
   .mini {
     padding: 6px 13px; border: 1px solid var(--line); border-radius: 9px;
-    font-size: 12px; font-weight: 600; color: var(--muted); font-style: normal;
-    transition: color .15s, border-color .15s, background .15s;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    transition: color .15s, border-color .15s, opacity .15s;
   }
   .mini:hover { color: var(--accent); border-color: var(--accent); }
+  .mini:disabled { opacity: .45; cursor: default; }
+  .mini:disabled:hover { color: var(--muted); border-color: var(--line); }
 
   /* list view */
-  .list-body { height: min(64vh, 720px); min-height: 340px; overflow: auto; padding: 4px 0 12px; }
   .list-head {
-    position: sticky; top: 0; z-index: 3; background: var(--card);
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap;
     padding: 10px 18px; border-bottom: 1px solid var(--line);
     font-size: 12.5px; color: var(--muted);
   }
+  .list-acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .list-body { height: min(calc(64vh - 44px), 676px); min-height: 296px; overflow: auto; padding: 4px 0 12px; }
   .sortseg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
   .sortseg button { padding: 4px 12px; font-size: 11.5px; font-weight: 600; color: var(--muted); }
   .sortseg button + button { border-left: 1px solid var(--line); }
@@ -256,13 +265,38 @@
   .llu { font-family: var(--f-mono); font-size: 11px; color: var(--muted); text-align: right; }
   .list-empty { padding: 60px 20px; text-align: center; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; }
 
+  /* the analytical table */
+  .atable { width: 100%; min-width: 560px; border-collapse: collapse; }
+  .atable th {
+    position: sticky; top: 0; z-index: 2; background: var(--card);
+    font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); text-align: left; padding: 9px 14px;
+    border-bottom: 1px solid var(--line2); cursor: pointer; user-select: none; white-space: nowrap;
+  }
+  .atable th.r { text-align: right; }
+  .atable th:hover { color: var(--ink); }
+  .atable th.on { color: var(--ink); }
+  .tri { display: inline-flex; flex-direction: column; gap: 2px; margin-left: 7px; vertical-align: -1px; }
+  .tri i { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; }
+  .tri .tu { border-bottom: 5px solid var(--line2); }
+  .tri .td { border-top: 5px solid var(--line2); }
+  .tri .tu.act { border-bottom-color: var(--accent); }
+  .tri .td.act { border-top-color: var(--accent); }
+  .atable td { padding: 7px 14px; border-bottom: 1px solid var(--line); font-size: 13px; white-space: nowrap; }
+  .atable tbody tr { cursor: pointer; }
+  .atable tbody tr:hover { background: var(--accent-soft); }
+  .atable .ldot { display: inline-block; margin-right: 9px; vertical-align: -0.5px; }
+  .atable td.c-sec { font-size: 12px; color: var(--muted); }
+  .atable .c-dt, .atable .c-dy { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+  .atable .c-dy { text-align: right; }
+
   /* themes pane */
   .settings { padding: 8px 22px 26px; max-width: 860px; }
   .set-group { padding: 20px 0; border-bottom: 1px solid var(--line); }
   .set-group:last-child { border-bottom: none; }
   .set-group h3 {
     font-family: var(--f-serif); font-size: 15px; font-weight: 600;
-    display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;
   }
   .set-group h3 .h-note { font-family: var(--ui); font-size: 11.5px; font-weight: 400; color: var(--muted); }
   .fontopts { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -291,16 +325,27 @@
   .sw input:checked + i::after { left: 21px; }
   .cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2px 18px; }
   .crow { display: flex; align-items: center; gap: 10px; padding: 6px 2px; border-radius: 8px; }
-  .csw {
-    flex: none; width: 22px; height: 22px; border-radius: 7px;
-    border: 1.5px solid transparent; position: relative;
-  }
+  .csw { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid transparent; position: relative; }
   .csw:hover { border-color: var(--ink); }
   .csw.auto { border-style: dashed; border-color: var(--muted); opacity: .75; }
   .cn { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .crow .ov { margin-left: auto; font-family: var(--f-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
   .mini2 { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 2px 6px; border-radius: 6px; }
   .mini2:hover { color: var(--accent); background: var(--accent-soft); }
+  .lorow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .lorow[hidden] { display: none; }
+  .loselect {
+    font: inherit; font-size: 12.5px; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
+    padding: 6px 10px; max-width: 200px;
+  }
+  .loselect:focus { outline: none; border-color: var(--accent); }
+  .loinput input {
+    font: inherit; font-size: 12.5px; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
+    padding: 6px 10px; width: 220px;
+  }
+  .loinput input:focus { outline: none; border-color: var(--accent); }
   .dhint { font-size: 12.5px; line-height: 1.7; color: var(--muted); }
   .dhint b { color: var(--ink); }
   .dhint code { font-family: var(--f-mono); font-size: 11px; background: var(--accent-soft); border-radius: 5px; padding: 1px 5px; }
@@ -336,7 +381,15 @@
   .datachip:hover { color: var(--ink); }
   .chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
   .datachip.warn .chip-dot { background: var(--warn); }
-  .zoom { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-left: auto; }
+  .zoomstep { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .zoomstep button { width: 30px; height: 29px; display: grid; place-items: center; color: var(--muted); }
+  .zoomstep button:hover { color: var(--ink); background: var(--accent-soft); }
+  .zoomstep span {
+    font-family: var(--f-mono); font-size: 10.5px; color: var(--muted);
+    display: flex; align-items: center; justify-content: center; min-width: 38px;
+    border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+  }
+  .zoom { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
   .zoom button { padding: 6px 13px; font-size: 12px; font-weight: 700; letter-spacing: .03em; color: var(--muted); }
   .zoom button + button { border-left: 1px solid var(--line); }
   .zoom button.on { background: var(--accent); color: var(--on-accent); }
@@ -444,6 +497,7 @@
   @media (max-width: 760px) {
     .view-count, .datachip { display: none; }
     .bt { display: none; }
+    #filterBtn { margin-right: auto; }
     .wrap { padding: 14px 12px 30px; }
     .toolbar { grid-template-columns: auto 1fr; row-gap: 8px; }
     .tb-side.r { display: none; }
@@ -494,7 +548,10 @@
     <div id="noticeSlot"></div>
 
     <section class="pane active" id="pane-calendar">
-      <div class="tl" id="tl"><div class="tl-loading">loading events…</div></div>
+      <div class="tl-wrap">
+        <div class="tl" id="tl"></div>
+        <div class="tl-empty" id="tlEmpty"><p>loading events…</p></div>
+      </div>
     </section>
 
     <section class="pane" id="pane-list"></section>
@@ -506,6 +563,15 @@
         Filters <span class="badge" id="filterBadge" hidden></span>
       </button>
       <button class="datachip" id="dataChip" title="Data status — click for details"><span class="chip-dot"></span><span id="dataChipTxt"></span></button>
+      <div class="zoomstep">
+        <button id="zOut" title="Zoom out slightly">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4"/></svg>
+        </button>
+        <span id="zPct" title="Zoom level">100%</span>
+        <button id="zIn" title="Zoom in slightly">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4M10.5 7.8v5.4"/></svg>
+        </button>
+      </div>
       <div class="zoom" id="zoomSeg">
         <button data-z="1" class="on">1M</button><button data-z="3">3M</button><button data-z="6">6M</button><button data-z="12">1Y</button>
       </div>
@@ -538,10 +604,11 @@
      The calendar reads this file (same folder as calendar.html).
      It's the "Machine" output of your Datepress tool, one event per line:
        {"start":"2025-09-14","end":"2025-09-16","event":"Landscape Architect","section":"Main Events"}
-     Optional fields: "section" (which lane it sits in), "color" (hex), "item".   */
+     Optional fields: "section" (lane grouping), "color" (hex), "item".   */
   const DATA_FILE = 'events.jsonl';
   const LS_KEY = 'bigfarm-calendar-v1';
   const MS = 86400000;
+  const BUF_MONTHS = 6;          // scrollable months kept on either side of the view
 
   const SAMPLE_JSONL = [
     '{"start":"2025-09-01","end":"2025-09-02","event":"Co-op Challenge","section":"Co-op"}',
@@ -581,6 +648,7 @@
   const $ = s => document.querySelector(s);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const normMonth = (y, m) => { const d = new Date(Date.UTC(y, m, 1)); return { y: d.getUTCFullYear(), m: d.getUTCMonth() }; };
+  const monthAddT = (t, n) => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1); };
   const todayUTC = () => { const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); };
 
   function fmtD(ts) { const d = new Date(ts); return d.getUTCDate() + ' ' + M_S[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
@@ -606,19 +674,32 @@
     theme: 'light', font: 'sans', zoom: 1,
     anchor: { y: now0.getFullYear(), m: now0.getMonth() },
     tab: 'calendar', density: 'comfortable', weekends: true, labels: true,
-    sort: 'date', colors: {},
+    sort: 'date', scale: 1,
+    listFormat: 'informal', tsort: { col: 'start', dir: 'asc' },
+    colors: {}, loadouts: {}, lastLoadout: '',
     filters: { sections: [], items: [], years: [] }   // lists of things turned OFF
   };
   let events = [], sections = [], items = [], years = [], secIdx = new Map();
   let filtered = [], source = 'sample', fileName = '', skipped = 0;
   let filtersLive = { sec: new Set(), it: new Set(), yr: new Set() };
-  let noticeDismissed = false, pinned = false, lastRenderW = 0, resetArmed = false;
+  let noticeDismissed = false, pinned = false, resetArmed = false, dataLoaded = false;
+
+  /* timeline runtime */
+  const tl = $('#tl');
+  let bufStartT = 0, bufEndT = 0, dayW = 20, savedScroll = 0, lastW = 0;
+  let laneRows = new Map(), secCounts = new Map();
+  let scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0;
+
+  const clone = o => JSON.parse(JSON.stringify(o));
 
   function save() {
     try { localStorage.setItem(LS_KEY, JSON.stringify({
       theme: state.theme, font: state.font, zoom: state.zoom, tab: state.tab,
       anchor: state.anchor, density: state.density, weekends: state.weekends,
-      labels: state.labels, sort: state.sort, colors: state.colors, filters: state.filters
+      labels: state.labels, sort: state.sort, scale: state.scale,
+      listFormat: state.listFormat, tsort: state.tsort,
+      colors: state.colors, loadouts: state.loadouts, lastLoadout: state.lastLoadout,
+      filters: state.filters
     })); } catch (e) {}
   }
   function loadSettings() {
@@ -632,8 +713,14 @@
       if (typeof s.weekends === 'boolean') state.weekends = s.weekends;
       if (typeof s.labels === 'boolean') state.labels = s.labels;
       if (['date','name','section'].includes(s.sort)) state.sort = s.sort;
+      if (typeof s.scale === 'number') state.scale = Math.min(3, Math.max(0.4, s.scale));
+      if (s.listFormat === 'informal' || s.listFormat === 'analytical') state.listFormat = s.listFormat;
+      if (s.tsort && ['event','section','start','end','days'].includes(s.tsort.col))
+        state.tsort = { col: s.tsort.col, dir: s.tsort.dir === 'desc' ? 'desc' : 'asc' };
       if (s.anchor && isFinite(s.anchor.y)) state.anchor = { y: s.anchor.y, m: s.anchor.m || 0 };
       if (s.colors && typeof s.colors === 'object') state.colors = s.colors;
+      if (s.loadouts && typeof s.loadouts === 'object') state.loadouts = s.loadouts;
+      if (typeof s.lastLoadout === 'string') state.lastLoadout = s.lastLoadout;
       if (s.filters) state.filters = s.filters;
     } catch (e) {}
   }
@@ -682,12 +769,13 @@
     secIdx = new Map(sections.map((s, i) => [s, i]));
     buildFilterSets();
     computeFiltered();
+    recomputeLanes();
   }
   function applyText(text, label) {
     const r = parseJSONL(text);
     events = r.list; skipped = r.bad;
     source = label === DATA_FILE ? 'file' : (label === 'sample' ? 'sample' : 'session');
-    fileName = label;
+    fileName = label; dataLoaded = true;
     deriveAll(); buildDrawer(); updateNotice(); updateChip(); refresh();
   }
   async function loadData() {
@@ -713,6 +801,22 @@
   function offCount() {
     return state.filters.sections.length + state.filters.items.length + state.filters.years.length;
   }
+  /* pack events into stable sub-rows across the WHOLE timeline,
+     so lane heights never jump while you scroll */
+  function recomputeLanes() {
+    laneRows = new Map(); secCounts = new Map();
+    sections.forEach(sec => {
+      const evs = filtered.filter(e => e.section === sec).sort((a, b) => a.start - b.start || b.days - a.days);
+      secCounts.set(sec, evs.length);
+      const rowsEnd = [];
+      for (const ev of evs) {
+        let r = rowsEnd.findIndex(end => ev.start > end);
+        if (r < 0) r = rowsEnd.length;
+        rowsEnd[r] = ev.end; ev.row = r;
+      }
+      laneRows.set(sec, Math.max(rowsEnd.length, evs.length ? 1 : 0));
+    });
+  }
 
   /* ── palette (read from the theme's CSS) ── */
   let palCache = { theme: null, vals: [] };
@@ -730,8 +834,28 @@
   }
 
   /* ── range helpers ── */
-  function rangeTS() { const { y, m } = state.anchor; return [Date.UTC(y, m, 1), Date.UTC(y, m + state.zoom, 1)]; }
-  function computeInView() { const [a, b] = rangeTS(); return filtered.filter(ev => ev.end >= a && ev.start < b); }
+  function laneW() { return innerWidth < 760 ? 120 : 172; }
+  const MINW = { 1: 8, 3: 5, 6: 1.6, 12: 1.2 };
+  function refitDayW() {
+    const avail = Math.max(tl.clientWidth - laneW(), 120);
+    dayW = Math.max(avail / (state.zoom * 30.4375) * state.scale, MINW[state.zoom]);
+  }
+  function dateAtLeft() { return bufStartT + (savedScroll / dayW) * MS; }
+  function chartViewMs() { return (Math.max(tl.clientWidth - laneW(), 0) / dayW) * MS; }
+  function visibleRange() {
+    const a = dateAtLeft();
+    return [a, a + chartViewMs()];
+  }
+  function deriveAnchor() {
+    const t = Math.min(Math.max(dateAtLeft(), bufStartT), bufEndT - 1);
+    const d = new Date(t);
+    return { y: d.getUTCFullYear(), m: d.getUTCMonth() };
+  }
+  function computeInView() {
+    const a = Date.UTC(state.anchor.y, state.anchor.m, 1);
+    const b = Date.UTC(state.anchor.y, state.anchor.m + state.zoom, 1);
+    return filtered.filter(ev => ev.end >= a && ev.start < b);
+  }
   function rangeLabel() {
     const { y, m } = state.anchor, z = state.zoom;
     if (z === 12) return String(y);
@@ -748,7 +872,11 @@
     $('#rangeBtn').style.display = z === 12 ? 'none' : '';
     $('#rangeVal').textContent = z === 1 ? M_L[m] : M_S[m] + ' – ' + M_S[e.m];
     $('#yearVal').textContent = e.y === y ? String(y) : y + ' – ' + e.y;
-    const n = computeInView().length;
+    let n;
+    if (state.tab === 'calendar') {
+      const [a, b] = visibleRange();
+      n = filtered.filter(ev => ev.end >= a && ev.start < b).length;
+    } else n = computeInView().length;
     $('#viewCount').textContent = n + ' event' + (n !== 1 ? 's' : '') + ' in view';
   }
   function updateBadge() {
@@ -778,55 +906,38 @@
       <button class="nx" id="noticeClose" aria-label="Dismiss">×</button></div>`;
   }
 
-  /* ── rendering: the calendar ── */
-  function pack(evs) {
-    const rows = [];
-    for (const ev of evs) {
-      let r = rows.findIndex(end => ev.start > end);
-      if (r < 0) r = rows.length;
-      rows[r] = ev.end; ev.row = r;
-    }
-    return rows.length;
-  }
-  function renderCalendar() {
-    const tl = $('#tl');
-    const LANE_W = innerWidth < 760 ? 120 : 172;
+  /* ── rendering: the scrolling timeline ── */
+  function renderTimeline() {
+    const LANE_W = laneW();
     const rowH = state.density === 'compact' ? 24 : 34;
     const barH = rowH - 12;
-    const [startT, endT] = rangeTS();
-    const totalDays = Math.round((endT - startT) / MS);
-    const avail = Math.max(tl.clientWidth - LANE_W, 120);
-    const minW = ({ 1: 26, 3: 6, 6: 2.4, 12: 1.7 })[state.zoom];
-    const dayW = Math.max(avail / totalDays, minW);
+    const totalDays = Math.round((bufEndT - bufStartT) / MS);
     const chartW = Math.round(totalDays * dayW);
-    lastRenderW = tl.clientWidth;
+    const xOf = t => (t - bufStartT) / MS * dayW;
 
     const months = [];
-    for (let i = 0; i < state.zoom; i++) {
-      const t0 = Date.UTC(state.anchor.y, state.anchor.m + i, 1);
-      const nm = normMonth(state.anchor.y, state.anchor.m + i);
-      months.push({ t: t0, mi: nm.m, yr: nm.y, days: Math.round((Date.UTC(nm.y, nm.m + 1, 1) - t0) / MS) });
+    for (let t = bufStartT; t < bufEndT; t = monthAddT(t, 1)) {
+      const d = new Date(t);
+      months.push({ t, mi: d.getUTCMonth(), yr: d.getUTCFullYear(), days: Math.round((monthAddT(t, 1) - t) / MS) });
     }
     const showDays = dayW >= 16, showWD = dayW >= 24;
     const todayT = todayUTC();
 
-    /* header: month labels */
     let monthsHTML = '';
     months.forEach((mo, i) => {
-      const x = Math.round((mo.t - startT) / MS * dayW), w = Math.round(mo.days * dayW);
+      const x = Math.round(xOf(mo.t)), w = Math.round(mo.days * dayW);
       let lb = w > 78 ? M_L[mo.mi] : M_S[mo.mi];
       if (i === 0 || mo.mi === 0) lb += ' ' + mo.yr;
       monthsHTML += `<div class="hmonth" style="left:${x}px;width:${w}px">${lb}</div>`;
     });
-    if (todayT >= startT && todayT < endT)
-      monthsHTML += `<div class="hflag" style="left:${Math.round((todayT - startT) / MS * dayW)}px">today</div>`;
+    if (todayT >= bufStartT && todayT < bufEndT)
+      monthsHTML += `<div class="hflag" style="left:${Math.round(xOf(todayT))}px">today</div>`;
 
-    /* header: day numbers (when zoomed in) */
     let daysHTML = '';
     if (showDays) {
-      const wd0 = new Date(startT).getUTCDay();
+      const wd0 = new Date(bufStartT).getUTCDay();
       for (let di = 0; di < totalDays; di++) {
-        const wd = (wd0 + di) % 7, dn = new Date(startT + di * MS).getUTCDate();
+        const wd = (wd0 + di) % 7, dn = new Date(bufStartT + di * MS).getUTCDate();
         daysHTML += `<div class="hday${wd === 0 || wd === 6 ? ' we' : ''}" style="left:${Math.round(di * dayW)}px;width:${Math.ceil(dayW)}px">` +
           (showWD ? `<i>${WD[wd]}</i>` : '') + `<b>${dn}</b></div>`;
       }
@@ -834,55 +945,47 @@
     const gridBg = dayW >= 7
       ? `background-image:repeating-linear-gradient(90deg,var(--dayline) 0 1px,transparent 1px ${dayW}px);` : '';
 
-    /* grid layer: month lines, weekend bands, today line */
     let grid = '';
-    months.forEach(mo => { grid += `<div class="gmonth" style="left:${Math.round((mo.t - startT) / MS * dayW)}px"></div>`; });
+    months.forEach(mo => { grid += `<div class="gmonth" style="left:${Math.round(xOf(mo.t))}px"></div>`; });
     if (state.weekends && dayW >= 7) {
-      const wd0 = new Date(startT).getUTCDay();
-      if (wd0 === 0) grid += `<div class="gwkd" style="left:0px;width:${dayW}px"></div>`;
+      const wd0 = new Date(bufStartT).getUTCDay();
+      if (wd0 === 0) grid += `<div class="gwkd" style="left:0;width:${dayW}px"></div>`;
       let di = (6 - wd0 + 7) % 7;
       for (; di < totalDays; di += 7) grid += `<div class="gwkd" style="left:${Math.round(di * dayW)}px;width:${dayW * 2}px"></div>`;
     }
-    if (todayT >= startT && todayT < endT)
-      grid += `<div class="gtoday" style="left:${Math.round((todayT - startT) / MS * dayW)}px"></div>`;
+    if (todayT >= bufStartT && todayT < bufEndT)
+      grid += `<div class="gtoday" style="left:${Math.round(xOf(todayT))}px"></div>`;
 
-    /* lanes & bars */
-    const inR = computeInView();
+    /* bars only for the buffered span; lane heights come from the global packing */
+    const inBuf = filtered.filter(ev => ev.end >= bufStartT && ev.start < bufEndT);
     const bySec = new Map(sections.map(s => [s, []]));
-    inR.forEach(ev => { if (bySec.has(ev.section)) bySec.get(ev.section).push(ev); });
+    inBuf.forEach(ev => { if (bySec.has(ev.section)) bySec.get(ev.section).push(ev); });
+
     let lanesHTML = '';
     sections.forEach(sec => {
       const si = secIdx.get(sec);
-      const evs = (bySec.get(sec) || []).slice().sort((a, b) => a.start - b.start || b.days - a.days);
-      let rows = 0, bars = '';
-      if (evs.length) {
-        rows = pack(evs);
-        evs.forEach(ev => {
-          const x1 = (ev.start - startT) / MS * dayW;
-          const w = Math.max(ev.days * dayW, 4);
-          const col = barColor(ev);
-          const showLbl = state.labels && w >= 54;
-          bars += `<div class="bar" data-id="${ev.id}" style="left:${x1}px;width:${w}px;top:${ev.row * rowH + (rowH - barH) / 2}px;height:${barH}px;background:${col}">` +
-            (showLbl ? `<span class="bl" style="color:${textColorFor(col)}">${esc(ev.name)}</span>` : '') + `</div>`;
-        });
-      }
-      const secAll = filtered.some(e => e.section === sec);
+      const evs = bySec.get(sec) || [];
+      const rows = laneRows.get(sec) || 1;
+      const total = secCounts.get(sec) || 0;
+      let bars = '';
+      evs.forEach(ev => {
+        const x1 = xOf(ev.start);
+        const w = Math.max(ev.days * dayW, 4);
+        const col = barColor(ev);
+        const showLbl = state.labels && w >= 54;
+        bars += `<div class="bar" data-id="${ev.id}" style="left:${x1}px;width:${w}px;top:${ev.row * rowH + (rowH - barH) / 2}px;height:${barH}px;background:${col}">` +
+          (showLbl ? `<span class="bl" style="color:${textColorFor(col)}">${esc(ev.name)}</span>` : '') + `</div>`;
+      });
       lanesHTML += `<div class="lane">
         <div class="lane-label" style="width:${LANE_W}px">
           <span class="dot" style="background:${palette()[si % 8]}"></span>
-          <span class="ltxt"><b>${esc(sec)}</b><small>${evs.length
-            ? evs.length + ' event' + (evs.length > 1 ? 's' : '') + (rows > 1 ? ' · ' + rows + ' lines' : '')
-            : (secAll ? 'none in range' : 'hidden')}</small></span>
+          <span class="ltxt"><b>${esc(sec)}</b><small>${total
+            ? total + ' event' + (total > 1 ? 's' : '') + (rows > 1 ? ' · ' + rows + ' lines' : '')
+            : 'hidden'}</small></span>
         </div>
         <div class="lane-chart" style="width:${chartW}px;height:${Math.max(rows, 1) * rowH}px">${bars}</div>
       </div>`;
     });
-
-    const empty = inR.length === 0;
-    const emptyHTML = empty ? `<div class="tl-empty"><p>No events in this range.</p><div class="tl-empty-btns">
-      ${filtered.length ? '<button class="mini" id="jumpFirst">Jump to first event</button>' : ''}
-      ${offCount() ? '<button class="mini" id="clearF">Clear filters</button>' : ''}
-    </div></div>` : '';
 
     tl.innerHTML = `<div class="tl-inner" style="width:${LANE_W + chartW}px">
       <div class="tl-head">
@@ -892,11 +995,88 @@
           ${showDays ? `<div class="hd-row">${daysHTML}</div>` : ''}
         </div>
       </div>
-      <div class="tl-lanewrap" style="min-height:${empty ? 240 : 0}px;position:relative">
-        <div class="tl-grid" style="left:${LANE_W}px;width:${chartW}px;top:0;bottom:0;${gridBg}">${grid}</div>
-        ${lanesHTML}${emptyHTML}
+      <div class="tl-lanewrap">
+        <div class="tl-grid" style="left:${LANE_W}px;width:${chartW}px;${gridBg}">${grid}</div>
+        ${lanesHTML}
       </div>
     </div>`;
+    tl.scrollLeft = savedScroll;
+  }
+
+  /* empty / loading overlay — pinned to the viewport */
+  function updateEmptyOverlay() {
+    const el = $('#tlEmpty');
+    if (!dataLoaded) { el.hidden = false; el.innerHTML = '<p>loading events…</p>'; return; }
+    if (!events.length) { el.hidden = false; el.innerHTML = '<p>No events loaded.</p>'; return; }
+    const [a, b] = visibleRange();
+    const any = filtered.some(ev => ev.end >= a && ev.start < b);
+    el.hidden = any;
+    if (!any) {
+      el.innerHTML = `<p>Nothing on the calendar here — keep scrolling, or…</p><div class="tl-empty-btns">
+        ${filtered.length ? '<button class="mini" id="jumpFirst">Jump to first event</button>' : ''}
+        ${offCount() ? '<button class="mini" id="clearF">Clear filters</button>' : ''}</div>`;
+    }
+  }
+
+  /* ── buffer management: seamless extension while scrolling ── */
+  function handleScrollFrame() {
+    savedScroll = tl.scrollLeft;
+    const rightGap = tl.scrollWidth - tl.clientWidth - savedScroll;
+    const trigger = 2 * 30.4375 * dayW;
+    if (rightGap < trigger) extendRight();
+    else if (savedScroll < trigger) extendLeft();
+    maybeTrim();
+    postScrollUpdate();
+  }
+  function extendRight() {
+    bufEndT = monthAddT(bufEndT, 6);
+    renderTimeline();           // chart origin unchanged → view doesn't move
+  }
+  function extendLeft() {
+    const old = bufStartT;
+    bufStartT = monthAddT(bufStartT, -6);
+    savedScroll += (old - bufStartT) / MS * dayW;   // compensate for the shifted origin
+    renderTimeline();
+  }
+  /* quietly drop far-away months so the scrollbar stays a sensible size */
+  function maybeTrim() {
+    const viewL = dateAtLeft(), viewR = viewL + chartViewMs();
+    const KEEP = 18 * 30.4375 * MS, STEP = 6 * 30.4375 * MS;
+    let ns = bufStartT, ne = bufEndT;
+    while (viewL - ns > KEEP + STEP) ns = monthAddT(ns, 6);
+    while (ne - viewR > KEEP + STEP) ne = monthAddT(ne, -6);
+    if (ns !== bufStartT || ne !== bufEndT) {
+      savedScroll -= (ns - bufStartT) / MS * dayW;
+      bufStartT = ns; bufEndT = ne;
+      renderTimeline();
+    }
+  }
+  function postScrollUpdate() {
+    const a = deriveAnchor();
+    if (a.y !== state.anchor.y || a.m !== state.anchor.m) state.anchor = a;
+    renderToolbar();
+    updateEmptyOverlay();
+    clearTimeout(anchorSaveTimer);
+    anchorSaveTimer = setTimeout(save, 500);
+  }
+
+  /* jump / glide to a date, extending the buffer first so nothing jerks */
+  function goToDate(t, smooth) {
+    const viewMs = Math.max(chartViewMs(), 30.4375 * dayW * MS);
+    const marginMs = 2.5 * 30.4375 * MS;
+    let delta = 0, changed = false;
+    while (bufStartT > t - marginMs) { const old = bufStartT; bufStartT = monthAddT(bufStartT, -6); delta += (old - bufStartT) / MS * dayW; changed = true; }
+    while (bufEndT < t + viewMs + marginMs) { bufEndT = monthAddT(bufEndT, 6); changed = true; }
+    if (changed) { savedScroll += delta; renderTimeline(); }
+    const x = Math.max(0, (t - bufStartT) / MS * dayW);
+    if (smooth && Math.abs(x - savedScroll) > 3000) smooth = false;  // long hops: jump, don't crawl
+    if (smooth) tl.scrollTo({ left: x, behavior: 'smooth' });
+    else { savedScroll = x; tl.scrollLeft = x; }
+    maybeTrim();
+    postScrollUpdate();
+  }
+  function step(dir) {
+    goToDate(Date.UTC(state.anchor.y, state.anchor.m + dir * state.zoom, 1), true);
   }
 
   /* ── rendering: list view ── */
@@ -908,41 +1088,83 @@
       <span class="ld">${esc(fmtRange(ev))}</span>
       <span class="llu">${ev.days}d</span></button>`;
   }
-  function renderList() {
-    const inV = computeInView();
+  function informalHTML(inV) {
     const s = state.sort;
     const list = inV.slice().sort(
       s === 'name' ? (a, b) => a.name.localeCompare(b.name) :
       s === 'section' ? (a, b) => a.section === b.section ? a.start - b.start : a.section.localeCompare(b.section) :
       (a, b) => a.start - b.start || a.name.localeCompare(b.name));
-    let html = `<div class="list-head"><span>${inV.length} event${inV.length !== 1 ? 's' : ''} · ${esc(rangeLabel())}</span>
-      <div class="sortseg">${[['date','Date'],['name','Name'],['section','Section']].map(([v, l]) =>
-        `<button data-sort="${v}" class="${s === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>`;
-    if (!list.length) html += `<div class="list-empty">Nothing here — try another range or loosen the filters.</div>`;
-    else if (s === 'date') {
-      let curKey = '', buf = [];
-      const groups = [];
-      list.forEach(ev => {
-        const d = new Date(ev.start), key = d.getUTCFullYear() + '-' + d.getUTCMonth();
-        if (key !== curKey) { if (buf.length) groups.push({ label: M_L[d.getUTCMonth()] + ' ' + d.getUTCFullYear(), evs: buf }); buf = []; curKey = key; }
-        buf.push(ev);
-      });
-      if (buf.length) { const d = new Date(buf[0].start); groups.push({ label: M_L[d.getUTCMonth()] + ' ' + d.getUTCFullYear(), evs: buf }); }
-      groups.forEach(g => {
-        html += `<div class="lg"><div class="lg-head">${esc(g.label)}<span>${g.evs.length}</span></div>` +
-          g.evs.map(rowHTML).join('') + `</div>`;
-      });
-    } else html += list.map(rowHTML).join('');
-    $('#pane-list').innerHTML = `<div class="list-body">${html}</div>`;
+    if (s !== 'date') return list.map(rowHTML).join('');
+    let curKey = '', curLabel = '', buf = [];
+    const groups = [];
+    list.forEach(ev => {
+      const d = new Date(ev.start), key = d.getUTCFullYear() + '-' + d.getUTCMonth();
+      if (key !== curKey) {
+        if (buf.length) groups.push({ label: curLabel, evs: buf });
+        buf = []; curKey = key;
+        curLabel = M_L[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+      }
+      buf.push(ev);
+    });
+    if (buf.length) groups.push({ label: curLabel, evs: buf });
+    return groups.map(g =>
+      `<div class="lg"><div class="lg-head">${esc(g.label)}<span>${g.evs.length}</span></div>` +
+      g.evs.map(rowHTML).join('') + `</div>`).join('');
+  }
+  function analyticalHTML(inV) {
+    const cols = [['event','Event'],['section','Section'],['start','Start'],['end','End'],['days','Days']];
+    const { col, dir } = state.tsort;
+    const mul = dir === 'asc' ? 1 : -1;
+    const list = inV.slice().sort((a, b) => {
+      let r = 0;
+      if (col === 'event') r = a.name.localeCompare(b.name);
+      else if (col === 'section') r = a.section.localeCompare(b.section) || a.name.localeCompare(b.name);
+      else if (col === 'start') r = a.start - b.start || a.name.localeCompare(b.name);
+      else if (col === 'end') r = a.end - b.end || a.name.localeCompare(b.name);
+      else r = a.days - b.days || a.start - b.start;
+      return r * mul;
+    });
+    const head = cols.map(([c, l]) => {
+      const on = col === c;
+      return `<th data-col="${c}" class="${on ? 'on' : ''}${c === 'days' ? ' r' : ''}" title="Sort by ${l}"><span>${l}</span>` +
+        `<span class="tri"><i class="tu${on && dir === 'asc' ? ' act' : ''}"></i><i class="td${on && dir === 'desc' ? ' act' : ''}"></i></span></th>`;
+    }).join('');
+    const rows = list.map(ev => `<tr data-id="${ev.id}">
+      <td><span class="ldot" style="background:${barColor(ev)}"></span>${esc(ev.name)}</td>
+      <td class="c-sec">${esc(ev.section)}</td>
+      <td class="c-dt">${fmtD(ev.start)}</td>
+      <td class="c-dt">${fmtD(ev.end)}</td>
+      <td class="c-dy">${ev.days}</td></tr>`).join('');
+    return `<table class="atable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  function renderList() {
+    const inV = computeInView();
+    const fmt = state.listFormat;
+    const head = `<div class="list-head">
+      <span>${inV.length} event${inV.length !== 1 ? 's' : ''} · ${esc(rangeLabel())}</span>
+      <div class="list-acts">
+        <div class="seg">
+          <button data-fmt="informal"${fmt === 'informal' ? ' class="on"' : ''}>Informal</button>
+          <button data-fmt="analytical"${fmt === 'analytical' ? ' class="on"' : ''}>Analytical</button>
+        </div>
+        ${fmt === 'informal' ? `<div class="sortseg">${[['date','Date'],['name','Name'],['section','Section']].map(([v, l]) =>
+          `<button data-sort="${v}"${state.sort === v ? ' class="on"' : ''}>${l}</button>`).join('')}</div>` : ''}
+      </div></div>`;
+    let body;
+    if (!inV.length) body = `<div class="list-empty">Nothing here — try another range or loosen the filters.</div>`;
+    else body = fmt === 'analytical' ? analyticalHTML(inV) : informalHTML(inV);
+    $('#pane-list').innerHTML = head + `<div class="list-body">${body}</div>`;
   }
 
   /* ── rendering: themes pane ── */
   function renderThemes() {
     const fonts = [
-      ['sans', 'Instrument Sans', 'Aa', 'clean sans — the default'],
-      ['serif', 'Fraunces', 'Aa', 'bookish serif'],
-      ['mono', 'IBM Plex Mono', 'Aa', 'technical mono']
+      ['sans', 'Instrument Sans', 'clean sans — the default'],
+      ['serif', 'Fraunces', 'bookish serif'],
+      ['mono', 'IBM Plex Mono', 'technical mono']
     ];
+    const loNames = Object.keys(state.loadouts).sort((a, b) => a.localeCompare(b));
+    const loSel = loNames.includes(state.lastLoadout) ? state.lastLoadout : '';
     const colorRows = items.map(nm => {
       const ev = events.find(e => e.name === nm);
       const si = ev ? secIdx.get(ev.section) : 0;
@@ -955,7 +1177,7 @@
       <div class="set-group"><h3>Font <span class="h-note">applies to the whole page, remembered</span></h3>
         <div class="fontopts">${fonts.map(f => `<button class="fontopt${state.font === f[0] ? ' on' : ''}" data-font="${f[0]}">
           <span class="fprev" style="font-family:var(--f-${f[0]})">${f[1]}</span>
-          <span class="fname">${f[2]} · ${f[3]}</span></button>`).join('')}</div>
+          <span class="fname">${f[2]}</span></button>`).join('')}</div>
       </div>
       <div class="set-group"><h3>Display</h3>
         <div class="setrow"><span class="lab">Row density<small>how tall each event line is</small></span>
@@ -965,9 +1187,26 @@
         <div class="setrow"><span class="lab">Labels on bars<small>shown only when a bar is wide enough</small></span>
           <label class="sw"><input type="checkbox" id="lblSw" ${state.labels ? 'checked' : ''}><i></i></label></div>
       </div>
-      <div class="set-group"><h3>Event colours <span class="h-note">overrides the section colour</span>
-        <button class="mini2" id="clearColors" style="margin-left:auto">clear all</button></h3>
+      <div class="set-group">
+        <h3>Event colours <span class="h-note">overrides the section colour</span>
+          <button class="mini2" id="clearColors" style="margin-left:auto">clear all</button></h3>
+        <div class="lorow">
+          <select class="loselect" id="loSelect" ${loNames.length ? '' : 'disabled'}>
+            ${loNames.length
+              ? loNames.map(n => `<option value="${esc(n)}"${n === loSel ? ' selected' : ''}>${esc(n)}</option>`).join('')
+              : '<option value="">no load-outs saved yet</option>'}
+          </select>
+          <button class="mini" id="loSave">save as…</button>
+          <button class="mini" id="loUpdate" ${loSel ? '' : 'disabled'}>update</button>
+          <button class="mini" id="loDelete" ${loSel ? '' : 'disabled'}>delete</button>
+        </div>
+        <div class="lorow loinput" id="loInputRow" hidden>
+          <input id="loName" type="text" placeholder="load-out name — e.g. Default" maxlength="24">
+          <button class="mini" id="loConfirm">save</button>
+          <button class="mini" id="loCancel">cancel</button>
+        </div>
         ${colorRows || '<p class="dhint">No events loaded yet.</p>'}
+        <p class="dhint" style="margin-top:10px">Load-outs are stored in this browser — a page can’t write files back into the site itself.</p>
       </div>
       <div class="set-group"><h3>Data</h3>
         <p class="dhint">The calendar reads <b>${DATA_FILE}</b> from the same folder — the <b>Machine</b> output of Datepress, one event per line.
@@ -983,7 +1222,7 @@
   }
 
   function renderPane(t) {
-    if (t === 'calendar') renderCalendar();
+    if (t === 'calendar') { renderTimeline(); updateEmptyOverlay(); }
     else if (t === 'list') renderList();
     else renderThemes();
   }
@@ -996,6 +1235,11 @@
     });
     ['calendar', 'list', 'themes'].forEach(p =>
       $('#pane-' + p).classList.toggle('active', p === t));
+    if (t === 'calendar') {
+      const old = dayW;
+      refitDayW();
+      savedScroll = savedScroll / old * dayW;   // keep the same date under the view
+    }
     renderPane(t);
   }
 
@@ -1038,7 +1282,8 @@
       `<div class="pgrid">${M_S.map((m, i) =>
         `<button class="pm${i === state.anchor.m ? ' on' : ''}" data-m="${i}">${m}</button>`).join('')}</div>`,
       e => { const b = e.target.closest('[data-m]'); if (!b) return;
-        state.anchor.m = +b.dataset.m; closePop(); refresh(); save(); });
+        goToDate(Date.UTC(state.anchor.y, +b.dataset.m, 1), true);
+        closePop(); });
   }
   function openYearPop() {
     const ys = years.length ? years : [state.anchor.y];
@@ -1048,7 +1293,8 @@
       `<div class="pgrid y">${list.map(y =>
         `<button class="pm${y === state.anchor.y ? ' on' : ''}" data-y="${y}">${y}</button>`).join('')}</div>`,
       e => { const b = e.target.closest('[data-y]'); if (!b) return;
-        state.anchor.y = +b.dataset.y; closePop(); refresh(); save(); });
+        goToDate(Date.UTC(+b.dataset.y, 0, 1), true);
+        closePop(); });
   }
   function openColorPop(name, anchor) {
     openPop(anchor, 'colour · ' + name,
@@ -1102,7 +1348,7 @@
   function setAllGroup(g, on) {
     const all = g === 'sections' ? sections : g === 'items' ? items : years.map(String);
     state.filters[g] = on ? [] : all.slice();
-    buildFilterSets(); computeFiltered(); buildDrawer(); updateBadge(); refresh(); save();
+    buildFilterSets(); computeFiltered(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
   }
 
   /* ── interactions ── */
@@ -1124,35 +1370,51 @@
   }
   function applyFont() { document.body.dataset.font = state.font; }
 
-  $('#prevBtn').addEventListener('click', () => { state.anchor = normMonth(state.anchor.y, state.anchor.m - state.zoom); refresh(); save(); });
-  $('#nextBtn').addEventListener('click', () => { state.anchor = normMonth(state.anchor.y, state.anchor.m + state.zoom); refresh(); save(); });
-  $('#todayBtn').addEventListener('click', () => {
-    const n = new Date();
-    state.anchor = state.zoom === 12 ? { y: n.getFullYear(), m: 0 } : { y: n.getFullYear(), m: n.getMonth() };
-    refresh(); save();
-  });
+  $('#prevBtn').addEventListener('click', () => step(-1));
+  $('#nextBtn').addEventListener('click', () => step(1));
+  $('#todayBtn').addEventListener('click', () => goToDate(todayUTC(), true));
   $('#rangeBtn').addEventListener('click', openMonthPop);
   $('#yearBtn').addEventListener('click', openYearPop);
 
   $('#zoomSeg').addEventListener('click', e => {
     const b = e.target.closest('[data-z]'); if (!b) return;
-    state.zoom = +b.dataset.z;
-    if (state.zoom === 12) state.anchor.m = 0;
+    const z = +b.dataset.z; if (z === state.zoom) return;
+    state.zoom = z; state.scale = 1; updateScaleUI();
     document.querySelectorAll('#zoomSeg button').forEach(x => x.classList.toggle('on', x === b));
-    refresh(); save();
+    rebuildAroundAnchor(); save();
   });
+  function rebuildAroundAnchor() {
+    refitDayW();
+    const aT = Date.UTC(state.anchor.y, state.anchor.m, 1);
+    bufStartT = monthAddT(aT, -BUF_MONTHS);
+    bufEndT = monthAddT(aT, state.zoom + BUF_MONTHS);
+    savedScroll = (aT - bufStartT) / MS * dayW;
+    renderTimeline(); renderToolbar(); updateEmptyOverlay();
+  }
+
+  /* slight manual zoom (× the fitted width), view centre preserved */
+  function setScale(f) {
+    const center = dateAtLeft() + chartViewMs() / 2;
+    state.scale = Math.min(3, Math.max(0.4, +(state.scale * f).toFixed(3)));
+    refitDayW();
+    savedScroll = Math.max(0, (center - bufStartT) / MS * dayW - Math.max(tl.clientWidth - laneW(), 0) / 2);
+    renderTimeline(); renderToolbar(); updateEmptyOverlay(); updateScaleUI(); save();
+  }
+  function updateScaleUI() { $('#zPct').textContent = Math.round(state.scale * 100) + '%'; }
+  $('#zIn').addEventListener('click', () => setScale(1.2));
+  $('#zOut').addEventListener('click', () => setScale(1 / 1.2));
 
   $('#filterBtn').addEventListener('click', () => document.body.classList.add('drawer-open'));
   $('#scrim').addEventListener('click', () => document.body.classList.remove('drawer-open'));
   $('#drawerClose').addEventListener('click', () => document.body.classList.remove('drawer-open'));
   $('#drawerReset').addEventListener('click', () => {
     state.filters = { sections: [], items: [], years: [] };
-    buildFilterSets(); computeFiltered(); buildDrawer(); updateBadge(); refresh(); save();
+    buildFilterSets(); computeFiltered(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
   });
   $('#drawerBody').addEventListener('change', e => {
     const c = e.target.closest('input[data-g]'); if (!c) return;
     toggleFilter(c.dataset.g, c.value, c.checked);
-    buildFilterSets(); computeFiltered(); updateBadge(); refresh(); updateDrawerFoot(); save();
+    buildFilterSets(); computeFiltered(); recomputeLanes(); updateBadge(); refresh(); updateDrawerFoot(); save();
   });
   $('#drawerBody').addEventListener('click', e => {
     const a = e.target.closest('[data-all]'), n = e.target.closest('[data-none]');
@@ -1167,50 +1429,89 @@
     });
   });
 
-  /* calendar: tooltips, pinning, empty-state buttons */
-  const tl = $('#tl');
-  tl.addEventListener('mouseover', e => { const b = e.target.closest('.bar'); if (b && !pinned) showTip(b); });
-  tl.addEventListener('mouseout', e => {
-    const b = e.target.closest('.bar');
-    if (b && !pinned && !(e.relatedTarget && b.contains(e.relatedTarget))) hideTip();
-  });
+  /* timeline: scroll → keep the buffer fed, labels & count follow */
+  tl.addEventListener('scroll', () => {
+    hideTip(); pinned = false;   // a pinned pop-up can't drift from its bar
+    if (scrollRaf) return;
+    scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; handleScrollFrame(); });
+  }, { passive: true });
+
   tl.addEventListener('click', e => {
-    const j = e.target.closest('#jumpFirst');
-    if (j) {
-      const ev = filtered[0]; if (!ev) return;
-      const d = new Date(ev.start);
-      state.anchor = state.zoom === 12 ? { y: d.getUTCFullYear(), m: 0 } : { y: d.getUTCFullYear(), m: d.getUTCMonth() };
-      refresh(); save(); return;
-    }
-    if (e.target.closest('#clearF')) {
-      state.filters = { sections: [], items: [], years: [] };
-      buildFilterSets(); computeFiltered(); buildDrawer(); updateBadge(); refresh(); save(); return;
-    }
     const b = e.target.closest('.bar');
     if (b) { pinned = true; showTip(b); }
     else { pinned = false; hideTip(); }
   });
+  $('#tlEmpty').addEventListener('click', e => {
+    if (e.target.closest('#jumpFirst')) {
+      const ev = filtered.slice().sort((a, b) => a.start - b.start)[0];
+      if (ev) goToDate(ev.start, true);
+    }
+    if (e.target.closest('#clearF')) {
+      state.filters = { sections: [], items: [], years: [] };
+      buildFilterSets(); computeFiltered(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
+    }
+  });
 
-  /* list view: sort + jump to event */
+  /* the event pop-up disappears when anything else on the page is clicked */
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.bar')) { pinned = false; hideTip(); }
+  });
+
+  /* list view: format toggle, sorting, jump-to-calendar */
   $('#pane-list').addEventListener('click', e => {
+    const th = e.target.closest('.atable th[data-col]');
+    if (th) {
+      const c = th.dataset.col;
+      if (state.tsort.col === c) state.tsort.dir = state.tsort.dir === 'asc' ? 'desc' : 'asc';
+      else state.tsort = { col: c, dir: 'asc' };
+      renderList(); save(); return;
+    }
+    const f = e.target.closest('[data-fmt]');
+    if (f) { state.listFormat = f.dataset.fmt; renderList(); save(); return; }
     const s = e.target.closest('[data-sort]');
     if (s) { state.sort = s.dataset.sort; renderList(); save(); return; }
-    const r = e.target.closest('.lrow');
+    const r = e.target.closest('[data-id]');
     if (r) jumpToEvent(+r.dataset.id);
   });
+
   function jumpToEvent(id) {
     const ev = events.find(x => x.id === id); if (!ev) return;
-    const d = new Date(ev.start);
-    state.anchor = state.zoom === 12 ? { y: d.getUTCFullYear(), m: 0 } : { y: d.getUTCFullYear(), m: d.getUTCMonth() };
-    setTab('calendar'); save();
+    setTab('calendar');
+    goToDate(ev.start, false);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const b = tl.querySelector('.bar[data-id="' + id + '"]');
-      if (b) { b.scrollIntoView({ block: 'nearest', inline: 'center' }); b.classList.add('flash'); setTimeout(() => b.classList.remove('flash'), 1500); }
+      if (b) {
+        b.scrollIntoView({ block: 'nearest', inline: 'center' });
+        savedScroll = tl.scrollLeft;
+        b.classList.add('flash');
+        setTimeout(() => b.classList.remove('flash'), 1500);
+      }
     }));
+    save();
   }
 
   /* themes pane */
   $('#pane-themes').addEventListener('click', e => {
+    if (e.target.closest('#loSave')) { $('#loInputRow').hidden = false; $('#loName').focus(); return; }
+    if (e.target.closest('#loCancel')) { $('#loInputRow').hidden = true; return; }
+    if (e.target.closest('#loConfirm')) {
+      const name = ($('#loName').value || '').trim();
+      if (!name) { $('#loName').focus(); return; }
+      state.loadouts[name] = clone(state.colors);
+      state.lastLoadout = name; save(); renderPane('themes'); return;
+    }
+    if (e.target.closest('#loUpdate')) {
+      if (!state.lastLoadout || !state.loadouts[state.lastLoadout]) return;
+      state.loadouts[state.lastLoadout] = clone(state.colors); save();
+      const b = e.target.closest('#loUpdate');
+      b.textContent = 'updated';
+      setTimeout(() => { if (b.isConnected) b.textContent = 'update'; }, 1200);
+      return;
+    }
+    if (e.target.closest('#loDelete')) {
+      if (state.lastLoadout) { delete state.loadouts[state.lastLoadout]; state.lastLoadout = ''; save(); renderPane('themes'); }
+      return;
+    }
     const f = e.target.closest('.fontopt');
     if (f) { state.font = f.dataset.font; applyFont(); renderPane('themes'); refresh(); save(); return; }
     const d = e.target.closest('[data-density]');
@@ -1226,12 +1527,26 @@
     }
   });
   $('#pane-themes').addEventListener('change', e => {
+    if (e.target.id === 'loSelect') {
+      const n = e.target.value;
+      if (n && state.loadouts[n]) {
+        state.colors = clone(state.loadouts[n]);
+        state.lastLoadout = n; save(); renderPane('themes');
+      }
+      return;
+    }
     if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; save(); }
     if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); }
   });
+  $('#pane-themes').addEventListener('keydown', e => {
+    if (e.target.id === 'loName' && e.key === 'Enter') { e.preventDefault(); $('#loConfirm').click(); }
+  });
 
   /* data chip → themes data section */
-  $('#dataChip').addEventListener('click', () => { setTab('themes'); $('#pane-themes').querySelector('.settings').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  $('#dataChip').addEventListener('click', () => {
+    setTab('themes');
+    $('#pane-themes').querySelector('.settings').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
   /* notice strip buttons (delegated, since it's re-rendered) */
   document.addEventListener('click', e => {
@@ -1258,13 +1573,18 @@
     if (e.key === 'Escape') { pinned = false; hideTip(); closePop(); document.body.classList.remove('drawer-open'); }
   });
 
-  /* keep the chart fitted on resize */
-  let roTimer = null;
+  /* keep the chart fitted on resize, view centre preserved */
   new ResizeObserver(() => {
     if (state.tab !== 'calendar') return;
     cancelAnimationFrame(roTimer);
     roTimer = requestAnimationFrame(() => {
-      if (Math.abs($('#tl').clientWidth - lastRenderW) > 8) renderCalendar();
+      const w = tl.clientWidth;
+      if (Math.abs(w - lastW) <= 8) return;
+      lastW = w;
+      const center = dateAtLeft() + chartViewMs() / 2;
+      refitDayW();
+      savedScroll = Math.max(0, (center - bufStartT) / MS * dayW - Math.max(tl.clientWidth - laneW(), 0) / 2);
+      renderTimeline(); renderToolbar(); updateEmptyOverlay();
     });
   }).observe(tl);
 
@@ -1272,6 +1592,13 @@
   loadSettings();
   applyTheme(); applyFont();
   document.querySelectorAll('#zoomSeg button').forEach(b => b.classList.toggle('on', +b.dataset.z === state.zoom));
+  updateScaleUI();
+  refitDayW();
+  const initAT = Date.UTC(state.anchor.y, state.anchor.m, 1);
+  bufStartT = monthAddT(initAT, -BUF_MONTHS);
+  bufEndT = monthAddT(initAT, state.zoom + BUF_MONTHS);
+  savedScroll = (initAT - bufStartT) / MS * dayW;
+  lastW = tl.clientWidth;
   setTab(state.tab);
   updateNotice(); updateChip(); updateBadge();
   loadData();
