@@ -1,29 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bigfarm Explorer</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f6f5f0;
-      font-family: Georgia, "Times New Roman", serif;
-      color: #2f2f2f;
-    }
-    h1 {
-      font-size: 2.8rem;
-      letter-spacing: 0.08em;
-      font-weight: normal;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bigfarm Explorer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%233E6B35'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23F7F4EA' text-anchor='middle'>BE</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --paper: #F3F1E9;
+    --ink: #22251E;
+    --muted: #6C6F62;
+    --line: rgba(34,37,30,.16);
+    --green: #3E6B35;
+    --green-deep: #2C4F26;
+  }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Fraunces', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  /* faint paper grain */
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .05; z-index: 40;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="180" height="180" filter="url(%23n)"/></svg>');
+  }
+  .cover {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 48px 26px 120px;
+    position: relative;
+  }
+  .mast { text-align: center; transform: translateY(-6vh); transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: .34em; text-transform: uppercase;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 14px; justify-content: center;
+  }
+  .eyebrow::before, .eyebrow::after { content: ""; width: 34px; height: 1px; background: var(--line); }
+  h1 {
+    margin-top: 18px;
+    font-size: clamp(3rem, 8vw, 5.2rem);
+    font-weight: 600; letter-spacing: -.015em; line-height: 1;
+  }
+  h1 .dot { color: var(--green); }
+  .tagline {
+    margin-top: 16px;
+    font-style: italic; font-size: clamp(1rem, 2.4vw, 1.2rem);
+    color: var(--muted); max-width: 44ch;
+  }
+  .entries { margin-top: 54px; width: min(460px, 92vw); transform: translateY(-4vh); }
+  .entry {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px;
+    border: 1px solid var(--ink);
+    border-radius: 14px;
+    text-decoration: none; color: var(--ink);
+    background: transparent;
+    transition: background .18s, color .18s, transform .18s, box-shadow .18s;
+  }
+  .entry:hover, .entry:focus-visible {
+    background: var(--green); color: #F6F4EB;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(44,79,38,.28);
+  }
+  .entry-ic { display: grid; place-items: center; flex: none; }
+  .entry-tx { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .entry-tx b { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: .01em; }
+  .entry-tx small {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; opacity: .65;
+  }
+  .entry-ar { flex: none; transition: transform .18s; }
+  .entry:hover .entry-ar { transform: translateX(5px); }
+  .soon {
+    margin-top: 16px; text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+  }
+  /* the field horizon */
+  .horizon {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 150px;
+    pointer-events: none; overflow: hidden;
+  }
+  .horizon svg { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 1600px; height: 150px; }
+  .sprout { stroke: var(--green); fill: none; stroke-width: 1.4; stroke-linecap: round; }
+  .hline { stroke: var(--line); stroke-width: 1; }
+  .tower { fill: var(--green-deep); }
+  .sails rect { fill: var(--green); }
+  .sails { transform-box: fill-box; transform-origin: center; animation: spin 26s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
 </head>
 <body>
-  <!-- Change the text below to rename the site -->
-  <h1>Bigfarm Explorer</h1>
+<main class="cover">
+
+  <header class="mast" id="mast">
+    <p class="eyebrow">field notes · schedules · data</p>
+    <!-- Change the text below to rename the site (also change <title> above) -->
+    <h1>Bigfarm Explorer<span class="dot">.</span></h1>
+    <p class="tagline">An almanac for the farm — what’s on, and when.</p>
+  </header>
+
+  <nav class="entries" aria-label="Sections of Bigfarm Explorer">
+    <!-- Add more <a class="entry"> blocks here as the site grows -->
+    <a class="entry" href="calendar.html">
+      <span class="entry-ic">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
+      </span>
+      <span class="entry-tx"><b>Bigfarm Calendar</b><small>events across months &amp; years</small></span>
+      <span class="entry-ar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+    <p class="soon">more sections as they’re written</p>
+  </nav>
+
+  <div class="horizon" aria-hidden="true">
+    <svg viewBox="0 0 1600 150" preserveAspectRatio="none">
+      <line class="hline" x1="0" y1="140" x2="1600" y2="140"/>
+      <g id="sprouts"></g>
+      <g transform="translate(1180,140)">
+        <path class="tower" d="M-9,0 L-4,-52 L4,-52 L9,0 Z"/>
+        <g transform="translate(0,-54)">
+          <g class="sails">
+            <rect x="-2.2" y="-30" width="4.4" height="30" rx="2.2"/>
+            <rect x="-2.2" y="0"   width="4.4" height="30" rx="2.2" transform="rotate(90)"/>
+            <rect x="-2.2" y="-30" width="4.4" height="30" rx="2.2" transform="rotate(180)"/>
+            <rect x="-2.2" y="0"   width="4.4" height="30" rx="2.2" transform="rotate(270)"/>
+          </g>
+          <circle class="tower" r="4"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+</main>
+<script>
+(function () {
+  'use strict';
+  // little deterministic prng so the sprout field is the same every visit
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const g = document.getElementById('sprouts');
+  let html = '';
+  for (let i = 0; i < 120; i++) {
+    const x = 30 + i * 12.8 + (rnd() * 10 - 5);
+    if (x > 1130 && x < 1240) continue;           // keep clear of the windmill
+    const h = 7 + rnd() * 9;
+    const y = 140, o = (0.22 + rnd() * 0.26).toFixed(2);
+    html += `<path class="sprout" style="opacity:${o}" d="M${x} ${y} V${y - h} M${x} ${y - h * .6} l-4 -3.2 M${x} ${y - h * .6} l4 -3.2"/>`;
+  }
+  g.innerHTML = html;
+
+  // gentle parallax on the horizon
+  const mast = document.getElementById('mast');
+  const horizon = document.querySelector('.horizon');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  addEventListener('mousemove', (e) => {
+    const nx = e.clientX / innerWidth - .5, ny = e.clientY / innerHeight - .5;
+    horizon.style.transform = `translate(${-nx * 10}px, ${-ny * 4}px)`;
+    mast.style.transform = `translateY(calc(-6vh + ${ny * 4}px))`;
+  }, { passive: true });
+})();
+</script>
 </body>
 </html>
