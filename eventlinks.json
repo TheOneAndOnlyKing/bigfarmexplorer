@@ -1,0 +1,74 @@
+{
+  "_readme": "HOW TO USE — Each name below is an event. Replace its [] with any number of lines, each shaped like: { \"text\": \"what the line says\", \"url\": \"https://the.link\", \"color\": \"#3E7FC1\" }. \"color\" is optional (any hex code, with or without #; without it the line just uses the pane's text colour). The lines appear inside the event's pop-up pane, in order, each opening in a new tab. Extra tricks: a SECTION name (e.g. \"Temporary farms\") also works as a key — every event in that section without its own lines inherits them — and subtitled Horse Season runs (e.g. \"Horse Season: Yeti\") fall back to the \"Horse Season\" entry. The two events with example entries show how it looks — replace them with real links, then save and refresh the calendar page.",
+
+  "Village Fair": [
+    { "text": "Example line — replace me", "url": "https://www.example.com/village-fair", "color": "#3E7FC1" }
+  ],
+  "Fishing Hard Worker Event": [],
+  "Hard Worker Event": [],
+  "Cooperative Hard Worker Event": [],
+  "Cooperative Championship": [],
+
+  "Cruise Ship": [],
+  "Goldfish Rescue": [],
+  "Pleasure Park": [],
+  "Urgent Delivery": [],
+  "Urgent Delivery (Gourmet Farm)": [],
+  "Shinkei-Suijaku": [],
+  "Pair Finder": [],
+
+  "Greta's Dream World": [],
+  "Tessa's Dream World": [],
+  "Tessa's Dream World (Missions)": [],
+
+  "Horse Season": [],
+  "Farmer's League": [],
+  "Worldwide Championship": [],
+
+  "Spring Season": [],
+  "Summer Season": [],
+  "Autumn Season": [],
+  "Winter Season": [],
+  "Christmas Season": [],
+
+  "Festive Farm": [],
+  "Northern Lights Farm": [],
+  "Viking Farm": [],
+  "Tropical Farm": [],
+  "Candy Farm": [],
+
+  "Candy Search": [],
+  "Mushroom Search Event": [],
+  "Valentine's Search Event": [],
+  "Easter Egg Hunt": [],
+  "Summer Time Search Event": [],
+  "Halloween Search Event": [],
+  "Winter Search Event": [],
+
+  "Global Point Event": [],
+  "Chinese New Year": [],
+  "Saint Patrick's Day": [],
+  "Golden Week Event": [],
+  "Tailgate Party": [],
+  "Oktoberfest": [],
+  "Santa's Workshop": [],
+  "Advent Calendar": [],
+  "Big Farm Anniversary Event": [],
+  "Football Fever": [],
+
+  "A Hint of Hawaii": [],
+  "Here's to Nature": [],
+  "Not of this World": [],
+  "Mysterious Asia": [],
+  "Fairytale Time": [],
+  "Culinary Campaign": [],
+  "Three Weddings and a Rigmarole": [],
+
+  "A Hero for Piggles": [],
+  "My bees are gone!": [],
+  "Fortune Teller": [],
+  "Landscape Architect": [
+    { "text": "Example line — replace me", "url": "https://www.example.com/landscape", "color": "#C25B3C" },
+    { "text": "Example second line", "url": "https://www.example.com/more-info", "color": "#42968B" }
+  ]
+}
