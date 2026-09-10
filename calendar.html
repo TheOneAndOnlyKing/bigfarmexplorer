@@ -773,7 +773,7 @@
     var out = [];
     var rec = SECTION_ORDER.find(function (s) { return s.name === sec; });
     if (rec) rec.events.forEach(function (n) { if (set.has(n)) { out.push(n); set.delete(n); } });
-    return out.concat([...set].sort(function (a, b) { return a.localeCompare(b); });
+    return out.concat([...set].sort(function (a, b) { return a.localeCompare(b); }));
   }
   function applyText(text, label, kind) {
     var r = parseJSONL(text);
