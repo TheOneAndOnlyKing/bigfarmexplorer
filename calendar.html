@@ -302,9 +302,12 @@
   .swrow { display: flex; flex-wrap: wrap; gap: 6px; max-width: 240px; }
   .swb { width: 26px; height: 26px; border-radius: 8px; border: 1.5px solid transparent; }
   .swb:hover { border-color: var(--ink); }
+  .swb.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--accent); }
   .pop .custom-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
   .pop input[type="color"] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 7px; background: none; cursor: pointer; }
   .pop .lbl { font-size: 12px; color: var(--muted); }
+  .pop .pacts { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .pop #cState { font-family: var(--f-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 
   /* the event pane — interactive, auto-sized */
   .tip { position: fixed; z-index: 90; display: none; }
@@ -668,7 +671,7 @@
   /* ── event links (eventlinks.json) ── */
   function normLinkColour(c) {
     if (typeof c !== 'string') return null;
-    var s = c.trim().replace(/^#+/, '#');   /* forgives a doubled ## from hand-editing */
+    var s = c.trim().replace(/^#+/, '#');
     if (s.charAt(0) !== '#') s = '#' + s;
     if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
     if (/^#[0-9a-fA-F]{3}$/.test(s)) return '#' + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2) + s.charAt(3) + s.charAt(3);
@@ -679,7 +682,6 @@
     if (!o || typeof o !== 'object') return null;
     var url = o.url || o.link || o.href;
     if (!url) {
-      /* recovery for a hand-edit slip: the URL pasted in place of its "url" label */
       for (var k in o) {
         if (/^https?:\/\//i.test(k) && typeof o[k] !== 'object') { url = k; break; }
       }
@@ -710,8 +712,6 @@
     });
     return out;
   }
-  /* the file is edited by hand, so tolerate the usual slips before giving up:
-     missing commas between entries, or a URL pasted without its "url" label */
   function parseLinkFile(text) {
     try { return JSON.parse(text); } catch (e) {}
     var fixed = text
@@ -725,7 +725,6 @@
     if (eventLinks[ev.name]) return eventLinks[ev.name];
     if (eventLinks[ev.base]) return eventLinks[ev.base];
     if (eventLinks[ev.section]) return eventLinks[ev.section];
-    /* case-insensitive fallback — so "village fair" in the file still matches "Village Fair" */
     if (linkLC.src !== eventLinks) {
       linkLC = { src: eventLinks, map: {} };
       Object.keys(eventLinks).forEach(function (k) { linkLC.map[k.toLowerCase()] = eventLinks[k]; });
@@ -947,6 +946,8 @@
     return rec ? rec.idx % 8 : 5;
   }
   function sectionColor(sec) {
+    var ov = state.colors.sections[sec];
+    if (ov) return resolveColour(ov);
     var i = SEC_INDEX.get(sec);
     return palette()[(i == null ? 0 : i) % 8];
   }
@@ -1657,31 +1658,63 @@
         closePop();
       });
   }
+  /* colour picker — rebuilt: custom colours commit on both `input` (live drag) and `change`
+     (confirm in browsers that only fire that), the active palette swatch is marked, and the
+     pop shows its current state with an explicit done button */
   function openColorPop(kind, key, anchor) {
     var store = state.colors[kind === 'event' ? 'events' : 'sections'];
     var cur = store[key];
+    var swHTML = palette().map(function (c, i) {
+      var on = cur && cur.t === 'p' && cur.i === i;
+      return '<button class="swb' + (on ? ' on' : '') + '" data-p="' + i + '" style="background:' + c + '" title="palette colour ' + (i + 1) + '"></button>';
+    }).join('');
     openPop(anchor, 'colour · ' + key,
-      '<div class="swrow">' + palette().map(function (c, i) {
-        return '<button class="swb" data-p="' + i + '" style="background:' + c + '" title="palette"></button>';
-      }).join('') + '</div>' +
-      '<div class="custom-row"><input type="color" id="cPick" value="' + (cur && cur.t === 'h' ? cur.v : '#C25B3C') + '">' +
-      '<span class="lbl">custom</span><button class="mini2" id="cReset" style="margin-left:auto">' + (kind === 'event' ? 'use section colour' : 'use default colour') + '</button></div>',
+      '<div class="swrow">' + swHTML + '</div>' +
+      '<div class="custom-row">' +
+        '<input type="color" id="cPick" value="' + (cur && cur.t === 'h' ? cur.v : '#C25B3C') + '" title="Choose any custom colour">' +
+        '<span class="lbl">custom — pick a colour, it applies at once</span>' +
+      '</div>' +
+      '<div class="pacts">' +
+        '<span id="cState"></span>' +
+        '<span style="margin-left:auto;display:flex;gap:6px">' +
+          '<button class="mini2" id="cReset">' + (kind === 'event' ? 'reset to automatic' : 'reset to default') + '</button>' +
+          '<button class="mini2" id="cDone">done</button>' +
+        '</span>' +
+      '</div>',
       function (e) {
-        var sw = e.target.closest('[data-p]');
-        if (sw) { store[key] = { t: 'p', i: +sw.dataset.p }; after(); return; }
+        var swb = e.target.closest('[data-p]');
+        if (swb) { store[key] = { t: 'p', i: +swb.dataset.p }; after(); return; }
         if (e.target.closest('#cReset')) { delete store[key]; after(); return; }
+        if (e.target.closest('#cDone')) { closePop(); return; }
       });
-    pop.querySelector('#cPick').addEventListener('input', function (e) {
-      store[key] = { t: 'h', v: e.target.value };
+    function pick() {
+      store[key] = { t: 'h', v: pop.querySelector('#cPick').value };
       after(true);
-    });
+    }
+    pop.querySelector('#cPick').addEventListener('input', pick);
+    pop.querySelector('#cPick').addEventListener('change', pick);
     function after(keepOpen) {
       save();
       buildDrawer();
       renderPane('themes');
       if (state.tab === 'calendar') renderTimeline();
+      /* refresh the pop's own indicators without rebuilding its colour input */
+      var cur2 = store[key];
+      var pal2 = !!(cur2 && cur2.t === 'p');
+      pop.querySelectorAll('.swb').forEach(function (b) {
+        b.classList.toggle('on', pal2 && cur2.i === +b.dataset.p);
+      });
+      var st = pop.querySelector('#cState');
+      if (st) st.textContent = (cur2 && cur2.t === 'h') ? 'custom colour in use'
+        : pal2 ? 'palette colour in use' : 'automatic colour';
       if (!keepOpen) closePop();
     }
+    /* set the initial state text */
+    (function () {
+      var st = pop.querySelector('#cState');
+      if (st) st.textContent = (cur && cur.t === 'h') ? 'custom colour in use'
+        : (cur && cur.t === 'p') ? 'palette colour in use' : 'automatic colour';
+    })();
   }
 
   /* ── filter drawer ── */
