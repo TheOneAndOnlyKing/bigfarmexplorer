@@ -18,8 +18,6 @@
   body[data-font="sans"]  { --ui: var(--f-sans); }
   body[data-font="serif"] { --ui: var(--f-serif); }
   body[data-font="mono"]  { --ui: var(--f-mono); }
-
-  /* ── theme palettes: light / grey / dark ─────────────────── */
   body[data-theme="light"] {
     --bg:#F2F0E8; --card:#FBFAF5; --ink:#22251E; --muted:#6C6F63;
     --line:#E3E0D4; --line2:#D2CEBF; --dayline:rgba(34,37,30,.08);
@@ -50,14 +48,8 @@
     --bar-0:#E07850; --bar-1:#93BE74; --bar-2:#E5BC58; --bar-3:#8FA9DA;
     --bar-4:#C293C6; --bar-5:#5FC2B0; --bar-6:#DE8E9C; --bar-7:#B2B45E;
   }
-
   html { background: var(--bg); }
-  body {
-    background: var(--bg); color: var(--ink);
-    font-family: var(--ui); font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-    transition: background-color .25s, color .25s;
-  }
+  body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-size: 14px; -webkit-font-smoothing: antialiased; transition: background-color .25s, color .25s; }
   button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   ::selection { background: var(--accent); color: var(--on-accent); }
@@ -65,122 +57,50 @@
   ::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 6px; border: 2px solid var(--card); }
   ::-webkit-scrollbar-track { background: transparent; }
   * { scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
-
-  /* ── top bar ─────────────────────────────────────────────── */
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 11px 22px; border-bottom: 1px solid var(--line);
-    transition: border-color .25s;
-  }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 11px 22px; border-bottom: 1px solid var(--line); }
   .home { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; min-height: 34px; }
-  /* LOGO — upload your image as logo.png next to this file. Optionally also upload
-     logo-dark.png (a light version) and it's used automatically in grey/dark mode. */
   .homelogo { display: block; height: 32px; width: auto; max-width: 250px; object-fit: contain; }
-  .bemark {
-    display: grid; place-items: center; width: 34px; height: 34px;
-    border-radius: 10px; background: var(--accent); color: var(--on-accent);
-    font-family: var(--f-serif); font-weight: 700; font-size: 15px;
-  }
+  .bemark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: var(--on-accent); font-family: var(--f-serif); font-weight: 700; font-size: 15px; }
   .bt { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
-  .themebtn {
-    display: flex; align-items: center; gap: 8px;
-    padding: 7px 13px; border: 1px solid var(--line); border-radius: 10px;
-    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-    color: var(--muted); transition: color .15s, border-color .15s;
-  }
+  .themebtn { display: flex; align-items: center; gap: 8px; padding: 7px 13px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
   .themebtn:hover { color: var(--ink); border-color: var(--line2); }
-
-  /* ── card, tabs, toolbar ─────────────────────────────────── */
   .wrap { max-width: 1280px; margin: 0 auto; padding: 20px 22px 44px; }
   .tabs { display: flex; gap: 6px; padding: 0 18px; margin-bottom: -1px; position: relative; z-index: 2; overflow-x: auto; }
-  .tab {
-    display: flex; align-items: center; gap: 7px; white-space: nowrap;
-    border: 1px solid transparent; border-bottom: none;
-    padding: 8px 16px 9px; border-radius: 11px 11px 0 0;
-    font-size: 13px; font-weight: 600; color: var(--muted);
-  }
+  .tab { display: flex; align-items: center; gap: 7px; white-space: nowrap; border: 1px solid transparent; border-bottom: none; padding: 8px 16px 9px; border-radius: 11px 11px 0 0; font-size: 13px; font-weight: 600; color: var(--muted); }
   .tab:hover { color: var(--ink); }
   .tab.active { background: var(--card); border-color: var(--line); padding-bottom: 10px; }
-  .card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-    box-shadow: var(--shadow); overflow: hidden;
-    transition: background-color .25s, border-color .25s;
-  }
-  .toolbar {
-    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-    padding: 10px 16px; border-bottom: 1px solid var(--line);
-  }
-  .card.on-themes .toolbar { display: none; }   /* the month/year changer is Calendar/List only */
-  .tb-side { display: flex; align-items: center; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+  .toolbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+  .card.on-themes .toolbar { display: none; }
+  .tb-side { display: flex; align-items: center; gap: 8px; }
   .tb-side.r { justify-content: flex-end; }
   .tb-center { display: flex; align-items: center; gap: 8px; }
-  .ghostbtn {
-    padding: 6px 12px; border: 1px solid var(--line); border-radius: 9px;
-    font-size: 12px; font-weight: 600; color: var(--muted);
-    transition: color .15s, border-color .15s;
-  }
+  .ghostbtn { padding: 6px 12px; border: 1px solid var(--line); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
   .ghostbtn:hover { color: var(--ink); border-color: var(--line2); }
-  .nav-arrow {
-    width: 30px; height: 30px; display: grid; place-items: center;
-    border: 1px solid var(--line); border-radius: 9px; color: var(--muted);
-  }
+  .ghostbtn.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .nav-arrow { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); }
   .nav-arrow:hover { color: var(--ink); border-color: var(--line2); }
-  .nav-label {
-    height: 30px; padding: 0 12px; display: flex; align-items: center; gap: 7px;
-    border: 1px solid var(--line); border-radius: 9px;
-    font-size: 13px; font-weight: 600;
-  }
+  .nav-label { height: 30px; padding: 0 12px; display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 9px; font-size: 13px; font-weight: 600; }
   .nav-label:hover { border-color: var(--accent); color: var(--accent); }
   .nav-label svg { opacity: .5; }
   .view-count { font-size: 12px; color: var(--muted); }
-
-  /* ── panes ───────────────────────────────────────────────── */
   .pane { display: none; }
   .pane.active { display: block; }
-
-  /* calendar: the scrolling timeline — stretchy height, internal scrollbars */
   .tl-wrap { position: relative; }
-  .tl {
-    position: relative; overflow: auto;
-    height: clamp(340px, calc(100vh - 270px), 1000px);
-  }
+  .tl { position: relative; overflow: auto; height: clamp(340px, calc(100vh - 270px), 1000px); }
   .tl-inner { position: relative; }
-  .tl-head {
-    position: sticky; top: 0; z-index: 6;
-    display: flex; background: var(--card);
-    border-bottom: 1px solid var(--line);
-    transition: background-color .25s;
-  }
-  .tl-corner {
-    position: sticky; left: 0; z-index: 7; flex: none;
-    display: flex; align-items: center; padding: 0 12px;
-    background: var(--card); border-right: 1px solid var(--line);
-    font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--muted);
-  }
+  .tl-head { position: sticky; top: 0; z-index: 6; display: flex; background: var(--card); border-bottom: 1px solid var(--line); }
+  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: center; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
   .tl-headcol { position: relative; flex: none; overflow: hidden; }
   .hm-row { position: relative; height: 32px; }
   .hd-row { position: relative; height: 34px; border-top: 1px solid var(--dayline); }
-  .hmonth {
-    position: absolute; top: 0; height: 100%;
-    display: flex; align-items: center; padding-left: 8px;
-    border-left: 1px solid var(--line);
-    font-size: 11.5px; font-weight: 600; letter-spacing: .04em; overflow: hidden; white-space: nowrap;
-  }
-  .hday {
-    position: absolute; top: 0; height: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
-  }
+  .hmonth { position: absolute; top: 0; height: 100%; display: flex; align-items: center; padding-left: 8px; border-left: 1px solid var(--line); font-size: 11.5px; font-weight: 600; letter-spacing: .04em; overflow: hidden; white-space: nowrap; }
+  .hday { position: absolute; top: 0; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
   .hday i { font-style: normal; font-size: 8.5px; color: var(--muted); }
   .hday b { font-size: 11px; font-weight: 500; }
   .hday.we b, .hday.we i { color: var(--muted); }
   .hday.we { background: var(--wknd); }
-  .hflag {
-    position: absolute; top: 4px; transform: translateX(-50%); z-index: 2;
-    background: var(--accent); color: var(--on-accent);
-    font-family: var(--f-mono); font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase;
-    padding: 1px 6px; border-radius: 99px;
-  }
+  .hflag { position: absolute; top: 4px; transform: translateX(-50%); z-index: 2; background: var(--accent); color: var(--on-accent); font-family: var(--f-mono); font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase; padding: 1px 6px; border-radius: 99px; }
   .tl-lanewrap { position: relative; }
   .tl-grid { position: absolute; top: 0; bottom: 0; pointer-events: none; z-index: 0; }
   .gmonth { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
@@ -188,77 +108,38 @@
   .gtoday { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); }
   .lane { display: flex; position: relative; z-index: 1; border-bottom: 1px solid var(--dayline); }
   .lane:last-child { border-bottom: none; }
-  .lane-label {
-    position: sticky; left: 0; z-index: 3; flex: none;
-    display: flex; align-items: center; gap: 10px; padding: 6px 12px;
-    background: var(--card); border-right: 1px solid var(--line);
-    transition: background-color .25s;
-  }
+  .lane-label { position: sticky; left: 0; z-index: 3; flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--card); border-right: 1px solid var(--line); }
   .lane-label .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+  .capdot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
   .ltxt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
   .ltxt b { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ltxt small { font-family: var(--f-mono); font-size: 9.5px; color: var(--muted); white-space: nowrap; }
   .lane-chart { position: relative; flex: none; overflow: hidden; }
-  .bar {
-    position: absolute; border-radius: 6px; overflow: hidden;
-    display: flex; align-items: center; padding: 0 8px;
-    cursor: pointer; font-size: 10.5px; font-weight: 500; letter-spacing: .01em;
-    transition: box-shadow .15s, filter .15s;
-  }
+  .bar { position: absolute; border-radius: 6px; overflow: hidden; display: flex; align-items: center; padding: 0 8px; cursor: pointer; font-size: 10.5px; font-weight: 500; letter-spacing: .01em; transition: box-shadow .15s, filter .15s, opacity .2s; }
   .bar:hover { filter: brightness(1.06) saturate(1.05); box-shadow: 0 0 0 1.5px var(--card), 0 0 0 3px var(--accent); }
   .bl { pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  @keyframes flash {
-    0%, 100% { box-shadow: none; }
-    15%, 45%, 75% { box-shadow: 0 0 0 3px var(--accent); }
-    30%, 60% { box-shadow: 0 0 0 3px transparent; }
-  }
+  .tl.fl-on .bar:not(.is-fl) { opacity: .28; }
+  .flb { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-style: normal; font-family: var(--f-mono); font-size: 8px; font-weight: 700; letter-spacing: .08em; background: var(--accent); color: var(--on-accent); border-radius: 3px; padding: 1px 3px; pointer-events: none; }
+  @keyframes flash { 0%, 100% { box-shadow: none; } 15%, 45%, 75% { box-shadow: 0 0 0 3px var(--accent); } 30%, 60% { box-shadow: 0 0 0 3px transparent; } }
   .bar.flash { animation: flash 1.4s ease; }
-
-  /* empty / loading overlay — pinned to the viewport, never to the content */
-  .tl-empty {
-    position: absolute; inset: 0; z-index: 5;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-    color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem;
-    background: var(--card);
-    background: color-mix(in srgb, var(--card) 86%, transparent);
-    pointer-events: none;
-  }
+  .tl-empty { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; background: var(--card); background: color-mix(in srgb, var(--card) 86%, transparent); pointer-events: none; }
   .tl-empty[hidden] { display: none; }
   .tl-empty p { text-align: center; padding: 0 20px; }
   .tl-empty-btns { display: flex; gap: 8px; }
   .tl-empty .mini { pointer-events: auto; font-style: normal; }
-  .mini {
-    padding: 6px 13px; border: 1px solid var(--line); border-radius: 9px;
-    font-size: 12px; font-weight: 600; color: var(--muted);
-    transition: color .15s, border-color .15s, opacity .15s;
-  }
+  .mini { padding: 6px 13px; border: 1px solid var(--line); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
   .mini:hover { color: var(--accent); border-color: var(--accent); }
   .mini:disabled { opacity: .45; cursor: default; }
-  .mini:disabled:hover { color: var(--muted); border-color: var(--line); }
-
-  /* list view */
-  .list-head {
-    display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap;
-    padding: 10px 18px; border-bottom: 1px solid var(--line);
-    font-size: 12.5px; color: var(--muted);
-  }
+  .list-head { display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 10px 18px; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
   .list-acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .list-body { height: clamp(300px, calc(100vh - 314px), 956px); overflow: auto; padding: 4px 0 12px; }
   .sortseg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
   .sortseg button { padding: 4px 12px; font-size: 11.5px; font-weight: 600; color: var(--muted); }
   .sortseg button + button { border-left: 1px solid var(--line); }
   .sortseg button.on { background: var(--accent); color: var(--on-accent); }
-  .lg-head {
-    display: flex; align-items: baseline; gap: 10px;
-    padding: 14px 18px 6px;
-    font-family: var(--f-serif); font-weight: 600; font-size: 14px;
-  }
+  .lg-head { display: flex; align-items: baseline; gap: 10px; padding: 14px 18px 6px; font-family: var(--f-serif); font-weight: 600; font-size: 14px; }
   .lg-head span { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
-  .lrow {
-    width: 100%; display: grid; grid-template-columns: 14px 1fr auto auto 44px;
-    align-items: center; gap: 12px; text-align: left;
-    padding: 8px 18px; border-radius: 10px;
-  }
+  .lrow { width: 100%; display: grid; grid-template-columns: 14px 1fr auto auto 44px; align-items: center; gap: 12px; text-align: left; padding: 8px 18px; border-radius: 10px; }
   .lrow:hover { background: var(--accent-soft); }
   .ldot { width: 10px; height: 10px; border-radius: 50%; }
   .ln { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -266,15 +147,10 @@
   .ld { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
   .llu { font-family: var(--f-mono); font-size: 11px; color: var(--muted); text-align: right; }
   .list-empty { padding: 60px 20px; text-align: center; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; }
-
-  /* the analytical table */
+  .flbadge { display: inline-flex; font-family: var(--f-mono); font-size: 8.5px; font-weight: 700; letter-spacing: .08em; background: var(--accent); color: var(--on-accent); border-radius: 3px; padding: 1px 4px; margin-left: 8px; vertical-align: 1px; }
+  #pane-list.fl-on .lrow:not(.has-fl), #pane-list.fl-on .atable tbody tr:not(.has-fl) { opacity: .45; }
   .atable { width: 100%; min-width: 560px; border-collapse: collapse; }
-  .atable th {
-    position: sticky; top: 0; z-index: 2; background: var(--card);
-    font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--muted); text-align: left; padding: 9px 14px;
-    border-bottom: 1px solid var(--line2); cursor: pointer; user-select: none; white-space: nowrap;
-  }
+  .atable th { position: sticky; top: 0; z-index: 2; background: var(--card); font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line2); cursor: pointer; user-select: none; white-space: nowrap; }
   .atable th.r { text-align: right; }
   .atable th:hover { color: var(--ink); }
   .atable th.on { color: var(--ink); }
@@ -291,23 +167,13 @@
   .atable td.c-sec { font-size: 12px; color: var(--muted); }
   .atable .c-dt, .atable .c-dy { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
   .atable .c-dy { text-align: right; }
-
-  /* themes pane */
   .settings { padding: 8px 22px 26px; max-width: 860px; }
   .set-group { padding: 20px 0; border-bottom: 1px solid var(--line); }
   .set-group:last-child { border-bottom: none; }
-  .set-group h3 {
-    font-family: var(--f-serif); font-size: 15px; font-weight: 600;
-    display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;
-  }
+  .set-group h3 { font-family: var(--f-serif); font-size: 15px; font-weight: 600; display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
   .set-group h3 .h-note { font-family: var(--ui); font-size: 11.5px; font-weight: 400; color: var(--muted); }
   .fontopts { display: flex; gap: 10px; flex-wrap: wrap; }
-  .fontopt {
-    flex: 1; min-width: 200px; text-align: left;
-    border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px;
-    display: flex; flex-direction: column; gap: 4px;
-    transition: border-color .15s, background .15s;
-  }
+  .fontopt { flex: 1; min-width: 200px; text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
   .fontopt:hover { border-color: var(--line2); }
   .fontopt.on { border-color: var(--accent); background: var(--accent-soft); }
   .fontopt .fprev { font-size: 19px; font-weight: 600; }
@@ -329,69 +195,36 @@
   .csub b { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
   .csub-acts { display: flex; align-items: center; gap: 4px; }
   .csub-lab { font-family: var(--f-mono); font-size: 9.5px; color: var(--muted); margin-right: 2px; }
-  .cgrid, .crow { }
   .crow { display: flex; align-items: center; gap: 10px; padding: 6px 2px; border-radius: 8px; }
   .csw { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid transparent; position: relative; }
   .csw:hover { border-color: var(--ink); }
   .csw.auto { border-style: dashed; border-color: var(--muted); opacity: .75; }
   .cn { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .crow .ov { margin-left: auto; font-family: var(--f-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-  .ovbtn {
-    margin-left: auto; font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 3px 11px;
-    transition: color .15s, border-color .15s, background .15s;
-  }
+  .ovbtn { margin-left: auto; font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 3px 11px; }
   .ovbtn:hover { color: var(--ink); border-color: var(--line2); }
   .ovbtn.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .mini2 { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 2px 6px; border-radius: 6px; }
   .mini2:hover { color: var(--accent); background: var(--accent-soft); }
   .lorow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
   .lorow[hidden] { display: none; }
-  .loselect {
-    font: inherit; font-size: 12.5px; color: var(--ink);
-    background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
-    padding: 6px 10px; max-width: 200px;
-  }
-  .loselect:focus { outline: none; border-color: var(--accent); }
-  .loinput input {
-    font: inherit; font-size: 12.5px; color: var(--ink);
-    background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
-    padding: 6px 10px; width: 220px;
-  }
-  .loinput input:focus { outline: none; border-color: var(--accent); }
+  .loselect { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 6px 10px; max-width: 200px; }
+  .loinput input { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 6px 10px; width: 220px; }
   #loStatus { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
   #loStatus.warn { color: var(--warn); }
   .dhint { font-size: 12.5px; line-height: 1.7; color: var(--muted); }
   .dhint b { color: var(--ink); }
   .dhint code { font-family: var(--f-mono); font-size: 11px; background: var(--accent-soft); border-radius: 5px; padding: 1px 5px; }
-  .code {
-    font-family: var(--f-mono); font-size: 11px; line-height: 1.6;
-    background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
-    padding: 10px 14px; margin: 10px 0; overflow-x: auto; white-space: pre;
-  }
+  .code { font-family: var(--f-mono); font-size: 11px; line-height: 1.6; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin: 10px 0; overflow-x: auto; white-space: pre; }
   .dstat { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
   .dstat.warn { color: var(--warn); }
   .dbtns { display: flex; gap: 8px; margin-top: 12px; }
   .danger { padding: 7px 14px; border: 1px solid var(--line2); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
   .danger:hover { border-color: var(--warn); color: var(--warn); }
-
-  /* card footer */
-  .cardfoot {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    padding: 10px 14px; border-top: 1px solid var(--line);
-  }
-  .filterbtn {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 13px; border: 1px solid var(--line); border-radius: 10px;
-    font-size: 12px; font-weight: 600; color: var(--muted);
-    transition: color .15s, border-color .15s;
-  }
+  .cardfoot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-top: 1px solid var(--line); }
+  .filterbtn { display: flex; align-items: center; gap: 8px; padding: 6px 13px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; font-weight: 600; color: var(--muted); }
   .filterbtn:hover { color: var(--ink); border-color: var(--line2); }
-  .badge {
-    background: var(--accent); color: var(--on-accent);
-    min-width: 16px; height: 16px; border-radius: 99px; padding: 0 4px;
-    display: inline-grid; place-items: center; font-size: 10px; font-weight: 700;
-  }
+  .badge { background: var(--accent); color: var(--on-accent); min-width: 16px; height: 16px; border-radius: 99px; padding: 0 4px; display: inline-grid; place-items: center; font-size: 10px; font-weight: 700; }
   .datachip { margin: 0 auto; display: flex; align-items: center; gap: 7px; font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
   .datachip:hover { color: var(--ink); }
   .chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
@@ -399,79 +232,39 @@
   .zoomstep { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
   .zoomstep button { width: 30px; height: 29px; display: grid; place-items: center; color: var(--muted); }
   .zoomstep button:hover { color: var(--ink); background: var(--accent-soft); }
-  .zoomstep span {
-    font-family: var(--f-mono); font-size: 10.5px; color: var(--muted);
-    display: flex; align-items: center; justify-content: center; min-width: 38px;
-    border-left: 1px solid var(--line); border-right: 1px solid var(--line);
-  }
+  .zoomstep span { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); display: flex; align-items: center; justify-content: center; min-width: 38px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
   .zoom { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
   .zoom button { padding: 6px 13px; font-size: 12px; font-weight: 700; letter-spacing: .03em; color: var(--muted); }
   .zoom button + button { border-left: 1px solid var(--line); }
   .zoom button.on { background: var(--accent); color: var(--on-accent); }
-
-  /* notice strip */
-  .notice {
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    padding: 9px 18px; background: var(--accent-soft);
-    border-bottom: 1px solid var(--line);
-    font-size: 12.5px; color: var(--muted);
-  }
+  .notice { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 9px 18px; background: var(--accent-soft); border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
   .notice b { color: var(--ink); }
   .notice .mini { border: none; padding: 2px 8px; color: var(--accent); text-decoration: underline; }
   .notice .nx { margin-left: auto; color: var(--muted); font-size: 15px; line-height: 1; }
-  .notice .nx:hover { color: var(--ink); }
-
-  /* filter drawer */
   .scrim { position: fixed; inset: 0; z-index: 39; background: rgba(20,22,16,.28); opacity: 0; pointer-events: none; transition: opacity .25s; }
   body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
   body.drawer-open { overflow: hidden; }
-  .drawer {
-    position: fixed; top: 0; bottom: 0; left: 0; z-index: 40;
-    width: min(340px, 88vw);
-    background: var(--card); border-right: 1px solid var(--line);
-    transform: translateX(-102%); transition: transform .25s ease;
-    display: flex; flex-direction: column;
-  }
+  .drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; width: min(340px, 88vw); background: var(--card); border-right: 1px solid var(--line); transform: translateX(-102%); transition: transform .25s ease; display: flex; flex-direction: column; }
   body.drawer-open .drawer { transform: none; }
   .d-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--line); }
   .d-head b { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
   .dclose { color: var(--muted); padding: 4px; }
-  .dclose:hover { color: var(--ink); }
   .d-scroll { flex: 1; overflow: auto; padding: 14px 18px; }
   .dgroup { margin-bottom: 22px; }
   .dg-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
   .dg-head b { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
   .dg-acts { display: flex; gap: 4px; }
-  .dsearch {
-    width: 100%; padding: 7px 10px; margin-bottom: 8px;
-    border: 1px solid var(--line); border-radius: 8px;
-    background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px;
-  }
-  .dsearch:focus { outline: none; border-color: var(--accent); }
+  .dsearch { width: 100%; padding: 7px 10px; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px; }
   .drow { display: flex; align-items: center; gap: 10px; padding: 6px 6px; border-radius: 8px; cursor: pointer; }
   .drow:hover { background: var(--accent-soft); }
-  .drow input {
-    appearance: none; width: 16px; height: 16px; flex: none;
-    border: 1.5px solid var(--muted); border-radius: 5px; display: grid; place-items: center; cursor: pointer;
-  }
+  .drow input { appearance: none; width: 16px; height: 16px; flex: none; border: 1.5px solid var(--muted); border-radius: 5px; display: grid; place-items: center; cursor: pointer; }
   .drow input:checked { background: var(--accent); border-color: var(--accent); }
-  .drow input:checked::after {
-    content: ""; width: 8px; height: 4px;
-    border-left: 2px solid var(--on-accent); border-bottom: 2px solid var(--on-accent);
-    transform: rotate(-45deg) translate(0, -1px);
-  }
+  .drow input:checked::after { content: ""; width: 8px; height: 4px; border-left: 2px solid var(--on-accent); border-bottom: 2px solid var(--on-accent); transform: rotate(-45deg) translate(0, -1px); }
   .drow .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
   .drow .dv { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .drow .cnt { margin-left: auto; font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
   .d-foot { padding: 12px 18px; border-top: 1px solid var(--line); font-family: var(--f-mono); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .d-empty { color: var(--muted); font-style: italic; }
-
-  /* popover */
-  .pop {
-    position: fixed; z-index: 60; display: none;
-    background: var(--card); border: 1px solid var(--line2); border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(20,22,14,.22); padding: 10px;
-  }
+  .pop { position: fixed; z-index: 60; display: none; background: var(--card); border: 1px solid var(--line2); border-radius: 12px; box-shadow: 0 8px 30px rgba(20,22,14,.22); padding: 10px; }
   .pgrid { display: grid; grid-template-columns: repeat(3, 62px); gap: 4px; }
   .pgrid.y { grid-template-columns: repeat(4, 56px); }
   .pm { padding: 7px 4px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--muted); text-align: center; }
@@ -480,35 +273,21 @@
   .poptitle { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 2px 2px 8px; }
   .swrow { display: flex; flex-wrap: wrap; gap: 6px; max-width: 240px; }
   .swb { width: 26px; height: 26px; border-radius: 8px; border: 1.5px solid transparent; }
-  .swb:hover, .swb.on { border-color: var(--ink); }
+  .swb:hover { border-color: var(--ink); }
   .pop .custom-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
   .pop input[type="color"] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 7px; background: none; cursor: pointer; }
   .pop .lbl { font-size: 12px; color: var(--muted); }
-
-  /* tooltip */
   .tip { position: fixed; z-index: 90; pointer-events: none; display: none; }
-  .tt {
-    background: var(--tipbg); color: var(--tipink);
-    border-left: 3px solid; border-radius: 10px; padding: 8px 12px;
-    display: flex; flex-direction: column; gap: 2px; max-width: 260px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.25); font-size: 12px;
-  }
+  .tt { background: var(--tipbg); color: var(--tipink); border-left: 3px solid; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; max-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,.25); font-size: 12px; }
   .tt b { font-weight: 600; }
   .tt .sec { opacity: .65; font-size: 11.5px; }
   .tt .td { font-family: var(--f-mono); font-size: 10.5px; opacity: .8; margin-top: 2px; }
-
-  /* drop overlay */
-  .drop {
-    position: fixed; inset: 14px; z-index: 100; display: none;
-    align-items: center; justify-content: center;
-    border: 2px dashed var(--accent); border-radius: 18px;
-    background: var(--accent-soft); backdrop-filter: blur(2px);
-  }
+  .tt .fl { font-family: var(--f-mono); font-size: 9px; font-weight: 700; letter-spacing: .1em; color: var(--tipink); background: rgba(255,255,255,.25); border-radius: 3px; padding: 1px 4px; align-self: flex-start; margin-top: 4px; }
+  .drop { position: fixed; inset: 14px; z-index: 100; display: none; align-items: center; justify-content: center; border: 2px dashed var(--accent); border-radius: 18px; background: var(--accent-soft); }
   .drop.on { display: flex; }
   .drop-in { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--accent); }
   .drop-in b { font-family: var(--f-serif); font-size: 22px; color: var(--ink); }
   .drop-in span { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-
   @media (max-width: 760px) {
     .view-count, .datachip { display: none; }
     .bt { display: none; }
@@ -552,7 +331,10 @@
 
   <div class="card" id="card">
     <div class="toolbar">
-      <div class="tb-side"><button class="ghostbtn" id="todayBtn">Today</button></div>
+      <div class="tb-side">
+        <button class="ghostbtn" id="todayBtn">Today</button>
+        <button class="ghostbtn" id="flBtn" title="Highlight the events counting for the Farmer's League" aria-pressed="false">FL</button>
+      </div>
       <div class="tb-center">
         <button class="nav-arrow" id="prevBtn" aria-label="Previous period"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l-8 8 8 8"/></svg></button>
         <button class="nav-label" id="rangeBtn"><span id="rangeVal"></span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -581,13 +363,9 @@
       </button>
       <button class="datachip" id="dataChip" title="Data status — click for details"><span class="chip-dot"></span><span id="dataChipTxt"></span></button>
       <div class="zoomstep">
-        <button id="zOut" title="Zoom out slightly">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4"/></svg>
-        </button>
+        <button id="zOut" title="Zoom out slightly"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4"/></svg></button>
         <span id="zPct" title="Zoom level">100%</span>
-        <button id="zIn" title="Zoom in slightly">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4M10.5 7.8v5.4"/></svg>
-        </button>
+        <button id="zIn" title="Zoom in slightly"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4M10.5 7.8v5.4"/></svg></button>
       </div>
       <div class="zoom" id="zoomSeg">
         <button data-z="1" class="on">1M</button><button data-z="3">3M</button><button data-z="6">6M</button><button data-z="12">1Y</button>
@@ -608,7 +386,7 @@
 <div class="drop" id="drop">
   <div class="drop-in">
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"/></svg>
-    <b>Drop your file</b><span>events .jsonl · colour layouts .json</span>
+    <b>Drop your events file</b><span>events .jsonl</span>
   </div>
 </div>
 <input type="file" id="fileInput" accept=".jsonl,.json,.txt" hidden>
@@ -619,49 +397,69 @@
   'use strict';
 
   /* ══════════════ CONFIG ══════════════
-     The calendar reads this file (same folder as calendar.html).
-     It's the "Machine" output of your Datepress tool, one event per line:
-       {"start":"2025-09-14","end":"2025-09-16","event":"Landscape Architect","section":"Main Events"}
-     Optional fields: "section" (lane grouping), "color" (hex), "item".   */
+     The calendar reads events.jsonl (Datepress 2 Machine output).
+     Sections + line order below mirror the map baked into Datepress 2.   */
   const DATA_FILE = 'events.jsonl';
   const LS_KEY = 'bigfarm-calendar-v1';
   const MS = 86400000;
   const BUF_MONTHS = 6;
 
-  /* The built-in "Default" colour layout for the Reset colours button.
-     Leave null for now — instead, save a load-out named "Default" from the
-     Themes tab and Reset colours will use that automatically.             */
-  const DEFAULT_LAYOUT = null;   // e.g. { sections:{ "Co-op":{t:'p',i:2} }, events:{...}, secOverride:{} }
+  const SECTION_ORDER = [
+    { name: 'Weekly events', cap: 0, events: ['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship'] },
+    { name: 'Monthly events', cap: 0, events: ['Cruise Ship', 'Goldfish Rescue', 'Pleasure Park', 'Urgent Delivery', 'Urgent Delivery (Gourmet Farm)', 'Shinkei-Suijaku', 'Pair Finder'] },
+    { name: 'Dream worlds', cap: 1, events: ["Greta's Dream World", "Tessa's Dream World", "Tessa's Dream World (Missions)"] },
+    { name: 'Background events', cap: 0, events: ['Horse Season', "Farmer's League", 'Worldwide Championship'] },
+    { name: 'Seasons', cap: 1, events: ['Spring Season', 'Summer Season', 'Autumn Season', 'Winter Season', 'Christmas Season'] },
+    { name: 'Temporary farms', cap: 1, events: ['Festive Farm', 'Northern Lights Farm', 'Viking Farm', 'Tropical Farm', 'Candy Farm'] },
+    { name: 'Search events', cap: 2, events: ['Candy Search', 'Mushroom Search Event', "Valentine's Search Event", 'Easter Egg Hunt', 'Summer Time Search Event', 'Halloween Search Event', 'Winter Search Event'] },
+    { name: 'Yearly events', cap: 2, events: ['Global Point Event', 'Chinese New Year', "Saint Patrick's Day", 'Golden Week Event', 'Tailgate Party', 'Oktoberfest', "Santa's Workshop", 'Advent Calendar', 'Big Farm Anniversary Event', 'Football Fever'] },
+    { name: 'Themed events', cap: 3, events: ['A Hint of Hawaii', "Here's to Nature", 'Not of this World', 'Mysterious Asia', 'Fairytale Time', 'Culinary Campaign', 'Three Weddings and a Rigmarole'] },
+    { name: 'Minor events', cap: 0, events: ['A Hero for Piggles', 'My bees are gone!', 'Fortune Teller', 'Landscape Architect'] }
+  ];
+  const WEEKLY_SET = new Set(['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship']);
+  const FL_NAME = "Farmer's League";
 
   const SAMPLE_JSONL = [
-    '{"start":"2025-09-01","end":"2025-09-02","event":"Co-op Challenge","section":"Co-op"}',
-    '{"start":"2025-10-01","end":"2025-10-02","event":"Co-op Challenge","section":"Co-op"}',
-    '{"start":"2025-11-01","end":"2025-11-02","event":"Co-op Challenge","section":"Co-op"}',
-    '{"start":"2025-12-01","end":"2025-12-02","event":"Co-op Challenge","section":"Co-op"}',
-    '{"start":"2025-09-08","end":"2025-09-10","event":"Co-op Project: Bridge Repair","section":"Co-op"}',
-    '{"start":"2025-10-17","end":"2025-10-19","event":"Co-op Championships","section":"Co-op"}',
-    '{"start":"2025-11-14","end":"2025-11-23","event":"Horse Season","section":"Co-op"}',
-    '{"start":"2025-09-05","end":"2025-09-09","event":"Farmer\'s Fair","section":"Main Events"}',
-    '{"start":"2025-09-07","end":"2025-09-12","event":"Autumn Market","section":"Main Events"}',
-    '{"start":"2025-09-14","end":"2025-09-16","event":"Landscape Architect","section":"Main Events"}',
-    '{"start":"2025-09-22","end":"2025-09-24","event":"Fishing Tournament","section":"Main Events"}',
-    '{"start":"2025-10-10","end":"2025-10-12","event":"Harvest Festival","section":"Main Events"}',
-    '{"start":"2025-10-24","end":"2025-10-26","event":"Mining Weekend","section":"Main Events"}',
-    '{"start":"2025-10-31","end":"2025-10-31","event":"Spooky Barn","section":"Main Events"}',
-    '{"start":"2025-11-06","end":"2025-11-11","event":"Seaside Wedding","section":"Main Events"}',
-    '{"start":"2025-11-28","end":"2025-11-30","event":"Fishing Tournament","section":"Main Events"}',
-    '{"start":"2025-12-12","end":"2025-12-15","event":"Winter Feast","section":"Main Events"}',
-    '{"start":"2026-01-09","end":"2026-01-11","event":"New Year Seed Swap","section":"Main Events"}',
-    '{"start":"2026-02-13","end":"2026-02-15","event":"Valentine\'s Bouquets","section":"Main Events"}',
-    '{"start":"2025-09-01","end":"2025-09-21","event":"Candy Farm","section":"Temporary Farms"}',
-    '{"start":"2025-10-03","end":"2025-10-26","event":"Viking Farm","section":"Temporary Farms"}',
-    '{"start":"2025-11-01","end":"2025-11-28","event":"Island Farm","section":"Temporary Farms"}',
-    '{"start":"2025-12-05","end":"2026-01-04","event":"Christmas Village","section":"Temporary Farms"}',
-    '{"start":"2026-02-01","end":"2026-02-22","event":"Sweetheart Bakery","section":"Temporary Farms"}',
-    '{"start":"2025-09-20","end":"2025-09-28","event":"Autumn Harvest","section":"Seasonal"}',
-    '{"start":"2025-12-20","end":"2025-12-31","event":"Winter Countdown","section":"Seasonal"}',
-    '{"start":"2025-12-29","end":"2026-01-01","event":"New Year Fireworks","section":"Seasonal"}',
-    '{"start":"2026-01-05","end":"2026-02-02","event":"First Frost","section":"Seasonal"}'
+    '{"start":"2025-08-26","end":"2025-10-07","event":"Farmer\'s League","section":"Background events"}',
+    '{"start":"2025-09-03","end":"2025-10-28","event":"Horse Season: Movie Heroes","section":"Background events"}',
+    '{"start":"2025-08-23","end":"2025-09-20","event":"Worldwide Championship","section":"Background events"}',
+    '{"start":"2025-08-25","end":"2025-08-31","event":"Summer Season","section":"Seasons"}',
+    '{"start":"2025-09-24","end":"2025-10-22","event":"Autumn Season","section":"Seasons"}',
+    '{"start":"2025-08-31","end":"2025-09-27","event":"Candy Farm","section":"Temporary farms"}',
+    '{"start":"2025-09-30","end":"2025-10-28","event":"Tropical Farm","section":"Temporary farms"}',
+    '{"start":"2025-10-22","end":"2025-11-03","event":"Halloween Search Event","section":"Search events"}',
+    '{"start":"2025-09-18","end":"2025-10-09","event":"Oktoberfest","section":"Yearly events"}',
+    '{"start":"2025-09-02","end":"2025-09-05","event":"Village Fair","section":"Weekly events","fl":true}',
+    '{"start":"2025-09-02","end":"2025-09-05","event":"Fishing Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-05","end":"2025-09-09","event":"Cooperative Championship","section":"Weekly events"}',
+    '{"start":"2025-09-09","end":"2025-09-12","event":"Cooperative Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-15","end":"2025-09-18","event":"Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-17","end":"2025-09-20","event":"Village Fair","section":"Weekly events","fl":true}',
+    '{"start":"2025-09-17","end":"2025-09-20","event":"Fishing Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-20","end":"2025-09-24","event":"Cooperative Championship","section":"Weekly events"}',
+    '{"start":"2025-09-24","end":"2025-09-27","event":"Cooperative Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-03","end":"2025-09-10","event":"Greta\'s Dream World","section":"Dream worlds"}',
+    '{"start":"2025-09-10","end":"2025-09-17","event":"Tessa\'s Dream World (Missions)","section":"Dream worlds"}',
+    '{"start":"2025-09-18","end":"2025-09-25","event":"Tessa\'s Dream World","section":"Dream worlds"}',
+    '{"start":"2025-08-22","end":"2025-08-26","event":"Cruise Ship","section":"Monthly events","fl":true}',
+    '{"start":"2025-09-05","end":"2025-09-09","event":"Pair Finder","section":"Monthly events"}',
+    '{"start":"2025-09-06","end":"2025-09-10","event":"Urgent Delivery (Gourmet Farm)","section":"Monthly events"}',
+    '{"start":"2025-09-09","end":"2025-09-13","event":"Pleasure Park","section":"Monthly events"}',
+    '{"start":"2025-09-20","end":"2025-09-24","event":"Shinkei-Suijaku","section":"Monthly events"}',
+    '{"start":"2025-09-21","end":"2025-09-30","event":"Goldfish Rescue","section":"Monthly events"}',
+    '{"start":"2025-09-08","end":"2025-09-15","event":"Culinary Campaign","section":"Themed events"}',
+    '{"start":"2025-09-13","end":"2025-09-20","event":"Fairytale Time","section":"Themed events"}',
+    '{"start":"2025-09-21","end":"2025-09-28","event":"Mysterious Asia","section":"Themed events"}',
+    '{"start":"2025-09-23","end":"2025-09-30","event":"A Hint of Hawaii","section":"Themed events"}',
+    '{"start":"2025-09-29","end":"2025-10-06","event":"Not of this World","section":"Themed events"}',
+    '{"start":"2025-09-05","end":"2025-09-07","event":"Fortune Teller","section":"Minor events"}',
+    '{"start":"2025-09-11","end":"2025-09-13","event":"Fortune Teller","section":"Minor events"}',
+    '{"start":"2025-09-21","end":"2025-09-30","event":"Fortune Teller","section":"Minor events"}',
+    '{"start":"2025-09-04","end":"2025-09-06","event":"Landscape Architect","section":"Minor events"}',
+    '{"start":"2025-09-09","end":"2025-09-11","event":"Landscape Architect","section":"Minor events"}',
+    '{"start":"2025-09-14","end":"2025-09-16","event":"Landscape Architect","section":"Minor events"}',
+    '{"start":"2025-09-23","end":"2025-09-25","event":"Landscape Architect","section":"Minor events"}',
+    '{"start":"2025-09-20","end":"2025-09-28","event":"My bees are gone!","section":"Minor events"}'
   ].join('\n');
 
   /* ── constants & helpers ── */
@@ -674,6 +472,21 @@
   const monthAddT = (t, n) => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1); };
   const todayUTC = () => { const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); };
   const clone = o => JSON.parse(JSON.stringify(o));
+
+  /* maps from the section list */
+  const EV_SEC = new Map();   // base name → { sec, idx }
+  const SEC_INDEX = new Map();
+  SECTION_ORDER.forEach((s, si) => {
+    SEC_INDEX.set(s.name, si);
+    s.events.forEach((n, i) => EV_SEC.set(n, { sec: s.name, idx: i }));
+  });
+  const SEC_CAP = new Map(SECTION_ORDER.map(s => [s.name, s.cap]));
+  function baseName(n) {
+    const ln = n.toLowerCase();
+    if (ln === 'horse season' || ln.startsWith('horse season:')) return 'Horse Season';
+    if (ln.startsWith('big farm anniversary event:')) return 'Big Farm Anniversary Event';
+    return n;
+  }
 
   function fmtD(ts) { const d = new Date(ts); return d.getUTCDate() + ' ' + M_S[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
   function fmtRange(ev) {
@@ -698,36 +511,32 @@
     theme: 'light', font: 'sans', zoom: 1,
     anchor: { y: now0.getFullYear(), m: now0.getMonth() },
     tab: 'calendar', density: 'comfortable', weekends: true, labels: true,
-    sort: 'date', scale: 1,
+    sort: 'date', scale: 1, showFL: false,
     listFormat: 'informal', tsort: { col: 'start', dir: 'asc' },
     colors: { sections: {}, events: {}, secOverride: {} },
     loadouts: {}, lastLoadout: '',
     filters: { sections: [], items: [], years: [] }
   };
-  let events = [], sections = [], items = [], years = [], secIdx = new Map();
-  let filtered = [], source = 'sample', fileName = '', skipped = 0;
+  let events = [], sections = [], items = [], years = [];
+  let filtered = [], source = 'sample', fileName = '', skipped = 0, dataLoaded = false;
   let filtersLive = { sec: new Set(), it: new Set(), yr: new Set() };
-  let noticeDismissed = false, pinned = false, resetArmed = false, dataLoaded = false;
+  let noticeDismissed = false, pinned = false, resetArmed = false;
 
-  /* timeline runtime */
   const tl = $('#tl');
   let bufStartT = 0, bufEndT = 0, dayW = 20, savedScroll = 0, lastW = 0;
-  let laneRows = new Map(), secCounts = new Map();
+  let laneRows = new Map(), secCounts = new Map(), capWarns = new Set();
   let scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0, loStatusTimer = 0;
 
   function save() {
     try { localStorage.setItem(LS_KEY, JSON.stringify({
       theme: state.theme, font: state.font, zoom: state.zoom, tab: state.tab,
       anchor: state.anchor, density: state.density, weekends: state.weekends,
-      labels: state.labels, sort: state.sort, scale: state.scale,
+      labels: state.labels, sort: state.sort, scale: state.scale, showFL: state.showFL,
       listFormat: state.listFormat, tsort: state.tsort,
       colors: state.colors, loadouts: state.loadouts, lastLoadout: state.lastLoadout,
       filters: state.filters
     })); } catch (e) {}
   }
-
-  /* colour layouts: { sections:{name:{t,i}|{t,v}}, events:{...}, secOverride:{name:true} }
-     — also accepts the older flat format { eventName: colour } */
   function normVal(v) {
     if (!v || typeof v !== 'object') return null;
     if (v.t === 'h' && /^#[0-9a-fA-F]{6}$/.test(v.v || '')) return { t: 'h', v: v.v };
@@ -761,6 +570,7 @@
       if (typeof s.labels === 'boolean') state.labels = s.labels;
       if (['date','name','section'].includes(s.sort)) state.sort = s.sort;
       if (typeof s.scale === 'number') state.scale = Math.min(3, Math.max(0.4, s.scale));
+      if (typeof s.showFL === 'boolean') state.showFL = s.showFL;
       if (s.listFormat === 'informal' || s.listFormat === 'analytical') state.listFormat = s.listFormat;
       if (s.tsort && ['event','section','start','end','days'].includes(s.tsort.col))
         state.tsort = { col: s.tsort.col, dir: s.tsort.dir === 'desc' ? 'desc' : 'asc' };
@@ -793,33 +603,35 @@
       try {
         const o = JSON.parse(s);
         const st = parseISO(o.start), en = parseISO(o.end);
-        if (st == null || en == null) {
-          bad++;
-          if (/^\d{1,2}-\d{1,2}$/.test(o.start || '')) console.warn('line ' + (i+1) + ': date has no year — set a year in Datepress');
-          else console.warn('line ' + (i+1) + ': dates must be YYYY-MM-DD');
-          return;
-        }
+        if (st == null || en == null) { bad++; console.warn('line ' + (i+1) + ': dates must be YYYY-MM-DD'); return; }
         if (en < st) { bad++; console.warn('line ' + (i+1) + ': ends before it starts — skipped'); return; }
-        const name = typeof o.event === 'string' ? o.event.trim() : '';
+        let name = typeof o.event === 'string' ? o.event.trim() : '';
         if (!name) { bad++; return; }
+        let fl = !!o.fl;
+        const flm = name.match(/\s*[-–—]\s*fl$/i);
+        if (flm) { fl = true; name = name.slice(0, flm.index).trim(); }
+        const base = baseName(name);
+        const rec = EV_SEC.get(base);
+        const section = rec ? rec.sec : (typeof o.section === 'string' && o.section.trim() ? o.section.trim() : 'Unsorted');
         list.push({
-          id: id++, name,
-          section: (typeof o.section === 'string' && o.section.trim()) ? o.section.trim() : 'Events',
-          item: (typeof o.item === 'string' && o.item.trim()) ? o.item.trim() : name,
-          color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : null,
-          start: st, end: en, days: Math.round((en - st) / MS) + 1
+          id: id++, name, base, section, fl,
+          start: st, end: en, days: Math.round((en - st) / MS) + 1,
+          row: 0, seamL: false, seamR: false, flInferred: false
         });
       } catch (e) { bad++; console.warn('line ' + (i+1) + ': not valid JSON'); }
     });
     return { list, bad };
   }
   function deriveAll() {
-    sections = [...new Set(events.map(e => e.section))];
-    items = [...new Set(events.map(e => e.name))].sort((a, b) => a.localeCompare(b));
+    const known = SECTION_ORDER.map(s => s.name);
+    const extra = [...new Set(events.map(e => e.section))].filter(s => !known.includes(s)).sort();
+    sections = known.filter(n => events.some(e => e.section === n)).concat(extra);
+    if (!sections.length) sections = known.slice(0, 1);
+    items = [...new Set(events.map(e => e.base))].sort((a, b) => a.localeCompare(b));
     years = [...new Set(events.map(e => new Date(e.start).getUTCFullYear()))].sort();
-    secIdx = new Map(sections.map((s, i) => [s, i]));
     buildFilterSets();
     computeFiltered();
+    computeFLInference();
     recomputeLanes();
   }
   function applyText(text, label) {
@@ -828,19 +640,6 @@
     source = label === DATA_FILE ? 'file' : (label === 'sample' ? 'sample' : 'session');
     fileName = label; dataLoaded = true;
     deriveAll(); buildDrawer(); updateNotice(); updateChip(); refresh();
-  }
-  /* route dropped/loaded files: colour layouts (.json) vs events (.jsonl) */
-  function applyAnyText(text, label) {
-    const s = text.trim();
-    if (s.startsWith('{')) {
-      try {
-        const o = JSON.parse(s);
-        if (o && (o.format === 'bigfarm-colours' || o.loadouts || o.current || o.sections || o.events)) {
-          importColoursText(text, true); return;
-        }
-      } catch (e) {}
-    }
-    applyText(text, label);
   }
   async function loadData() {
     try {
@@ -859,28 +658,83 @@
   }
   function computeFiltered() {
     filtered = events.filter(e =>
-      filtersLive.sec.has(e.section) && filtersLive.it.has(e.name) &&
+      filtersLive.sec.has(e.section) && filtersLive.it.has(e.base) &&
       filtersLive.yr.has(String(new Date(e.start).getUTCFullYear())));
   }
   function offCount() {
     return state.filters.sections.length + state.filters.items.length + state.filters.years.length;
   }
-  function recomputeLanes() {
-    laneRows = new Map(); secCounts = new Map();
-    sections.forEach(sec => {
-      const evs = filtered.filter(e => e.section === sec).sort((a, b) => a.start - b.start || b.days - a.days);
-      secCounts.set(sec, evs.length);
-      const rowsEnd = [];
-      for (const ev of evs) {
-        let r = rowsEnd.findIndex(end => ev.start > end);
-        if (r < 0) r = rowsEnd.length;
-        rowsEnd[r] = ev.end; ev.row = r;
+
+  /* ── FL inference: ≥2 days running, FL active, no other weekly active ── */
+  function computeFLInference() {
+    filtered.forEach(e => { e.flInferred = false; });
+    const flDays = new Set();
+    filtered.filter(e => e.base === FL_NAME).forEach(e => {
+      for (let d = e.start; d <= e.end; d += MS) flDays.add(d);
+    });
+    if (!flDays.size) return;
+    const weeklies = filtered.filter(e => WEEKLY_SET.has(e.base));
+    weeklies.forEach(e => {
+      const blockers = weeklies.filter(w => w !== e && w.start <= e.end && e.start <= w.end);
+      let n = 0;
+      for (let d = e.start; d <= e.end; d += MS) {
+        if (!flDays.has(d)) continue;
+        if (blockers.some(w => w.start <= d && d <= w.end)) continue;
+        n++;
       }
-      laneRows.set(sec, Math.max(rowsEnd.length, evs.length ? 1 : 0));
+      e.flInferred = n >= 2;
+    });
+  }
+  function isFL(e) { return e.fl || e.flInferred; }
+
+  /* ── dynamic line packing with mid-day chaining ──
+     rule: an event may share a row with another whose end ≤ its start
+     (equal start/end day = chained, rendered with a mid-day seam)     */
+  function orderOf(e) {
+    const rec = EV_SEC.get(e.base);
+    return rec ? rec.idx : 1000 + (e.base < '' ? 0 : 0) + e.base.charCodeAt(0);
+  }
+  function recomputeLanes() {
+    laneRows = new Map(); secCounts = new Map(); capWarns = new Set();
+    const bySec = new Map();
+    filtered.forEach(e => {
+      if (!bySec.has(e.section)) bySec.set(e.section, []);
+      bySec.get(e.section).push(e);
+    });
+    const known = SECTION_ORDER.map(s => s.name);
+    const order = known.filter(n => bySec.has(n))
+      .concat([...bySec.keys()].filter(n => !known.includes(n)).sort());
+    order.forEach(sec => {
+      const evs = bySec.get(sec).slice().sort((a, b) =>
+        a.start - b.start || orderOf(a) - orderOf(b) || a.id - b.id);
+      secCounts.set(sec, evs.length);
+      const rows = [];
+      evs.forEach(ev => {
+        ev.row = 0; ev.seamL = false; ev.seamR = false;
+        let r = -1;
+        for (let i = 0; i < rows.length; i++) {
+          if (ev.start >= rows[i].lastEnd) { r = i; break; }
+        }
+        if (r < 0) { r = rows.length; rows.push({ lastEnd: -Infinity, evs: [] }); }
+        rows[r].evs.push(ev); rows[r].lastEnd = ev.end; ev.row = r;
+      });
+      rows.forEach(row => {
+        row.evs.sort((a, b) => a.start - b.start || a.id - b.id);
+        for (let i = 0; i + 1 < row.evs.length; i++) {
+          const A = row.evs[i], B = row.evs[i + 1];
+          if (A.end === B.start) { A.seamR = true; B.seamL = true; }
+        }
+      });
+      laneRows.set(sec, rows);
+      const cap = SEC_CAP.get(sec);
+      if (cap && rows.length > cap) {
+        capWarns.add(sec);
+        console.warn('“' + sec + '” uses ' + rows.length + ' lines but its cap is ' + cap + ' — overlapping events may need checking.');
+      }
     });
   }
 
-  /* ── colours ── */
+  /* ── colours: defaults are per-event (position in its section) ── */
   let palCache = { theme: null, vals: [] };
   function palette() {
     if (palCache.theme === state.theme) return palCache.vals;
@@ -889,18 +743,18 @@
     return palCache.vals;
   }
   function resolveColour(o) { return o.t === 'h' ? o.v : palette()[o.i]; }
-  function sectionColor(sec) {
-    const ov = state.colors.sections[sec];
-    return ov ? resolveColour(ov) : palette()[secIdx.get(sec) % 8];
+  function eventColorIdx(base) {
+    const rec = EV_SEC.get(base);
+    return rec ? rec.idx % 8 : 5;
   }
+  function sectionColor(sec) { return palette()[SEC_INDEX.get(sec) % 8] || palette()[0]; }
   function barColor(ev) {
     const c = state.colors;
     if (c.secOverride[ev.section]) return sectionColor(ev.section);
-    const eo = c.events[ev.name];
+    const eo = c.events[ev.base];
     if (eo) return resolveColour(eo);
-    if (c.sections[ev.section]) return sectionColor(ev.section);
     if (ev.color) return ev.color;
-    return sectionColor(ev.section);
+    return palette()[eventColorIdx(ev.base)];
   }
 
   /* ── range helpers ── */
@@ -932,7 +786,7 @@
     return M_S[m] + ' ' + y + ' – ' + M_S[e.m] + ' ' + e.y;
   }
 
-  /* ── rendering: toolbar / chip / badge / notice ── */
+  /* ── toolbar / chip / notice ── */
   function renderToolbar() {
     const { y, m } = state.anchor, z = state.zoom;
     const e = normMonth(y, m + z - 1);
@@ -968,7 +822,7 @@
     const slot = $('#noticeSlot');
     if (source !== 'sample' || noticeDismissed) { slot.innerHTML = ''; return; }
     slot.innerHTML = `<div class="notice">
-      <span>Showing <b>sample data</b>. Save your Datepress output as <b>${DATA_FILE}</b> in this folder — or
+      <span>Showing <b>sample data</b>. Build <b>${DATA_FILE}</b> with Datepress 2 and put it in this folder — or
       <button class="mini" id="noticeLoad">load a file now</button>.</span>
       <button class="nx" id="noticeClose" aria-label="Dismiss">×</button></div>`;
   }
@@ -1023,33 +877,39 @@
     if (todayT >= bufStartT && todayT < bufEndT)
       grid += `<div class="gtoday" style="left:${Math.round(xOf(todayT))}px"></div>`;
 
-    const inBuf = filtered.filter(ev => ev.end >= bufStartT && ev.start < bufEndT);
-    const bySec = new Map(sections.map(s => [s, []]));
-    inBuf.forEach(ev => { if (bySec.has(ev.section)) bySec.get(ev.section).push(ev); });
-
+    /* bars: iterate the packed rows per section */
+    const flOn = state.showFL;
+    const half = dayW / 2, seamGap = Math.min(dayW / 2, 3);
     let lanesHTML = '';
     sections.forEach(sec => {
-      const si = secIdx.get(sec);
-      const evs = bySec.get(sec) || [];
-      const rows = laneRows.get(sec) || 1;
+      const rows = laneRows.get(sec) || [];
+      const nRows = Math.max(rows.length, 1);
       const total = secCounts.get(sec) || 0;
-      let bars = '';
-      evs.forEach(ev => {
-        const x1 = xOf(ev.start);
-        const w = Math.max(ev.days * dayW, 4);
-        const col = barColor(ev);
-        const showLbl = state.labels && w >= 54;
-        bars += `<div class="bar" data-id="${ev.id}" style="left:${x1}px;width:${w}px;top:${ev.row * rowH + (rowH - barH) / 2}px;height:${barH}px;background:${col}">` +
-          (showLbl ? `<span class="bl" style="color:${textColorFor(col)}">${esc(ev.name)}</span>` : '') + `</div>`;
+      const capFlag = capWarns.has(sec)
+        ? `<span class="capdot" title="More concurrent events than this section's cap — check for overlapping or stray lines"></span>` : '';
+      let barsHTML = '';
+      rows.forEach(row => {
+        row.evs.forEach(ev => {
+          if (ev.end < bufStartT || ev.start >= bufEndT) return;
+          let x1 = xOf(ev.start) + (ev.seamL ? half + seamGap / 2 : 0);
+          let x2 = xOf(ev.end) + dayW - (ev.seamR ? half + seamGap / 2 : 0);
+          const w = Math.max(x2 - x1, 3);
+          const col = barColor(ev);
+          const showLbl = state.labels && w >= 54;
+          const isFl = flOn && isFL(ev);
+          const badge = isFl && w >= 30 ? '<i class="flb">FL</i>' : '';
+          barsHTML += `<div class="bar${isFl ? ' is-fl' : ''}" data-id="${ev.id}" style="left:${x1}px;width:${w}px;top:${ev.row * rowH + (rowH - barH) / 2}px;height:${barH}px;background:${col}">` +
+            (showLbl ? `<span class="bl" style="color:${textColorFor(col)}">${esc(ev.name)}${ev.fl ? ' - FL' : ''}</span>` : '') + badge + `</div>`;
+        });
       });
       lanesHTML += `<div class="lane">
         <div class="lane-label" style="width:${LANE_W}px">
-          <span class="dot" style="background:${sectionColor(sec)}"></span>
+          <span class="dot" style="background:${sectionColor(sec)}"></span>${capFlag}
           <span class="ltxt"><b>${esc(sec)}</b><small>${total
-            ? total + ' event' + (total > 1 ? 's' : '') + (rows > 1 ? ' · ' + rows + ' lines' : '')
+            ? total + ' event' + (total > 1 ? 's' : '') + ' · ' + nRows + (nRows > 1 ? ' lines' : ' line')
             : 'hidden'}</small></span>
         </div>
-        <div class="lane-chart" style="width:${chartW}px;height:${Math.max(rows, 1) * rowH}px">${bars}</div>
+        <div class="lane-chart" style="width:${chartW}px;height:${nRows * rowH}px">${barsHTML}</div>
       </div>`;
     });
 
@@ -1066,6 +926,7 @@
         ${lanesHTML}
       </div>
     </div>`;
+    tl.classList.toggle('fl-on', flOn);
     tl.scrollLeft = savedScroll;
   }
 
@@ -1083,7 +944,7 @@
     }
   }
 
-  /* ── buffer management ── */
+  /* ── buffer management (unchanged engine) ── */
   function handleScrollFrame() {
     savedScroll = tl.scrollLeft;
     const rightGap = tl.scrollWidth - tl.clientWidth - savedScroll;
@@ -1141,11 +1002,12 @@
     goToDate(Date.UTC(state.anchor.y, state.anchor.m + dir * state.zoom, 1), true);
   }
 
-  /* ── rendering: list view ── */
+  /* ── list view ── */
   function rowHTML(ev) {
-    return `<button class="lrow" data-id="${ev.id}">
+    const badge = isFL(ev) ? '<span class="flbadge">FL</span>' : '';
+    return `<button class="lrow${isFL(ev) ? ' has-fl' : ''}" data-id="${ev.id}">
       <span class="ldot" style="background:${barColor(ev)}"></span>
-      <span class="ln">${esc(ev.name)}</span>
+      <span class="ln">${esc(ev.name)}${badge}</span>
       <span class="ls">${esc(ev.section)}</span>
       <span class="ld">${esc(fmtRange(ev))}</span>
       <span class="llu">${ev.days}d</span></button>`;
@@ -1191,8 +1053,8 @@
       return `<th data-col="${c}" class="${on ? 'on' : ''}${c === 'days' ? ' r' : ''}" title="Sort by ${l}"><span>${l}</span>` +
         `<span class="tri"><i class="tu${on && dir === 'asc' ? ' act' : ''}"></i><i class="td${on && dir === 'desc' ? ' act' : ''}"></i></span></th>`;
     }).join('');
-    const rows = list.map(ev => `<tr data-id="${ev.id}">
-      <td><span class="ldot" style="background:${barColor(ev)}"></span>${esc(ev.name)}</td>
+    const rows = list.map(ev => `<tr data-id="${ev.id}" class="${isFL(ev) ? 'has-fl' : ''}">
+      <td><span class="ldot" style="background:${barColor(ev)}"></span>${esc(ev.name)}${isFL(ev) ? '<span class="flbadge">FL</span>' : ''}</td>
       <td class="c-sec">${esc(ev.section)}</td>
       <td class="c-dt">${fmtD(ev.start)}</td>
       <td class="c-dt">${fmtD(ev.end)}</td>
@@ -1215,10 +1077,12 @@
     let body;
     if (!inV.length) body = `<div class="list-empty">Nothing here — try another range or loosen the filters.</div>`;
     else body = fmt === 'analytical' ? analyticalHTML(inV) : informalHTML(inV);
-    $('#pane-list').innerHTML = head + `<div class="list-body">${body}</div>`;
+    const pane = $('#pane-list');
+    pane.innerHTML = head + `<div class="list-body">${body}</div>`;
+    pane.classList.toggle('fl-on', state.showFL);
   }
 
-  /* ── rendering: themes pane ── */
+  /* ── themes pane ── */
   function renderThemes() {
     const fonts = [
       ['sans', 'Instrument Sans', 'clean sans — the default'],
@@ -1241,11 +1105,10 @@
     }).join('');
 
     const evRows = items.map(nm => {
-      const ev0 = events.find(e => e.name === nm);
       const own = c.events[nm];
-      const col = ev0 ? barColor(ev0) : palette()[0];
+      const col = palette()[eventColorIdx(nm)];
       return `<div class="crow">
-        <button class="csw${own ? '' : ' auto'}" data-cname="${esc(nm)}" style="background:${col}" title="Set colour"></button>
+        <button class="csw${own ? '' : ' auto'}" data-cname="${esc(nm)}" style="background:${own ? resolveColour(own) : col}" title="Set colour"></button>
         <span class="cn">${esc(nm)}</span>${own ? '<span class="ov">custom</span>' : ''}
       </div>`;
     }).join('');
@@ -1263,9 +1126,11 @@
           <label class="sw"><input type="checkbox" id="wkndSw" ${state.weekends ? 'checked' : ''}><i></i></label></div>
         <div class="setrow"><span class="lab">Labels on bars<small>shown only when a bar is wide enough</small></span>
           <label class="sw"><input type="checkbox" id="lblSw" ${state.labels ? 'checked' : ''}><i></i></label></div>
+        <div class="setrow"><span class="lab">FL highlighting<small>the FL button on the Calendar &amp; List tabs</small></span>
+          <label class="sw"><input type="checkbox" id="flSw" ${state.showFL ? 'checked' : ''}><i></i></label></div>
       </div>
       <div class="set-group">
-        <h3>Colours <span class="h-note">sections &amp; events, saved as load-outs</span>
+        <h3>Colours <span class="h-note">defaults are per-event; overrides live in this browser</span>
           <button class="mini2" id="resetColours" style="margin-left:auto" title="Return to the Default layout">Reset colours</button></h3>
         <div class="lorow">
           <select class="loselect" id="loSelect" ${loNames.length ? '' : 'disabled'}>
@@ -1289,18 +1154,17 @@
         </div>
         <div class="csub"><b>sections</b>
           <span class="csub-acts"><span class="csub-lab">event override:</span>
-            <button class="mini2" data-ovall="1" title="Every section’s colour overrides its events">all</button>
+            <button class="mini2" data-ovall="1" title="Every section's colour overrides its events">all</button>
             <button class="mini2" data-ovnone="1" title="No section overrides its events">none</button></span></div>
-        ${secRows || '<p class="dhint">No sections loaded yet.</p>'}
+        ${secRows || '<p class="dhint">No data loaded yet.</p>'}
         <div class="csub"><b>events</b></div>
         ${evRows || '<p class="dhint">No events loaded yet.</p>'}
-        <p class="dhint" style="margin-top:12px">A section colour tints the whole lane; an event colour beats it unless that section is set to override.
+        <p class="dhint" style="margin-top:12px">A section colour override tints the whole band; an event colour beats it unless the section is set to override.
         Load-outs live in this browser — use export / import to move them between devices.</p>
       </div>
       <div class="set-group"><h3>Data</h3>
-        <p class="dhint">The calendar reads <b>${DATA_FILE}</b> from the same folder — the <b>Machine</b> output of Datepress, one event per line.
-        Optional extra fields: <code>section</code> (which lane), <code>color</code> (hex), <code>item</code>. Sample line:</p>
-        <pre class="code">{ "start":"2025-09-14", "end":"2025-09-16", "event":"Landscape Architect", "section":"Main Events" }</pre>
+        <p class="dhint">The calendar reads <b>${DATA_FILE}</b> from the same folder — built with <b>Datepress 2</b> (Machine mode, one event per line).</p>
+        <pre class="code">{ "start":"2025-09-14", "end":"2025-09-16", "event":"Village Fair", "section":"Weekly events", "fl":true }</pre>
         <p class="dstat${source === 'sample' ? ' warn' : ''}">${esc(dataStatusText())}</p>
         <div class="dbtns"><button class="mini" id="reloadBtn">reload file</button><button class="mini" id="loadFileBtn">load a file…</button></div>
       </div>
@@ -1333,13 +1197,14 @@
     renderPane(t);
   }
 
-  /* ── colour load-outs: save / apply / export / import ── */
+  /* ── colour load-outs / import / export ── */
   function loStatus(msg, warn) {
     const el = $('#loStatus'); if (!el) return;
     el.textContent = msg; el.classList.toggle('warn', !!warn);
     clearTimeout(loStatusTimer);
     loStatusTimer = setTimeout(() => { if (el.isConnected) el.textContent = ''; }, 3200);
   }
+  const DEFAULT_LAYOUT = null;   /* future: baked-in Default layout for Reset colours */
   function resetColours() {
     if (state.loadouts['Default']) {
       state.colors = clone(state.loadouts['Default']);
@@ -1354,14 +1219,10 @@
       state.lastLoadout = '';
       loStatus('colours reset to automatic');
     }
-    save(); buildDrawer(); renderPane('themes');
+    save(); buildDrawer(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline();
   }
   function exportColours() {
-    const data = {
-      format: 'bigfarm-colours', version: 1,
-      exported: new Date().toISOString(),
-      current: state.colors, loadouts: state.loadouts
-    };
+    const data = { format: 'bigfarm-colours', version: 1, exported: new Date().toISOString(), current: state.colors, loadouts: state.loadouts };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -1370,7 +1231,7 @@
     setTimeout(() => URL.revokeObjectURL(url), 2000);
     loStatus('exported colours + load-outs');
   }
-  function importColoursText(text, fromDrop) {
+  function importColoursText(text) {
     let obj;
     try { obj = JSON.parse(text); } catch (e) { loStatus("couldn't read that as JSON", true); return; }
     let applied = false, imported = 0;
@@ -1397,7 +1258,8 @@
     const col = barColor(ev);
     tip.innerHTML = `<div class="tt" style="border-color:${col}"><b>${esc(ev.name)}</b>
       <span class="sec">${esc(ev.section)}</span>
-      <span class="td">${esc(fmtRange(ev))} · ${ev.days} day${ev.days > 1 ? 's' : ''}</span></div>`;
+      <span class="td">${esc(fmtRange(ev))} · ${ev.days} day${ev.days > 1 ? 's' : ''}</span>
+      ${isFL(ev) ? '<span class="fl">COUNTS FOR FL</span>' : ''}</div>`;
     tip.style.display = 'block';
     const w = tip.offsetWidth, h = tip.offsetHeight, r = bar.getBoundingClientRect();
     let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8);
@@ -1406,7 +1268,7 @@
   }
   function hideTip() { tip.style.display = 'none'; }
 
-  /* ── popover ── */
+  /* ── popovers ── */
   const pop = $('#pop');
   let popAnchor = null, popHandler = null;
   function openPop(anchor, title, html, handler) {
@@ -1443,7 +1305,6 @@
         goToDate(Date.UTC(+b.dataset.y, 0, 1), true);
         closePop(); });
   }
-  /* colour picker for a single event or section */
   function openColorPop(kind, key, anchor) {   // kind: 'event' | 'section'
     const store = state.colors[kind === 'event' ? 'events' : 'sections'];
     const cur = store[key];
@@ -1460,7 +1321,7 @@
     pop.querySelector('#cPick').addEventListener('input', e => {
       store[key] = { t: 'h', v: e.target.value }; after(true);
     });
-    function after(keepOpen) { save(); buildDrawer(); renderPane('themes'); if (!keepOpen) closePop(); }
+    function after(keepOpen) { save(); buildDrawer(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); if (!keepOpen) closePop(); }
   }
 
   /* ── filter drawer ── */
@@ -1468,12 +1329,12 @@
     const body = $('#drawerBody');
     if (!sections.length) { body.innerHTML = '<p class="d-empty">No data loaded yet.</p>'; $('#drawerFoot').textContent = ''; return; }
     const cntSec = s => events.filter(e => e.section === s).length;
-    const cntIt = i => events.filter(e => e.name === i).length;
+    const cntIt = i => events.filter(e => e.base === i).length;
     const cntYr = y => events.filter(e => new Date(e.start).getUTCFullYear() === y).length;
     const dGroup = (key, title, rowsHTML, search) =>
       `<div class="dgroup"><div class="dg-head"><b>${title}</b><span class="dg-acts">
         <button class="mini2" data-all="${key}">all</button><button class="mini2" data-none="${key}">none</button></span></div>
-        ${search ? '<input class="dsearch" data-search="it" type="search" placeholder="find an item…">' : ''}
+        ${search ? '<input class="dsearch" data-search="it" type="search" placeholder="find an event…">' : ''}
         <div class="dg-rows" data-rows="${key}">${rowsHTML}</div></div>`;
     body.innerHTML =
       dGroup('sections', 'Sections', sections.map(s =>
@@ -1498,10 +1359,10 @@
   function setAllGroup(g, on) {
     const all = g === 'sections' ? sections : g === 'items' ? items : years.map(String);
     state.filters[g] = on ? [] : all.slice();
-    buildFilterSets(); computeFiltered(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
+    buildFilterSets(); computeFiltered(); computeFLInference(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
   }
 
-  /* ── logo: logo.png everywhere, logo-dark.png in grey/dark if you upload one ── */
+  /* ── logo ── */
   const homeLogo = $('#homeLogo'), homeMark = $('#homeMark');
   let darkLogoOK = false;
   const logoProbe = new Image();
@@ -1545,6 +1406,12 @@
   $('#todayBtn').addEventListener('click', () => goToDate(todayUTC(), true));
   $('#rangeBtn').addEventListener('click', openMonthPop);
   $('#yearBtn').addEventListener('click', openYearPop);
+  $('#flBtn').addEventListener('click', () => {
+    state.showFL = !state.showFL;
+    $('#flBtn').classList.toggle('on', state.showFL);
+    $('#flBtn').setAttribute('aria-pressed', state.showFL);
+    refresh(); save();
+  });
 
   $('#zoomSeg').addEventListener('click', e => {
     const b = e.target.closest('[data-z]'); if (!b) return;
@@ -1577,12 +1444,12 @@
   $('#drawerClose').addEventListener('click', () => document.body.classList.remove('drawer-open'));
   $('#drawerReset').addEventListener('click', () => {
     state.filters = { sections: [], items: [], years: [] };
-    buildFilterSets(); computeFiltered(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
+    buildFilterSets(); computeFiltered(); computeFLInference(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
   });
   $('#drawerBody').addEventListener('change', e => {
     const c = e.target.closest('input[data-g]'); if (!c) return;
     toggleFilter(c.dataset.g, c.value, c.checked);
-    buildFilterSets(); computeFiltered(); recomputeLanes(); updateBadge(); refresh(); updateDrawerFoot(); save();
+    buildFilterSets(); computeFiltered(); computeFLInference(); recomputeLanes(); updateBadge(); refresh(); updateDrawerFoot(); save();
   });
   $('#drawerBody').addEventListener('click', e => {
     const a = e.target.closest('[data-all]'), n = e.target.closest('[data-none]');
@@ -1604,19 +1471,20 @@
   }, { passive: true });
 
   tl.addEventListener('click', e => {
-    const b = e.target.closest('.bar');
-    if (b) { pinned = true; showTip(b); }
-    else { pinned = false; hideTip(); }
-  });
-  $('#tlEmpty').addEventListener('click', e => {
-    if (e.target.closest('#jumpFirst')) {
+    const j = e.target.closest('#jumpFirst');
+    if (j) {
       const ev = filtered.slice().sort((a, b) => a.start - b.start)[0];
       if (ev) goToDate(ev.start, true);
+      return;
     }
     if (e.target.closest('#clearF')) {
       state.filters = { sections: [], items: [], years: [] };
-      buildFilterSets(); computeFiltered(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
+      buildFilterSets(); computeFiltered(); computeFLInference(); recomputeLanes(); buildDrawer(); updateBadge(); refresh(); save();
+      return;
     }
+    const b = e.target.closest('.bar');
+    if (b) { pinned = true; showTip(b); }
+    else { pinned = false; hideTip(); }
   });
   document.addEventListener('click', e => {
     if (!e.target.closest('.bar')) { pinned = false; hideTip(); }
@@ -1656,7 +1524,6 @@
 
   /* themes pane */
   $('#pane-themes').addEventListener('click', e => {
-    /* colour load-outs */
     if (e.target.closest('#loSave')) { $('#loInputRow').hidden = false; $('#loName').focus(); return; }
     if (e.target.closest('#loCancel')) { $('#loInputRow').hidden = true; return; }
     if (e.target.closest('#loConfirm')) {
@@ -1680,31 +1547,27 @@
     if (e.target.closest('#loExport')) { exportColours(); return; }
     if (e.target.closest('#loImport')) { $('#colImport').click(); return; }
     if (e.target.closest('#resetColours')) { resetColours(); return; }
-
-    /* section colour overrides */
     const ovT = e.target.closest('[data-ovsec]');
     if (ovT) {
       const sec = ovT.dataset.ovsec;
       if (state.colors.secOverride[sec]) delete state.colors.secOverride[sec];
       else state.colors.secOverride[sec] = true;
-      save(); buildDrawer(); renderPane('themes'); return;
+      save(); buildDrawer(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); return;
     }
     if (e.target.closest('[data-ovall]')) {
       sections.forEach(s => state.colors.secOverride[s] = true);
-      save(); buildDrawer(); renderPane('themes'); return;
+      save(); buildDrawer(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); return;
     }
     if (e.target.closest('[data-ovnone]')) {
       state.colors.secOverride = {};
-      save(); buildDrawer(); renderPane('themes'); return;
+      save(); buildDrawer(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); return;
     }
     const ssw = e.target.closest('[data-secname]');
     if (ssw) { openColorPop('section', ssw.dataset.secname, ssw); return; }
-
-    /* everything else */
     const f = e.target.closest('.fontopt');
     if (f) { state.font = f.dataset.font; applyFont(); renderPane('themes'); refresh(); save(); return; }
     const d = e.target.closest('[data-density]');
-    if (d) { state.density = d.dataset.density; renderPane('themes'); save(); return; }
+    if (d) { state.density = d.dataset.density; renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
     const sw = e.target.closest('[data-cname]');
     if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
     if (e.target.closest('#reloadBtn')) { loadData(); return; }
@@ -1719,19 +1582,20 @@
       const n = e.target.value;
       if (n && state.loadouts[n]) {
         state.colors = clone(state.loadouts[n]);
-        state.lastLoadout = n; save(); renderPane('themes');
+        state.lastLoadout = n; save(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline();
       }
       return;
     }
-    if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; save(); }
-    if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); }
+    if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; save(); if (state.tab === 'calendar') renderTimeline(); }
+    if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); if (state.tab === 'calendar') renderTimeline(); }
+    if (e.target.id === 'flSw') { state.showFL = e.target.checked; $('#flBtn').classList.toggle('on', state.showFL); refresh(); save(); }
   });
   $('#pane-themes').addEventListener('keydown', e => {
     if (e.target.id === 'loName' && e.key === 'Enter') { e.preventDefault(); $('#loConfirm').click(); }
   });
   $('#colImport').addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return;
-    f.text().then(t => importColoursText(t, false)); e.target.value = '';
+    f.text().then(t => importColoursText(t)); e.target.value = '';
   });
 
   $('#dataChip').addEventListener('click', () => {
@@ -1746,7 +1610,7 @@
 
   $('#fileInput').addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return;
-    f.text().then(t => applyAnyText(t, f.name)); e.target.value = '';
+    f.text().then(t => applyText(t, f.name)); e.target.value = '';
   });
   let dragDepth = 0;
   addEventListener('dragenter', e => { e.preventDefault(); if (++dragDepth === 1) $('#drop').classList.add('on'); });
@@ -1754,7 +1618,7 @@
   addEventListener('dragleave', e => { e.preventDefault(); if (--dragDepth <= 0) { dragDepth = 0; $('#drop').classList.remove('on'); } });
   addEventListener('drop', e => {
     e.preventDefault(); dragDepth = 0; $('#drop').classList.remove('on');
-    const f = e.dataTransfer.files[0]; if (f) f.text().then(t => applyAnyText(t, f.name));
+    const f = e.dataTransfer.files[0]; if (f) f.text().then(t => applyText(t, f.name));
   });
 
   document.addEventListener('keydown', e => {
@@ -1778,6 +1642,8 @@
   /* ── init ── */
   loadSettings();
   applyTheme(); applyFont();
+  $('#flBtn').classList.toggle('on', state.showFL);
+  $('#flBtn').setAttribute('aria-pressed', state.showFL);
   document.querySelectorAll('#zoomSeg button').forEach(b => b.classList.toggle('on', +b.dataset.z === state.zoom));
   updateScaleUI();
   refitDayW();
