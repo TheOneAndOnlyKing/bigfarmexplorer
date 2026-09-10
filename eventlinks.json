@@ -2,28 +2,79 @@
   "_readme": "HOW TO USE — Each name below is an event. Replace its [] with any number of lines, each shaped like: { \"text\": \"what the line says\", \"url\": \"https://the.link\", \"color\": \"#3E7FC1\" }. \"color\" is optional (any hex code, with or without #; without it the line just uses the pane's text colour). The lines appear inside the event's pop-up pane, in order, each opening in a new tab. Extra tricks: a SECTION name (e.g. \"Temporary farms\") also works as a key — every event in that section without its own lines inherits them — and subtitled Horse Season runs (e.g. \"Horse Season: Yeti\") fall back to the \"Horse Season\" entry. The two events with example entries show how it looks — replace them with real links, then save and refresh the calendar page.",
 
   "Village Fair": [
-    { "text": "Example line — replace me", "url": "https://www.example.com/village-fair", "color": "#3E7FC1" }
+{ "text": "Village Fair", "url": "https://bigfarm.fandom.com/de/wiki/Dorffest", "color": "#99403a" }
+{ "text": "VF Item’s Point Multiplier", "url": "https://docspace-lqwk1c.onlyoffice.com/s/CfdXNdV72mY5PTY", "color": "#9a6aaf" }
   ],
-  "Fishing Hard Worker Event": [],
-  "Hard Worker Event": [],
-  "Cooperative Hard Worker Event": [],
-  "Cooperative Championship": [],
+  "Fishing Hard Worker Event": [
+{ "text": "Fishing Hard Worker Event", "url": "https://bigfarm.fandom.com/de/wiki/Fisch-Flei%C3%9Fevent", "color": "#99403a" }
+{ "text": "HWE, CHWE, FHWE Values Complete", "url": "https://docspace-lqwk1c.onlyoffice.com/s/PgQkpZg5XBsJ5BH", "color": "#9a6aaf" }
+],
+  "Hard Worker Event": [
+{ "text": "Hard Worker Event", "https://bigfarm.fandom.com/de/wiki/Flei%C3%9Fevent": "xxx", "color": "#99403a" }
+{ "text": "HWE, CHWE, FHWE Values Complete", "url": "https://docspace-lqwk1c.onlyoffice.com/s/PgQkpZg5XBsJ5BH", "color": "#9a6aaf" }
+],
+  "Cooperative Hard Worker Event": [
+{ "text": "Cooperative Hard Worker Event", "url": "https://bigfarm.fandom.com/de/wiki/B%C3%BCndnis-Flei%C3%9Fevent", "color": "#99403a" }
+{ "text": "HWE, CHWE, FHWE Values Complete", "url": "https://docspace-lqwk1c.onlyoffice.com/s/PgQkpZg5XBsJ5BH", "color": "#9a6aaf" }
+],
+  "Cooperative Championship": [
+{ "text": "Cooperative Championship", "url": "https://bigfarm.fandom.com/de/wiki/B%C3%BCndnismeisterschaft", "color": "#99403a" }
+{ "text": "Cooperative Championship Strategy", "url": "https://discord.com/channels/820962964391198741/1236996973316276294", "color": "#264362" }
+],
 
-  "Cruise Ship": [],
-  "Goldfish Rescue": [],
-  "Pleasure Park": [],
-  "Urgent Delivery": [],
-  "Urgent Delivery (Gourmet Farm)": [],
-  "Shinkei-Suijaku": [],
-  "Pair Finder": [],
+  "Cruise Ship": [
+{ "text": "Cruise Ship Task List", "url": "https://docspace-lqwk1c.onlyoffice.com/s/vqF_5TCKsy-WkD8", "color": "#9a6aaf" }
+],
+  "Goldfish Rescue": [
+{ "text": "Goldfish Rescue", "url": "https://bigfarm.fandom.com/de/wiki/Goldfischrettung", "color": "#99403a" }
+],
+  "Pleasure Park": [
+{ "text": "Pleasure Park", "url": "https://bigfarm.fandom.com/de/wiki/Vergn%C3%BCgungspark", "color": "#99403a" }
+{ "text": "Ninjahumans’s Guide", "url": "https://discord.com/channels/820962964391198741/1236920981386432562", "color": "#264362" }
+{ "text": "𝓔𝔂𝓮𝓣’s Spreadsheet", "url": "https://discord.com/channels/820962964391198741/1352449056374263879", "color": "#264362" }
+{ "text": "Pleasure Park Item Value List & Calculator", "url": "https://docspace-lqwk1c.onlyoffice.com/s/MGwMVBZNcZRC5-d", "color": "#9a6aaf" }
+],
+  "Urgent Delivery": [
+{ "text": "Urgent Delivery", "url": "https://bigfarm.fandom.com/de/wiki/Dringende_Lieferung", "color": "#99403a" }
+{ "text": "Urgent Delivery Item Weights & Calculator", "url": "https://docspace-lqwk1c.onlyoffice.com/s/LgMDj33qtJk52M3", "color": "#9a6aaf" }
+],
+  "Urgent Delivery (Gourmet Farm)": [
+{ "text": "Urgent Delivery", "url": "https://bigfarm.fandom.com/de/wiki/Dringende_Lieferung", "color": "#99403a" }
+{ "text": "Urgent Delivery Item Weights & Calculator", "url": "https://docspace-lqwk1c.onlyoffice.com/s/LgMDj33qtJk52M3", "color": "#9a6aaf" }
+],
+  "Shinkei-Suijaku": [
+{ "text": "Shinkei Suijaku", "url": "https://bigfarm.fandom.com/de/wiki/Shinkei_Suijaku", "color": "#99403a" }
+],
+  "Pair Finder": [
+{ "text": "Pair Finder", "url": "https://bigfarm.fandom.com/de/wiki/Paarfinder", "color": "#99403a" }
+],
 
-  "Greta's Dream World": [],
-  "Tessa's Dream World": [],
-  "Tessa's Dream World (Missions)": [],
+  "Greta's Dream World": [
+{ "text": "Dream World", "url": "https://bigfarm.fandom.com/de/wiki/Traumwelt", "color": "#99403a" }
+{ "text": "Greta's DW Project Value List", "url": "https://docspace-lqwk1c.onlyoffice.com/s/bqgHVpR-Dw_SYNM", "color": "#9a6aaf" }
+{ "text": "Youtube Tutorials", "url": "https://app.notion.com/p/30306a7ca0fa80f1ba52e64e28c9c990?pvs=25#30c06a7ca0fa8024b677f56395d06400", "color": "#00fffb" }
+],
+  "Tessa's Dream World": [
+{ "text": "Dream World", "url": "https://bigfarm.fandom.com/de/wiki/Traumwelt", "color": "#99403a" }
+{ "text": "Greta's DW Project Value List", "url": "https://docspace-lqwk1c.onlyoffice.com/s/bqgHVpR-Dw_SYNM", "color": "#9a6aaf" }
+{ "text": "Youtube Tutorials", "url": "https://app.notion.com/p/30306a7ca0fa80f1ba52e64e28c9c990?pvs=25#30c06a7ca0fa8024b677f56395d06400", "color": "#00fffb" }
+],
+  "Tessa's Dream World (Missions)": [
+{ "text": "Dream World", "url": "https://bigfarm.fandom.com/de/wiki/Traumwelt", "color": "#99403a" }
+{ "text": "Greta's DW Project Value List", "url": "https://docspace-lqwk1c.onlyoffice.com/s/bqgHVpR-Dw_SYNM", "color": "#9a6aaf" }
+{ "text": "Youtube Tutorials", "url": "https://app.notion.com/p/30306a7ca0fa80f1ba52e64e28c9c990?pvs=25#30c06a7ca0fa8024b677f56395d06400", "color": "#00fffb" }
+],
 
-  "Horse Season": [],
-  "Farmer's League": [],
-  "Worldwide Championship": [],
+  "Horse Season": [
+{ "text": "Horse Season", "url": "https://bigfarm.fandom.com/de/wiki/Pferdesaison", "color": "#99403a" }
+],
+  "Farmer's League": [
+{ "text": "Farmer’s League", "url": "https://bigfarm.fandom.com/de/wiki/Farmerliga", "color": "#99403a" }
+{ "text": "FL Medal Points Calculator", "url": "https://docspace-lqwk1c.onlyoffice.com/s/B4hqN_4rdFQTQsb", "color": "#9a6aaf" }
+],
+  "Worldwide Championship": [
+{ "text": "World Wide Championship", "url": "https://bigfarm.fandom.com/de/wiki/Weltweite_Meisterschaft", "color": "#99403a" }
+],
 
   "Spring Season": [],
   "Summer Season": [],
@@ -31,44 +82,123 @@
   "Winter Season": [],
   "Christmas Season": [],
 
-  "Festive Farm": [],
-  "Northern Lights Farm": [],
-  "Viking Farm": [],
-  "Tropical Farm": [],
-  "Candy Farm": [],
+  "Festive Farm": [
+{ "text": "Festive Farm", "url": "https://bigfarm.fandom.com/de/wiki/Weihnachtsfarm", "color": "#99403a" }
+],
+  "Northern Lights Farm": [
+{ "text": "Northern Lights Farm", "url": "https://bigfarm.fandom.com/de/wiki/Nordlichtfarm", "color": "#99403a" }
+],
+  "Viking Farm": [
+{ "text": "Viking Farm", "url": "https://bigfarm.fandom.com/de/wiki/Wikingerfarm", "color": "#99403a" }
+{ "text": "Viking Farm", "url": "https://web.archive.org/web/20210121041120/http://crazybigfarm.net/strategy/viking_farm_walkthrough.htm", "color": "##705526" }
+],
+  "Tropical Farm": [
+{ "text": "Tropical Farm", "url": "https://bigfarm.fandom.com/de/wiki/Inselfarm", "color": "#99403a" }
+{ "text": "Tropical Farm", "url": "https://web.archive.org/web/20210117215923/http://crazybigfarm.net/strategy/island_farm_walkthrough.htm", "color": "#705526" }
+],
+  "Candy Farm": [
+{ "text": "Candy Farm", "url": "https://bigfarm.fandom.com/de/wiki/Naschfarm", "color": "#99403a" }
+{ "text": "Candy Farm", "url": "https://web.archive.org/web/20210117220211/http://crazybigfarm.net/strategy/candy_farm_walkthrough.htm", "color": "##705526" }
+{ "text": "Guide to Candy Farm Cocoa Run (Morti-HN)", "url": "https://discord.com/channels/820962964391198741/1523257022835851384", "color": "##264362" }
+],
 
-  "Candy Search": [],
-  "Mushroom Search Event": [],
-  "Valentine's Search Event": [],
-  "Easter Egg Hunt": [],
-  "Summer Time Search Event": [],
-  "Halloween Search Event": [],
-  "Winter Search Event": [],
+  "Candy Search": [
+{ "text": "Candy search maps", "url": "https://discord.com/channels/820962964391198741/1240629386974203904", "color": "#264362" }
+],
+  "Mushroom Search Event": [
+{ "text": "Mushroom search event", "url": "https://bigfarm.fandom.com/de/wiki/Gro%C3%9Fmutters_ber%C3%BChmter_Pilzeintopf", "color": "#99403a" }
+{ "text": "Mushroom Hunt maps", "url": "https://discord.com/channels/820962964391198741/1169563839977750589", "color": "#264362" }
+],
+  "Valentine's Search Event": [
+{ "text": "Valentine's Day", "url": "https://bigfarm.fandom.com/de/wiki/Valentinstag", "color": "#99403a" }
+{ "text": "Valentine Heart Hunt Maps", "url": "https://discord.com/channels/820962964391198741/1071505723328057504", "color": "#264362" }
+],
+  "Easter Egg Hunt": [
+{ "text": "Easter", "url": "https://bigfarm.fandom.com/de/wiki/Ostern", "color": "#99403a" }
+{ "text": "Easter Egg Hunt Maps", "https://discord.com/channels/820962964391198741/1092756104271892542", "color": "#264362" }
+],
+  "Summer Time Search Event": [
+{ "text": "It's Summer!", "url": "https://bigfarm.fandom.com/de/wiki/Es_ist_Sommer!", "color": "#99403a" }
+{ "text": "Beach Balls search", "url": "https://discord.com/channels/820962964391198741/1523260383396237444", "color": "#264362" }
+],
+  "Halloween Search Event": [
+{ "text": "Halloween", "url": "https://bigfarm.fandom.com/de/wiki/Halloween", "color": "#99403a" }
+{ "text": "Halloween Hunt Maps", "url": "https://discord.com/channels/820962964391198741/1164836849106292776", "color": "#264362" }
+],
+  "Winter Search Event": [
+{ "text": "Winter search event", "url": "https://bigfarm.fandom.com/de/wiki/Winter-Suchevent", "color": "#99403a" }
+{ "text": "Winter Search Event Hunt Maps", "url": "https://discord.com/channels/820962964391198741/1328835208559988766", "color": "#264362" }
+],
 
-  "Global Point Event": [],
-  "Chinese New Year": [],
-  "Saint Patrick's Day": [],
-  "Golden Week Event": [],
-  "Tailgate Party": [],
-  "Oktoberfest": [],
-  "Santa's Workshop": [],
-  "Advent Calendar": [],
+  "Global Point Event": [
+{ "text": "Global Points Event", "url": "https://bigfarm.fandom.com/de/wiki/Globales_Punkte_Event", "color": "#99403a" }
+],
+  "Chinese New Year": [
+{ "text": "Chinese New Year", "url": "https://bigfarm.fandom.com/de/wiki/Chinesisches_Neujahrsfest", "color": "#99403a" }
+],
+  "Saint Patrick's Day": [
+{ "text": "St. Patrick's Day", "url": "https://bigfarm.fandom.com/de/wiki/St._Patrick%60s_Day", "color": "#99403a" }
+],
+  "Golden Week Event": [
+{ "text": "Japanese Golden Week", "url": "https://bigfarm.fandom.com/de/wiki/Japanische_goldene_Woche", "color": "#99403a" }
+],
+  "Tailgate Party": [
+{ "text": "Tailgate Party", "url": "https://bigfarm.fandom.com/de/wiki/Tailgate-Party", "color": "#99403a" }
+],
+  "Oktoberfest": [
+{ "text": "Oktoberfest", "url": "https://bigfarm.fandom.com/de/wiki/Oktoberfest", "color": "#99403a" }
+],
+  "Santa's Workshop": [
+{ "text": "Santa's Workshop", "url": "https://bigfarm.fandom.com/de/wiki/Santa%60s_Werkstatt", "color": "#99403a" }
+{ "text": "Santa’s Workshop Deco Set List", "url": "https://docspace-lqwk1c.onlyoffice.com/s/pQ5BtsPp6hGbMNL", "color": "#9a6aaf" }
+],
+  "Advent Calendar": [
+{ "text": "Advent calendar", "url": "https://bigfarm.fandom.com/de/wiki/Adventskalender", "color": "#99403a" }
+],
   "Big Farm Anniversary Event": [],
-  "Football Fever": [],
+  "Football Fever": [
+{ "text": "Football Fever", "url": "https://bigfarm.fandom.com/de/wiki/Fu%C3%9Fballfieber", "color": "#99403a" }
+],
 
-  "A Hint of Hawaii": [],
-  "Here's to Nature": [],
-  "Not of this World": [],
-  "Mysterious Asia": [],
-  "Fairytale Time": [],
-  "Culinary Campaign": [],
-  "Three Weddings and a Rigmarole": [],
+  "A Hint of Hawaii": [
+{ "text": "Hint of Hawaii", "url": "https://bigfarm.fandom.com/de/wiki/Aloha_von_Hawaii", "color": "#99403a" }
+{ "text": "Themed Event Item Drop Rates", "url": "https://docs.google.com/spreadsheets/d/1S6eR_wC_FtsbCXHXq_HC0MpRQHRR5Z7xhAmyg9eE_s4/edit?gid=8707739#gid=8707739", "color": "#9a6aaf" }
+],
+  "Here's to Nature": [
+{ "text": "Here’s to Nature", "url": "https://bigfarm.fandom.com/de/wiki/Auf_in_die_Natur", "color": "#99403a" }
+{ "text": "Themed Event Item Drop Rates", "url": "https://docs.google.com/spreadsheets/d/1S6eR_wC_FtsbCXHXq_HC0MpRQHRR5Z7xhAmyg9eE_s4/edit?gid=8707739#gid=8707739", "color": "#9a6aaf" }
+],
+  "Not of this World": [
+{ "text": "Not of this world", "url": "https://bigfarm.fandom.com/de/wiki/Nicht_von_dieser_Welt", "color": "#99403a" }
+{ "text": "Themed Event Item Drop Rates", "url": "https://docs.google.com/spreadsheets/d/1S6eR_wC_FtsbCXHXq_HC0MpRQHRR5Z7xhAmyg9eE_s4/edit?gid=8707739#gid=8707739", "color": "#9a6aaf" }
+],
+  "Mysterious Asia": [
+{ "text": "Mysterious Asia", "url": "https://bigfarm.fandom.com/de/wiki/Geheimnisvolles_Asien", "color": "#99403a" }
+{ "text": "Themed Event Item Drop Rates", "url": "https://docs.google.com/spreadsheets/d/1S6eR_wC_FtsbCXHXq_HC0MpRQHRR5Z7xhAmyg9eE_s4/edit?gid=8707739#gid=8707739", "color": "#9a6aaf" }
+],
+  "Fairytale Time": [
+{ "text": "Fairy Tale Time", "url": "https://bigfarm.fandom.com/de/wiki/M%C3%A4rchenstunde", "color": "#99403a" }
+{ "text": "Themed Event Item Drop Rates", "url": "https://docs.google.com/spreadsheets/d/1S6eR_wC_FtsbCXHXq_HC0MpRQHRR5Z7xhAmyg9eE_s4/edit?gid=8707739#gid=8707739", "color": "#9a6aaf" }
+],
+  "Culinary Campaign": [
+{ "text": "Food Truck", "url": "https://bigfarm.fandom.com/de/wiki/Food_Truck", "color": "#99403a" }
+{ "text": "Themed Event Item Drop Rates", "url": "https://docs.google.com/spreadsheets/d/1S6eR_wC_FtsbCXHXq_HC0MpRQHRR5Z7xhAmyg9eE_s4/edit?gid=8707739#gid=8707739", "color": "#9a6aaf" }
+],
+  "Three Weddings and a Rigmarole": [
+{ "text": "Wedding Planner", "url": "https://bigfarm.fandom.com/de/wiki/Hochzeitsplaner", "color": "#99403a" }
+{ "text": "Themed Event Item Drop Rates", "url": "https://docs.google.com/spreadsheets/d/1S6eR_wC_FtsbCXHXq_HC0MpRQHRR5Z7xhAmyg9eE_s4/edit?gid=8707739#gid=8707739", "color": "#9a6aaf" }
+],
 
-  "A Hero for Piggles": [],
-  "My bees are gone!": [],
-  "Fortune Teller": [],
+  "A Hero for Piggles": [
+{ "text": "A hero for Piggles", "url": "https://bigfarm.fandom.com/de/wiki/Ein_Held_f%C3%BCr_Piggels", "color": "#99403a" }
+],
+  "My bees are gone!": [
+{ "text": "Where are the bees?", "url": "https://bigfarm.fandom.com/de/wiki/Wo_sind_die_Bienen%3F", "color": "#99403a" }
+],
+  "Fortune Teller": [
+{ "text": "Fortune Teller", "url": "https://bigfarm.fandom.com/de/wiki/Wahrsagerin", "color": "#99403a" }
+],
   "Landscape Architect": [
-    { "text": "Example line — replace me", "url": "https://www.example.com/landscape", "color": "#C25B3C" },
-    { "text": "Example second line", "url": "https://www.example.com/more-info", "color": "#42968B" }
+{ "text": "Landscape Designer", "url": "https://bigfarm.fandom.com/de/wiki/Landschaftsgestalterin", "color": "#99403a" }
   ]
 }
