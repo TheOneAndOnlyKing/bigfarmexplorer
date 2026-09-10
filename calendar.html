@@ -142,7 +142,6 @@
   .mini:hover { color: var(--accent); border-color: var(--accent); }
   .mini:disabled { opacity: .45; cursor: default; }
 
-  /* height drag handle — at the very bottom of the card */
   .vresize { display: flex; align-items: center; justify-content: center; height: 18px; cursor: row-resize; border-top: 1px solid var(--line); touch-action: none; user-select: none; -webkit-user-select: none; }
   .vresize span { width: 48px; height: 5px; border-radius: 3px; background: #3E7FC1; transition: background .15s, width .15s; }
   .vresize:hover span, .vresize.drag span { background: #2A5E97; width: 62px; }
@@ -446,14 +445,14 @@
   'use strict';
 
   /* ══════════════ CONFIG ══════════════ */
-  const LS_KEY = 'bigfarm-calendar-v1';
-  const MS = 86400000;
-  const BUF_MONTHS = 6;
-  const DATA_FILES = ['events.jsonl', 'Events Machine.txt', 'Events Machine.jsonl'];
-  const TEMPLATE_FILE = 'defaultcolourtemplate.json';
-  const EVENTLINKS_FILE = 'eventlinks.json';
+  var LS_KEY = 'bigfarm-calendar-v1';
+  var MS = 86400000;
+  var BUF_MONTHS = 6;
+  var DATA_FILES = ['events.jsonl', 'Events Machine.txt', 'Events Machine.jsonl'];
+  var TEMPLATE_FILE = 'defaultcolourtemplate.json';
+  var EVENTLINKS_FILE = 'eventlinks.json';
 
-  const SECTION_ORDER = [
+  var SECTION_ORDER = [
     { name: 'Weekly events', cap: 0, events: ['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship'] },
     { name: 'Monthly events', cap: 0, events: ['Cruise Ship', 'Goldfish Rescue', 'Pleasure Park', 'Urgent Delivery', 'Urgent Delivery (Gourmet Farm)', 'Shinkei-Suijaku', 'Pair Finder'] },
     { name: 'Dream worlds', cap: 1, events: ["Greta's Dream World", "Tessa's Dream World", "Tessa's Dream World (Missions)"] },
@@ -465,10 +464,10 @@
     { name: 'Themed events', cap: 3, events: ['A Hint of Hawaii', "Here's to Nature", 'Not of this World', 'Mysterious Asia', 'Fairytale Time', 'Culinary Campaign', 'Three Weddings and a Rigmarole'] },
     { name: 'Minor events', cap: 0, events: ['A Hero for Piggles', 'My bees are gone!', 'Fortune Teller', 'Landscape Architect'] }
   ];
-  const WEEKLY_SET = new Set(['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship']);
-  const FL_NAME = "Farmer's League";
+  var WEEKLY_SET = new Set(['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship']);
+  var FL_NAME = "Farmer's League";
 
-  const SAMPLE_JSONL = [
+  var SAMPLE_JSONL = [
     '{"start":"2025-08-26","end":"2025-10-07","event":"Farmer\'s League","section":"Background events"}',
     '{"start":"2025-09-03","end":"2025-10-28","event":"Horse Season: Movie Heroes","section":"Background events"}',
     '{"start":"2025-08-23","end":"2025-09-20","event":"Worldwide Championship","section":"Background events"}',
@@ -511,8 +510,7 @@
     '{"start":"2025-09-20","end":"2025-09-28","event":"My bees are gone!","section":"Minor events"}'
   ].join('\n');
 
-  /* links shown when the sample data is in use (eventlinks.json replaces these) */
-  const SAMPLE_LINKS = {
+  var SAMPLE_LINKS = {
     'Village Fair': [
       { text: 'Example link — replace in eventlinks.json', url: 'https://www.example.com/village-fair', color: '#3E7FC1' }
     ],
@@ -523,22 +521,26 @@
   };
 
   /* ── helpers ── */
-  const M_L = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const M_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const WD  = ['S','M','T','W','T','F','S'];
-  const $ = s => document.querySelector(s);
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const normMonth = (y, m) => { const d = new Date(Date.UTC(y, m, 1)); return { y: d.getUTCFullYear(), m: d.getUTCMonth() }; };
-  const monthAddT = (t, n) => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1); };
-  const todayUTC = () => { const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); };
-  const clone = o => JSON.parse(JSON.stringify(o));
-  const pad2 = n => (n < 10 ? '0' : '') + n;
-  function fmtD(ts) { const d = new Date(ts); return d.getUTCDate() + ' ' + M_S[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
-  function isoOf(ts) { const d = new Date(ts); return d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate()); }
-  function dmy(ts) { const d = new Date(ts); return pad2(d.getUTCDate()) + '/' + pad2(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear(); }
+  var M_L = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var M_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var WD  = ['S','M','T','W','T','F','S'];
+  function $(s) { return document.querySelector(s); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function normMonth(y, m) { var d = new Date(Date.UTC(y, m, 1)); return { y: d.getUTCFullYear(), m: d.getUTCMonth() }; }
+  function monthAddT(t, n) { var d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1); }
+  function todayUTC() { var n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function fmtD(ts) { var d = new Date(ts); return d.getUTCDate() + ' ' + M_S[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
+  function isoOf(ts) { var d = new Date(ts); return d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate()); }
+  function dmy(ts) { var d = new Date(ts); return pad2(d.getUTCDate()) + '/' + pad2(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear(); }
   function fmtRange(ev) {
     if (ev.start === ev.end) return fmtD(ev.start);
-    const a = new Date(ev.start), b = new Date(ev.end);
+    var a = new Date(ev.start), b = new Date(ev.end);
     if (a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth())
       return a.getUTCDate() + ' – ' + b.getUTCDate() + ' ' + M_S[a.getUTCMonth()] + ' ' + a.getUTCFullYear();
     if (a.getUTCFullYear() === b.getUTCFullYear())
@@ -546,30 +548,30 @@
     return fmtD(ev.start) + ' – ' + fmtD(ev.end);
   }
   function textColorFor(hex) {
-    const h = hex.replace('#', '');
-    const ch = c => { c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); };
-    const L = .2126 * ch(parseInt(h.substr(0,2),16)) + .7152 * ch(parseInt(h.substr(2,2),16)) + .0722 * ch(parseInt(h.substr(4,2),16));
+    var h = hex.replace('#', '');
+    function ch(c) { c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); }
+    var L = .2126 * ch(parseInt(h.substr(0, 2), 16)) + .7152 * ch(parseInt(h.substr(2, 2), 16)) + .0722 * ch(parseInt(h.substr(4, 2), 16));
     return L > .45 ? '#20241A' : '#FDFCF7';
   }
   function baseName(n) {
-    const ln = n.toLowerCase();
-    if (ln === 'horse season' || ln.startsWith('horse season:')) return 'Horse Season';
-    if (ln.startsWith('big farm anniversary event:')) return 'Big Farm Anniversary Event';
+    var ln = n.toLowerCase();
+    if (ln === 'horse season' || ln.indexOf('horse season:') === 0) return 'Horse Season';
+    if (ln.indexOf('big farm anniversary event:') === 0) return 'Big Farm Anniversary Event';
     return n;
   }
 
   /* ── section maps ── */
-  const EV_SEC = new Map();
-  const SEC_INDEX = new Map();
-  SECTION_ORDER.forEach((s, si) => {
+  var EV_SEC = new Map();
+  var SEC_INDEX = new Map();
+  SECTION_ORDER.forEach(function (s, si) {
     SEC_INDEX.set(s.name, si);
-    s.events.forEach((n, i) => EV_SEC.set(n, { sec: s.name, idx: i }));
+    s.events.forEach(function (n, i) { EV_SEC.set(n, { sec: s.name, idx: i }); });
   });
-  const SEC_CAP = new Map(SECTION_ORDER.map(s => [s.name, s.cap]));
+  var SEC_CAP = new Map(SECTION_ORDER.map(function (s) { return [s.name, s.cap]; }));
 
   /* ── state ── */
-  const now0 = new Date();
-  const state = {
+  var now0 = new Date();
+  var state = {
     theme: 'light', font: 'sans', zoom: 1,
     anchor: { y: now0.getFullYear(), m: now0.getMonth() },
     tab: 'calendar', density: 'comfortable', weekends: true, labels: true,
@@ -581,19 +583,19 @@
     loadouts: {}, lastLoadout: '',
     filters: { sections: [], items: [], years: [] }
   };
-  let events = [], sections = [], items = [], years = [];
-  let filtered = [], source = 'sample', fileName = '', dataLoaded = false;
-  let filtersLive = { sec: new Set(), it: new Set(), yr: new Set() };
-  let noticeDismissed = false, pinned = false, resetArmed = false;
-  let DEFAULT_LAYOUT = null, defaultFound = false;
-  let eventLinks = {}, linksFromFile = false;
-  let pendingZoomRebuild = false;
+  var events = [], sections = [], items = [], years = [];
+  var filtered = [], source = 'sample', fileName = '', dataLoaded = false;
+  var filtersLive = { sec: new Set(), it: new Set(), yr: new Set() };
+  var noticeDismissed = false, pinned = false, resetArmed = false;
+  var DEFAULT_LAYOUT = null, defaultFound = false;
+  var eventLinks = {}, linksFromFile = false;
+  var pendingZoomRebuild = false;
 
-  const tl = $('#tl');
-  const drawerEl = $('#drawer');
-  let bufStartT = 0, bufEndT = 0, dayW = 20, savedScroll = 0, lastW = 0;
-  let laneRows = new Map(), secCounts = new Map(), capWarns = new Set();
-  let scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0, loStatusTimer = 0;
+  var tl = $('#tl');
+  var drawerEl = $('#drawer');
+  var bufStartT = 0, bufEndT = 0, dayW = 20, savedScroll = 0, lastW = 0;
+  var laneRows = new Map(), secCounts = new Map(), capWarns = new Set();
+  var scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0, loStatusTimer = 0;
 
   function save() {
     try { localStorage.setItem(LS_KEY, JSON.stringify({
@@ -614,17 +616,17 @@
     return null;
   }
   function normalizeLayout(raw) {
-    const out = { sections: {}, events: {}, secOverride: {} };
+    var out = { sections: {}, events: {}, secOverride: {} };
     if (!raw || typeof raw !== 'object') return out;
     if (raw.sections || raw.events || raw.secOverride) {
-      ['sections', 'events'].forEach(k => {
+      ['sections', 'events'].forEach(function (k) {
         if (raw[k] && typeof raw[k] === 'object')
-          for (const [key, v] of Object.entries(raw[k])) { const r = normVal(v); if (r) out[k][key] = r; }
+          for (var key in raw[k]) { var r = normVal(raw[k][key]); if (r) out[k][key] = r; }
       });
       if (raw.secOverride && typeof raw.secOverride === 'object')
-        for (const [k, v] of Object.entries(raw.secOverride)) if (v) out.secOverride[k] = true;
+        for (var k2 in raw.secOverride) if (raw.secOverride[k2]) out.secOverride[k2] = true;
     } else {
-      for (const [key, v] of Object.entries(raw)) { const r = normVal(v); if (r) out.events[key] = r; }
+      for (var key2 in raw) { var r2 = normVal(raw[key2]); if (r2) out.events[key2] = r2; }
     }
     return out;
   }
@@ -633,7 +635,7 @@
   }
   function loadSettings() {
     try {
-      const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      var s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
       if (s.theme === 'light' || s.theme === 'grey' || s.theme === 'dark') state.theme = s.theme;
       if (['sans','serif','mono'].includes(s.font)) state.font = s.font;
       if ([7,1,3,6,12].includes(s.zoom)) state.zoom = s.zoom;
@@ -654,8 +656,8 @@
       if (isFinite(s.vHeight) && s.vHeight > 0) state.vHeight = s.vHeight;
       if (s.colors) state.colors = normalizeLayout(s.colors);
       if (s.loadouts && typeof s.loadouts === 'object') {
-        const lo = {};
-        for (const [n, v] of Object.entries(s.loadouts)) if (n && v && typeof v === 'object') lo[n] = normalizeLayout(v);
+        var lo = {};
+        for (var n in s.loadouts) if (n && s.loadouts[n] && typeof s.loadouts[n] === 'object') lo[n] = normalizeLayout(s.loadouts[n]);
         state.loadouts = lo;
       }
       if (typeof s.lastLoadout === 'string' && state.loadouts[s.lastLoadout]) state.lastLoadout = s.lastLoadout;
@@ -666,125 +668,131 @@
   /* ── event links (eventlinks.json) ── */
   function normLinkColour(c) {
     if (typeof c !== 'string') return null;
-    let s = c.trim();
+    var s = c.trim();
     if (!s) return null;
-    if (s[0] !== '#') s = '#' + s;
+    if (s.charAt(0) !== '#') s = '#' + s;
     if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
-    if (/^#[0-9a-fA-F]{3}$/.test(s)) return '#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3];
+    if (/^#[0-9a-fA-F]{3}$/.test(s)) return '#' + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2) + s.charAt(3) + s.charAt(3);
     return null;
   }
   function normLink(o) {
     if (typeof o === 'string') o = { url: o };
     if (!o || typeof o !== 'object') return null;
-    const url = o.url || o.link || o.href;
+    var url = o.url || o.link || o.href;
     if (typeof url !== 'string' || !/^https?:\/\//i.test(url.trim())) return null;
-    const text = (o.text || o.label || o.title || url).trim();
+    var text = (o.text || o.label || o.title || url).trim();
     if (!text) return null;
-    return { text, url: url.trim(), color: normLinkColour(o.color || o.colour) };
+    return { text: text, url: url.trim(), color: normLinkColour(o.color || o.colour) };
   }
   function normalizeLinks(obj) {
-    const out = {};
+    var out = {};
     if (!obj || typeof obj !== 'object') return out;
-    for (const [k, v] of Object.entries(obj)) {
-      if (k.startsWith('_')) continue;         /* the _readme key and friends */
-      if (!Array.isArray(v)) { console.warn('eventlinks: "' + k + '" is not a list — skipped'); continue; }
-      const list = v.map(normLink).filter(Boolean);
-      const dropped = v.length - list.length;
+    Object.keys(obj).forEach(function (k) {
+      if (k.charAt(0) === '_') return;
+      var v = obj[k];
+      if (!Array.isArray(v)) { console.warn('eventlinks: "' + k + '" is not a list — skipped'); return; }
+      var list = v.map(normLink).filter(Boolean);
+      var dropped = v.length - list.length;
       if (dropped) console.warn('eventlinks: ' + dropped + ' bad entr' + (dropped === 1 ? 'y' : 'ies') + ' under "' + k + '" — skipped');
       if (list.length) out[k] = list;
-    }
+    });
     return out;
   }
   function lookupLinks(ev) {
     return eventLinks[ev.name] || eventLinks[ev.base] || eventLinks[ev.section] || [];
   }
   function warnUnknownLinkKeys() {
-    const known = new Set(items.concat(sections));
-    Object.keys(eventLinks).forEach(k => {
+    var known = new Set(items.concat(sections));
+    Object.keys(eventLinks).forEach(function (k) {
       if (!known.has(k)) console.warn('eventlinks: no event or section named "' + k + '" — check the spelling');
     });
   }
   function fetchEventLinks() {
     fetch(EVENTLINKS_FILE)
-      .then(r => { if (!r.ok) throw new Error('missing'); return r.json(); })
-      .then(o => {
+      .then(function (r) { if (!r.ok) throw new Error('missing'); return r.json(); })
+      .then(function (o) {
         eventLinks = normalizeLinks(o);
         linksFromFile = true;
         if (items.length) warnUnknownLinkKeys();
       })
-      .catch(() => {});
+      .catch(function () {});
   }
 
   /* ── data loading ── */
   function parseISO(v) {
     if (typeof v !== 'string') return null;
-    const m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    var m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
     if (!m) return null;
-    const y = +m[1], mo = +m[2], d = +m[3];
-    const dt = new Date(Date.UTC(y, mo - 1, d));
+    var y = +m[1], mo = +m[2], d = +m[3];
+    var dt = new Date(Date.UTC(y, mo - 1, d));
     if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
     return Date.UTC(y, mo - 1, d);
   }
   function parseJSONL(text) {
-    const list = []; let bad = 0, id = 0;
-    text.split(/\r?\n/).forEach((ln, i) => {
-      const s = ln.trim(); if (!s) return;
+    var list = [], bad = 0, id = 0;
+    text.split(/\r?\n/).forEach(function (ln, i) {
+      var s = ln.trim();
+      if (!s) return;
       try {
-        const o = JSON.parse(s);
-        const st = parseISO(o.start), en = parseISO(o.end);
-        if (st == null || en == null) { bad++; console.warn('line ' + (i+1) + ': dates must be YYYY-MM-DD'); return; }
-        if (en < st) { bad++; console.warn('line ' + (i+1) + ': ends before it starts — skipped'); return; }
-        let name = typeof o.event === 'string' ? o.event.trim() : '';
+        var o = JSON.parse(s);
+        var st = parseISO(o.start), en = parseISO(o.end);
+        if (st == null || en == null) { bad++; console.warn('line ' + (i + 1) + ': dates must be YYYY-MM-DD'); return; }
+        if (en < st) { bad++; console.warn('line ' + (i + 1) + ': ends before it starts — skipped'); return; }
+        var name = typeof o.event === 'string' ? o.event.trim() : '';
         if (!name) { bad++; return; }
-        let fl = !!o.fl;
-        const flm = name.match(/\s*[-–—]\s*fl$/i);
+        var fl = !!o.fl;
+        var flm = name.match(/\s*[-–—]\s*fl$/i);
         if (flm) { fl = true; name = name.slice(0, flm.index).trim(); }
-        const base = baseName(name);
-        const rec = EV_SEC.get(base);
-        const section = rec ? rec.sec : (typeof o.section === 'string' && o.section.trim() ? o.section.trim() : 'Unsorted');
+        var base = baseName(name);
+        var rec = EV_SEC.get(base);
+        var section = rec ? rec.sec : ((typeof o.section === 'string' && o.section.trim()) ? o.section.trim() : 'Unsorted');
         list.push({
-          id: id++, name, base, section, fl,
+          id: id++, name: name, base: base, section: section, fl: fl,
           start: st, end: en,
           days: Math.max(1, Math.round((en - st) / MS)),
           row: 0, seamL: false, seamR: false, flInferred: false
         });
-      } catch (e) { bad++; console.warn('line ' + (i+1) + ': not valid JSON'); }
+      } catch (e) { bad++; console.warn('line ' + (i + 1) + ': not valid JSON'); }
     });
-    return { list, bad };
+    return { list: list, bad: bad };
   }
   function deriveAll() {
-    const known = SECTION_ORDER.map(s => s.name);
-    const extra = [...new Set(events.map(e => e.section))].filter(s => !known.includes(s)).sort();
-    sections = known.filter(n => events.some(e => e.section === n)).concat(extra);
+    var known = SECTION_ORDER.map(function (s) { return s.name; });
+    var extra = [...new Set(events.map(function (e) { return e.section; }))].filter(function (s) { return known.indexOf(s) < 0; }).sort();
+    sections = known.filter(function (n) { return events.some(function (e) { return e.section === n; }); }).concat(extra);
     if (!sections.length) sections = known.slice(0, 1);
-    items = [...new Set(events.map(e => e.base))].sort((a, b) => a.localeCompare(b));
-    years = [...new Set(events.map(e => new Date(e.start).getUTCFullYear()))].sort();
+    items = [...new Set(events.map(function (e) { return e.base; }))].sort(function (a, b) { return a.localeCompare(b); });
+    years = [...new Set(events.map(function (e) { return new Date(e.start).getUTCFullYear(); }))].sort();
     buildFilterSets();
     computeFiltered();
     computeFLInference();
     recomputeLanes();
   }
   function orderedItems(sec) {
-    const set = new Set(events.filter(e => e.section === sec).map(e => e.base));
-    const out = [];
-    const rec = SECTION_ORDER.find(s => s.name === sec);
-    if (rec) rec.events.forEach(n => { if (set.has(n)) { out.push(n); set.delete(n); } });
-    return out.concat([...set].sort((a, b) => a.localeCompare(b)));
+    var set = new Set(events.filter(function (e) { return e.section === sec; }).map(function (e) { return e.base; }));
+    var out = [];
+    var rec = SECTION_ORDER.find(function (s) { return s.name === sec; });
+    if (rec) rec.events.forEach(function (n) { if (set.has(n)) { out.push(n); set.delete(n); } });
+    return out.concat([...set].sort(function (a, b) { return a.localeCompare(b); });
   }
   function applyText(text, label, kind) {
-    const r = parseJSONL(text);
+    var r = parseJSONL(text);
     events = r.list;
     source = kind || 'session';
-    fileName = label; dataLoaded = true;
+    fileName = label;
+    dataLoaded = true;
     if (!linksFromFile) eventLinks = (kind === 'sample') ? SAMPLE_LINKS : {};
     if (linksFromFile) warnUnknownLinkKeys();
-    deriveAll(); buildDrawer(); updateNotice(); refresh();
+    deriveAll();
+    buildDrawer();
+    updateNotice();
+    refresh();
   }
   async function loadData() {
-    for (const name of DATA_FILES) {
+    for (var i = 0; i < DATA_FILES.length; i++) {
       try {
-        const res = await fetch(name);
-        if (res.ok) { applyText(await res.text(), name, 'file'); return; }
+        var res = await fetch(DATA_FILES[i]);
+        if (res.ok) { applyText(await res.text(), DATA_FILES[i], 'file'); return; }
       } catch (e) {}
     }
     applyText(SAMPLE_JSONL, 'sample', 'sample');
@@ -792,39 +800,45 @@
 
   /* ── filtering ── */
   function buildFilterSets() {
-    const off = state.filters;
-    filtersLive.sec = new Set(sections.filter(s => !off.sections.includes(s)));
-    filtersLive.it  = new Set(items.filter(i => !off.items.includes(i)));
-    filtersLive.yr  = new Set(years.map(String).filter(y => !off.years.includes(y)));
+    var off = state.filters;
+    filtersLive.sec = new Set(sections.filter(function (s) { return off.sections.indexOf(s) < 0; }));
+    filtersLive.it  = new Set(items.filter(function (i) { return off.items.indexOf(i) < 0; }));
+    filtersLive.yr  = new Set(years.map(String).filter(function (y) { return off.years.indexOf(y) < 0; }));
   }
   function computeFiltered() {
-    filtered = events.filter(e =>
-      filtersLive.sec.has(e.section) && filtersLive.it.has(e.base) &&
-      filtersLive.yr.has(String(new Date(e.start).getUTCFullYear())));
+    filtered = events.filter(function (e) {
+      return filtersLive.sec.has(e.section) && filtersLive.it.has(e.base) &&
+        filtersLive.yr.has(String(new Date(e.start).getUTCFullYear()));
+    });
   }
   function offCount() {
     return state.filters.sections.length + state.filters.items.length + state.filters.years.length;
   }
   function rebuildAfterFilter() {
-    buildFilterSets(); computeFiltered(); recomputeLanes();
-    buildDrawer(); updateBadge(); refresh(); save();
+    buildFilterSets();
+    computeFiltered();
+    recomputeLanes();
+    buildDrawer();
+    updateBadge();
+    refresh();
+    save();
   }
 
   /* ── FL inference (always from the full loaded data) ── */
   function computeFLInference() {
-    events.forEach(e => { e.flInferred = false; });
-    const flDays = new Set();
-    events.filter(e => e.base === FL_NAME).forEach(e => {
-      for (let d = e.start; d <= e.end; d += MS) flDays.add(d);
+    events.forEach(function (e) { e.flInferred = false; });
+    var flDays = new Set();
+    events.filter(function (e) { return e.base === FL_NAME; }).forEach(function (e) {
+      for (var d = e.start; d <= e.end; d += MS) flDays.add(d);
     });
     if (!flDays.size) return;
-    const weeklies = events.filter(e => WEEKLY_SET.has(e.base));
-    weeklies.forEach(e => {
-      const blockers = weeklies.filter(w => w !== e && w.start <= e.end && e.start <= w.end);
-      let n = 0;
-      for (let d = e.start; d <= e.end; d += MS) {
+    var weeklies = events.filter(function (e) { return WEEKLY_SET.has(e.base); });
+    weeklies.forEach(function (e) {
+      var blockers = weeklies.filter(function (w) { return w !== e && w.start <= e.end && e.start <= w.end; });
+      var n = 0;
+      for (var d = e.start; d <= e.end; d += MS) {
         if (!flDays.has(d)) continue;
-        if (blockers.some(w => w.start <= d && d <= w.end)) continue;
+        if (blockers.some(function (w) { return w.start <= d && d <= w.end; })) continue;
         n++;
       }
       e.flInferred = n >= 2;
@@ -834,42 +848,45 @@
 
   /* ── packing (noon-to-noon bars) ── */
   function orderOf(e) {
-    const rec = EV_SEC.get(e.base);
+    var rec = EV_SEC.get(e.base);
     return rec ? rec.idx : 1000 + e.base.charCodeAt(0);
   }
   function recomputeLanes() {
     laneRows = new Map(); secCounts = new Map(); capWarns = new Set();
-    const bySec = new Map();
-    filtered.forEach(e => {
+    var bySec = new Map();
+    filtered.forEach(function (e) {
       if (!bySec.has(e.section)) bySec.set(e.section, []);
       bySec.get(e.section).push(e);
     });
-    const known = SECTION_ORDER.map(s => s.name);
-    const order = known.filter(n => bySec.has(n))
-      .concat([...bySec.keys()].filter(n => !known.includes(n)).sort());
-    order.forEach(sec => {
-      const evs = bySec.get(sec).slice().sort((a, b) =>
-        a.start - b.start || orderOf(a) - orderOf(b) || a.id - b.id);
+    var known = SECTION_ORDER.map(function (s) { return s.name; });
+    var order = known.filter(function (n) { return bySec.has(n); })
+      .concat([...bySec.keys()].filter(function (n) { return known.indexOf(n) < 0; }).sort());
+    order.forEach(function (sec) {
+      var evs = bySec.get(sec).slice().sort(function (a, b) {
+        return a.start - b.start || orderOf(a) - orderOf(b) || a.id - b.id;
+      });
       secCounts.set(sec, evs.length);
-      const rows = [];
-      evs.forEach(ev => {
+      var rows = [];
+      evs.forEach(function (ev) {
         ev.row = 0; ev.seamL = false; ev.seamR = false;
-        let r = -1;
-        for (let i = 0; i < rows.length; i++) {
+        var r = -1;
+        for (var i = 0; i < rows.length; i++) {
           if (ev.start >= rows[i].lastEnd) { r = i; break; }
         }
         if (r < 0) { r = rows.length; rows.push({ lastEnd: -Infinity, evs: [] }); }
-        rows[r].evs.push(ev); rows[r].lastEnd = ev.end; ev.row = r;
+        rows[r].evs.push(ev);
+        rows[r].lastEnd = ev.end;
+        ev.row = r;
       });
-      rows.forEach(row => {
-        row.evs.sort((a, b) => a.start - b.start || a.id - b.id);
-        for (let i = 0; i + 1 < row.evs.length; i++) {
-          const A = row.evs[i], B = row.evs[i + 1];
+      rows.forEach(function (row) {
+        row.evs.sort(function (a, b) { return a.start - b.start || a.id - b.id; });
+        for (var i = 0; i + 1 < row.evs.length; i++) {
+          var A = row.evs[i], B = row.evs[i + 1];
           if (A.end === B.start) { A.seamR = true; B.seamL = true; }
         }
       });
       laneRows.set(sec, rows);
-      const cap = SEC_CAP.get(sec);
+      var cap = SEC_CAP.get(sec);
       if (cap && rows.length > cap) {
         capWarns.add(sec);
         console.warn('“' + sec + '” uses ' + rows.length + ' lines but its cap is ' + cap + ' — overlapping events may need checking.');
@@ -878,26 +895,26 @@
   }
 
   /* ── colours ── */
-  let palCache = { theme: null, vals: [] };
+  var palCache = { theme: null, vals: [] };
   function palette() {
     if (palCache.theme === state.theme) return palCache.vals;
-    const cs = getComputedStyle(document.body);
-    palCache = { theme: state.theme, vals: [0,1,2,3,4,5,6,7].map(i => cs.getPropertyValue('--bar-' + i).trim()) };
+    var cs = getComputedStyle(document.body);
+    palCache = { theme: state.theme, vals: [0,1,2,3,4,5,6,7].map(function (i) { return cs.getPropertyValue('--bar-' + i).trim(); }) };
     return palCache.vals;
   }
   function resolveColour(o) { return o.t === 'h' ? o.v : palette()[o.i]; }
   function eventColorIdx(base) {
-    const rec = EV_SEC.get(base);
+    var rec = EV_SEC.get(base);
     return rec ? rec.idx % 8 : 5;
   }
   function sectionColor(sec) {
-    const i = SEC_INDEX.get(sec);
+    var i = SEC_INDEX.get(sec);
     return palette()[(i == null ? 0 : i) % 8];
   }
   function barColor(ev) {
-    const c = state.colors;
+    var c = state.colors;
     if (c.secOverride[ev.section]) return sectionColor(ev.section);
-    const eo = c.events[ev.base];
+    var eo = c.events[ev.base];
     if (eo) return resolveColour(eo);
     return palette()[eventColorIdx(ev.base)];
   }
@@ -905,45 +922,45 @@
   /* ── zoom / range ── */
   function zoomDays(z) { return z === 7 ? 7 : z * 30.4375; }
   function laneW() { return innerWidth < 760 ? 120 : 172; }
-  const MINW = { 7: 30, 1: 8, 3: 5, 6: 1.6, 12: 1.2 };
+  var MINW = { 7: 30, 1: 8, 3: 5, 6: 1.6, 12: 1.2 };
   function refitDayW() {
-    const avail = Math.max(tl.clientWidth - laneW(), 120);
+    var avail = Math.max(tl.clientWidth - laneW(), 120);
     dayW = Math.max(avail / zoomDays(state.zoom) * state.scale, MINW[state.zoom]);
   }
   function dateAtLeft() { return bufStartT + (savedScroll / dayW) * MS; }
   function chartViewMs() { return (Math.max(tl.clientWidth - laneW(), 0) / dayW) * MS; }
-  function visibleRange() { const a = dateAtLeft(); return [a, a + chartViewMs()]; }
+  function visibleRange() { var a = dateAtLeft(); return [a, a + chartViewMs()]; }
   function deriveAnchor() {
-    const t = Math.min(Math.max(dateAtLeft(), bufStartT), bufEndT - 1);
-    const d = new Date(t);
+    var t = Math.min(Math.max(dateAtLeft(), bufStartT), bufEndT - 1);
+    var d = new Date(t);
     return { y: d.getUTCFullYear(), m: d.getUTCMonth() };
   }
   function computeInView() {
-    let a, b;
+    var a, b;
     if (state.listFrom != null && state.listTo != null) {
       a = state.listFrom; b = state.listTo + MS;
     } else {
       a = Date.UTC(state.anchor.y, state.anchor.m, 1);
       b = a + zoomDays(state.zoom) * MS;
     }
-    return filtered.filter(ev => ev.end >= a && ev.start < b);
+    return filtered.filter(function (ev) { return ev.end >= a && ev.start < b; });
   }
   function fmtListRange() {
     if (state.listFrom == null || state.listTo == null) return '';
-    const a = new Date(state.listFrom), b = new Date(state.listTo);
+    var a = new Date(state.listFrom), b = new Date(state.listTo);
     if (a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth())
       return a.getUTCDate() + ' – ' + b.getUTCDate() + ' ' + M_L[b.getUTCMonth()] + ' ' + b.getUTCFullYear();
     return a.getUTCDate() + ' ' + M_S[a.getUTCMonth()] + (a.getUTCFullYear() !== b.getUTCFullYear() ? ' ' + a.getUTCFullYear() : '') +
       ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()] + ' ' + b.getUTCFullYear();
   }
   function rangeLabel() {
-    const { y, m } = state.anchor, z = state.zoom;
+    var y = state.anchor.y, m = state.anchor.m, z = state.zoom;
     if (z === 7) {
-      const a = new Date(Date.UTC(y, m, 1)), b = new Date(Date.UTC(y, m, 1) + 6 * MS);
+      var a = new Date(Date.UTC(y, m, 1)), b = new Date(Date.UTC(y, m, 1) + 6 * MS);
       return a.getUTCDate() + ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()] + ' ' + b.getUTCFullYear();
     }
     if (z === 12) return String(y);
-    const e = normMonth(y, m + z - 1);
+    var e = normMonth(y, m + z - 1);
     if (z === 1) return M_L[m] + ' ' + y;
     if (e.y === y) return M_S[m] + ' – ' + M_S[e.m] + ' ' + y;
     return M_S[m] + ' ' + y + ' – ' + M_S[e.m] + ' ' + e.y;
@@ -951,187 +968,188 @@
 
   /* ── toolbar ── */
   function renderToolbar() {
-    const onList = state.tab === 'list';
+    var onList = state.tab === 'list';
     $('#calCenter').style.display = onList ? 'none' : '';
     $('#listCenter').style.display = onList ? '' : 'none';
-    let n;
+    var n;
     if (onList) {
-      const fd = $('#fromDate'), td = $('#toDate');
+      var fd = $('#fromDate'), td = $('#toDate');
       if (document.activeElement !== fd) fd.value = state.listFrom != null ? isoOf(state.listFrom) : '';
       if (document.activeElement !== td) td.value = state.listTo != null ? isoOf(state.listTo) : '';
       n = computeInView().length;
       $('#viewCount').textContent = n + ' event' + (n !== 1 ? 's' : '') + ' in range';
     } else {
-      const { y, m } = state.anchor, z = state.zoom;
+      var y = state.anchor.y, m = state.anchor.m, z = state.zoom;
       $('#rangeBtn').style.display = z === 12 ? 'none' : '';
       if (z === 7) {
-        const t0 = Math.floor(dateAtLeft() / MS) * MS;
-        const a = new Date(t0), b = new Date(t0 + 6 * MS);
+        var t0 = Math.floor(dateAtLeft() / MS) * MS;
+        var a = new Date(t0), b = new Date(t0 + 6 * MS);
         $('#rangeVal').textContent = a.getUTCMonth() === b.getUTCMonth()
           ? a.getUTCDate() + ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()]
           : a.getUTCDate() + ' ' + M_S[a.getUTCMonth()] + ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()];
         $('#yearVal').textContent = String(b.getUTCFullYear());
       } else {
-        const e = normMonth(y, m + z - 1);
+        var e = normMonth(y, m + z - 1);
         $('#rangeVal').textContent = z === 1 ? M_L[m] : M_S[m] + ' – ' + M_S[e.m];
         $('#yearVal').textContent = e.y === y ? String(y) : y + ' – ' + e.y;
       }
-      const [va, vb] = visibleRange();
-      n = filtered.filter(ev => ev.end >= va && ev.start < vb).length;
+      var vr = visibleRange();
+      n = filtered.filter(function (ev) { return ev.end >= vr[0] && ev.start < vr[1]; }).length;
       $('#viewCount').textContent = n + ' event' + (n !== 1 ? 's' : '') + ' in view';
     }
   }
   function updateBadge() {
-    const n = offCount(), b = $('#filterBadge');
-    b.hidden = n === 0; b.textContent = n;
+    var n = offCount(), b = $('#filterBadge');
+    b.hidden = n === 0;
+    b.textContent = n;
   }
   function updateNotice() {
-    const slot = $('#noticeSlot');
+    var slot = $('#noticeSlot');
     if (source !== 'sample' || noticeDismissed) { slot.innerHTML = ''; return; }
-    slot.innerHTML = `<div class="notice">
-      <span>Showing <b>sample data</b>. Save your events as <b>Events Machine.txt</b> (or events.jsonl) in this folder — or
-      <button class="mini" id="noticeLoad">load a file now</button>.</span>
-      <button class="nx" id="noticeClose" aria-label="Dismiss">×</button></div>`;
+    slot.innerHTML = '<div class="notice">' +
+      '<span>Showing <b>sample data</b>. Save your events as <b>Events Machine.txt</b> (or events.jsonl) in this folder — or ' +
+      '<button class="mini" id="noticeLoad">load a file now</button>.</span>' +
+      '<button class="nx" id="noticeClose" aria-label="Dismiss">×</button></div>';
   }
 
   /* ── timeline ── */
   function renderTimeline() {
-    const LANE_W = laneW();
-    const rowH = state.density === 'compact' ? 24 : 34;
-    const barH = rowH - 12;
-    const totalDays = Math.round((bufEndT - bufStartT) / MS);
-    const chartW = Math.round(totalDays * dayW);
-    const xOf = t => (t - bufStartT) / MS * dayW;
+    var LANE_W = laneW();
+    var rowH = state.density === 'compact' ? 24 : 34;
+    var barH = rowH - 12;
+    var totalDays = Math.round((bufEndT - bufStartT) / MS);
+    var chartW = Math.round(totalDays * dayW);
+    function xOf(t) { return (t - bufStartT) / MS * dayW; }
 
-    const months = [];
-    for (let t = bufStartT; t < bufEndT; t = monthAddT(t, 1)) {
-      const d = new Date(t);
-      months.push({ t, mi: d.getUTCMonth(), yr: d.getUTCFullYear(), days: Math.round((monthAddT(t, 1) - t) / MS) });
+    var months = [];
+    for (var t = bufStartT; t < bufEndT; t = monthAddT(t, 1)) {
+      var d = new Date(t);
+      months.push({ t: t, mi: d.getUTCMonth(), yr: d.getUTCFullYear(), days: Math.round((monthAddT(t, 1) - t) / MS) });
     }
-    const showDays = dayW >= 16, showWD = dayW >= 24;
-    const todayT = todayUTC();
+    var showDays = dayW >= 16, showWD = dayW >= 24;
+    var todayT = todayUTC();
 
-    let monthsHTML = '';
-    months.forEach((mo, i) => {
-      const x = Math.round(xOf(mo.t)), w = Math.round(mo.days * dayW);
-      let lb = w > 78 ? M_L[mo.mi] : M_S[mo.mi];
+    var monthsHTML = '';
+    months.forEach(function (mo, i) {
+      var x = Math.round(xOf(mo.t)), w = Math.round(mo.days * dayW);
+      var lb = w > 78 ? M_L[mo.mi] : M_S[mo.mi];
       if (i === 0 || mo.mi === 0) lb += ' ' + mo.yr;
-      monthsHTML += `<div class="hmonth" style="left:${x}px;width:${w}px">${lb}</div>`;
+      monthsHTML += '<div class="hmonth" style="left:' + x + 'px;width:' + w + 'px">' + lb + '</div>';
     });
     if (todayT >= bufStartT && todayT < bufEndT)
-      monthsHTML += `<div class="hflag" style="left:${Math.round(xOf(todayT))}px">today</div>`;
+      monthsHTML += '<div class="hflag" style="left:' + Math.round(xOf(todayT)) + 'px">today</div>';
 
-    let daysHTML = '';
+    var daysHTML = '';
     if (showDays) {
-      const wd0 = new Date(bufStartT).getUTCDay();
-      for (let di = 0; di < totalDays; di++) {
-        const wd = (wd0 + di) % 7, dn = new Date(bufStartT + di * MS).getUTCDate();
-        daysHTML += `<div class="hday${wd === 0 || wd === 6 ? ' we' : ''}" style="left:${Math.round(di * dayW)}px;width:${Math.ceil(dayW)}px">` +
-          (showWD ? `<i>${WD[wd]}</i>` : '') + `<b>${dn}</b></div>`;
+      var wd0 = new Date(bufStartT).getUTCDay();
+      for (var di = 0; di < totalDays; di++) {
+        var wd = (wd0 + di) % 7, dn = new Date(bufStartT + di * MS).getUTCDate();
+        daysHTML += '<div class="hday' + (wd === 0 || wd === 6 ? ' we' : '') + '" style="left:' + Math.round(di * dayW) + 'px;width:' + Math.ceil(dayW) + 'px">' +
+          (showWD ? '<i>' + WD[wd] + '</i>' : '') + '<b>' + dn + '</b></div>';
       }
     }
-    const gridBg = dayW >= 7
-      ? `background-image:repeating-linear-gradient(90deg,var(--dayline) 0 1px,transparent 1px ${dayW}px);` : '';
+    var gridBg = dayW >= 7
+      ? 'background-image:repeating-linear-gradient(90deg,var(--dayline) 0 1px,transparent 1px ' + dayW + 'px);' : '';
 
-    let grid = '';
-    months.forEach(mo => { grid += `<div class="gmonth" style="left:${Math.round(xOf(mo.t))}px"></div>`; });
+    var grid = '';
+    months.forEach(function (mo) { grid += '<div class="gmonth" style="left:' + Math.round(xOf(mo.t)) + 'px"></div>'; });
     if (state.weekends && dayW >= 7) {
-      const wd0 = new Date(bufStartT).getUTCDay();
-      if (wd0 === 0) grid += `<div class="gwkd" style="left:0;width:${dayW}px"></div>`;
-      let di = (6 - wd0 + 7) % 7;
-      for (; di < totalDays; di += 7) grid += `<div class="gwkd" style="left:${Math.round(di * dayW)}px;width:${dayW * 2}px"></div>`;
+      var wd0b = new Date(bufStartT).getUTCDay();
+      if (wd0b === 0) grid += '<div class="gwkd" style="left:0;width:' + dayW + 'px"></div>';
+      var di2 = (6 - wd0b + 7) % 7;
+      for (; di2 < totalDays; di2 += 7) grid += '<div class="gwkd" style="left:' + Math.round(di2 * dayW) + 'px;width:' + dayW * 2 + 'px"></div>';
     }
     if (todayT >= bufStartT && todayT < bufEndT)
-      grid += `<div class="gtoday" style="left:${Math.round(xOf(todayT))}px"></div>`;
+      grid += '<div class="gtoday" style="left:' + Math.round(xOf(todayT)) + 'px"></div>';
 
-    const flOn = state.showFL;
-    const half = dayW / 2;
-    const sgap = Math.min(dayW / 2, 3);
-    const minBar = Math.max(2, Math.min(dayW * 0.4, 10));
-    let lanesHTML = '';
-    sections.forEach(sec => {
-      const rows = laneRows.get(sec) || [];
-      const nRows = Math.max(rows.length, 1);
-      const total = secCounts.get(sec) || 0;
-      const capFlag = capWarns.has(sec)
-        ? `<span class="capdot" title="More concurrent events than this section's cap — check for overlapping or stray lines"></span>` : '';
-      let barsHTML = '';
-      rows.forEach(row => {
-        row.evs.forEach((ev, i) => {
+    var flOn = state.showFL;
+    var half = dayW / 2;
+    var sgap = Math.min(dayW / 2, 3);
+    var minBar = Math.max(2, Math.min(dayW * 0.4, 10));
+    var lanesHTML = '';
+    sections.forEach(function (sec) {
+      var rows = laneRows.get(sec) || [];
+      var nRows = Math.max(rows.length, 1);
+      var total = secCounts.get(sec) || 0;
+      var capFlag = capWarns.has(sec)
+        ? '<span class="capdot" title="More concurrent events than this section\'s cap — check for overlapping or stray lines"></span>' : '';
+      var barsHTML = '';
+      rows.forEach(function (row) {
+        row.evs.forEach(function (ev, i) {
           if (ev.end < bufStartT || ev.start >= bufEndT) return;
-          let x1 = xOf(ev.start) + half + (ev.seamL ? sgap / 2 : 0);
-          const x2 = xOf(ev.end) + half - (ev.seamR ? sgap / 2 : 0);
+          var x1 = xOf(ev.start) + half + (ev.seamL ? sgap / 2 : 0);
+          var x2 = xOf(ev.end) + half - (ev.seamR ? sgap / 2 : 0);
           if (x2 - x1 < minBar && !ev.seamL) x1 = x2 - minBar;
-          const w = Math.max(x2 - x1, 1.5);
-          const right = x1 + w;
-          const top = ev.row * rowH + (rowH - barH) / 2;
-          const col = barColor(ev);
-          const isFl = flOn && isFL(ev);
+          var w = Math.max(x2 - x1, 1.5);
+          var right = x1 + w;
+          var top = ev.row * rowH + (rowH - barH) / 2;
+          var col = barColor(ev);
+          var isFl = flOn && isFL(ev);
 
-          let inLbl = '', outLbl = '';
+          var inLbl = '', outLbl = '';
           if (state.labels) {
             if (w >= 40) {
-              inLbl = `<span class="bl" style="color:${textColorFor(col)}">${esc(ev.name)}${ev.fl ? ' - FL' : ''}</span>`;
+              inLbl = '<span class="bl" style="color:' + textColorFor(col) + '">' + esc(ev.name) + (ev.fl ? ' - FL' : '') + '</span>';
             } else {
-              const next = row.evs[i + 1];
-              const limit = next ? xOf(next.start) + half + (next.seamL ? sgap / 2 : 0) : chartW;
-              const room = limit - right - 8;
+              var next = row.evs[i + 1];
+              var limit = next ? xOf(next.start) + half + (next.seamL ? sgap / 2 : 0) : chartW;
+              var room = limit - right - 8;
               if (room >= 34) {
-                outLbl = `<span class="blo${flOn && !isFl ? ' dim' : ''}" style="left:${right + 5}px;top:${top}px;height:${barH}px;max-width:${Math.min(room, 170)}px">${esc(ev.name)}${ev.fl ? ' · FL' : ''}</span>`;
+                outLbl = '<span class="blo' + (flOn && !isFl ? ' dim' : '') + '" style="left:' + (right + 5) + 'px;top:' + top + 'px;height:' + barH + 'px;max-width:' + Math.min(room, 170) + 'px">' + esc(ev.name) + (ev.fl ? ' · FL' : '') + '</span>';
               }
             }
           }
-          const badge = isFl && w >= 26 ? '<i class="flb">FL</i>' : '';
-          barsHTML += `<div class="bar${isFl ? ' is-fl' : ''}" data-id="${ev.id}" style="left:${x1}px;width:${w}px;top:${top}px;height:${barH}px;background:${col}">${inLbl}${badge}</div>` + outLbl;
+          var badge = isFl && w >= 26 ? '<i class="flb">FL</i>' : '';
+          barsHTML += '<div class="bar' + (isFl ? ' is-fl' : '') + '" data-id="' + ev.id + '" style="left:' + x1 + 'px;width:' + w + 'px;top:' + top + 'px;height:' + barH + 'px;background:' + col + '">' + inLbl + badge + '</div>' + outLbl;
         });
       });
-      lanesHTML += `<div class="lane">
-        <div class="lane-label" style="width:${LANE_W}px">
-          <span class="dot" style="background:${sectionColor(sec)}"></span>${capFlag}
-          <span class="ltxt"><b>${esc(sec)}</b><small>${total
+      lanesHTML += '<div class="lane">' +
+        '<div class="lane-label" style="width:' + LANE_W + 'px">' +
+          '<span class="dot" style="background:' + sectionColor(sec) + '"></span>' + capFlag +
+          '<span class="ltxt"><b>' + esc(sec) + '</b><small>' + (total
             ? total + ' event' + (total > 1 ? 's' : '') + ' · ' + nRows + (nRows > 1 ? ' lines' : ' line')
-            : 'hidden'}</small></span>
-        </div>
-        <div class="lane-chart" style="width:${chartW}px;height:${nRows * rowH}px">${barsHTML}</div>
-      </div>`;
+            : 'hidden') + '</small></span>' +
+        '</div>' +
+        '<div class="lane-chart" style="width:' + chartW + 'px;height:' + nRows * rowH + 'px">' + barsHTML + '</div>' +
+      '</div>';
     });
 
-    tl.innerHTML = `<div class="tl-inner" style="width:${LANE_W + chartW}px">
-      <div class="tl-head">
-        <div class="tl-corner" style="width:${LANE_W}px">sections</div>
-        <div class="tl-headcol" style="width:${chartW}px;${gridBg}">
-          <div class="hm-row">${monthsHTML}</div>
-          ${showDays ? `<div class="hd-row">${daysHTML}</div>` : ''}
-        </div>
-      </div>
-      <div class="tl-lanewrap">
-        <div class="tl-grid" style="left:${LANE_W}px;width:${chartW}px;${gridBg}">${grid}</div>
-        ${lanesHTML}
-      </div>
-    </div>`;
+    tl.innerHTML = '<div class="tl-inner" style="width:' + (LANE_W + chartW) + 'px">' +
+      '<div class="tl-head">' +
+        '<div class="tl-corner" style="width:' + LANE_W + 'px">sections</div>' +
+        '<div class="tl-headcol" style="width:' + chartW + 'px;' + gridBg + '">' +
+          '<div class="hm-row">' + monthsHTML + '</div>' +
+          (showDays ? '<div class="hd-row">' + daysHTML + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="tl-lanewrap">' +
+        '<div class="tl-grid" style="left:' + LANE_W + 'px;width:' + chartW + 'px;' + gridBg + '">' + grid + '</div>' +
+        lanesHTML +
+      '</div>' +
+    '</div>';
     tl.classList.toggle('fl-on', flOn);
     tl.scrollLeft = savedScroll;
   }
 
   function updateEmptyOverlay() {
-    const el = $('#tlEmpty');
+    var el = $('#tlEmpty');
     if (!dataLoaded) { el.hidden = false; el.innerHTML = '<p>loading events…</p>'; return; }
     if (!events.length) { el.hidden = false; el.innerHTML = '<p>No events loaded.</p>'; return; }
-    const [a, b] = visibleRange();
-    const any = filtered.some(ev => ev.end >= a && ev.start < b);
+    var vr = visibleRange();
+    var any = filtered.some(function (ev) { return ev.end >= vr[0] && ev.start < vr[1]; });
     el.hidden = any;
     if (!any) {
-      el.innerHTML = `<p>Nothing on the calendar here — keep scrolling, or…</p><div class="tl-empty-btns">
-        ${filtered.length ? '<button class="mini" id="jumpFirst">Jump to first event</button>' : ''}
-        ${offCount() ? '<button class="mini" id="clearF">Clear filters</button>' : ''}</div>`;
+      el.innerHTML = '<p>Nothing on the calendar here — keep scrolling, or…</p><div class="tl-empty-btns">' +
+        (filtered.length ? '<button class="mini" id="jumpFirst">Jump to first event</button>' : '') +
+        (offCount() ? '<button class="mini" id="clearF">Clear filters</button>' : '') + '</div>';
     }
   }
 
   /* ── buffer management ── */
   function handleScrollFrame() {
     savedScroll = tl.scrollLeft;
-    const rightGap = tl.scrollWidth - tl.clientWidth - savedScroll;
-    const trigger = 2 * 30.4375 * dayW;
+    var rightGap = tl.scrollWidth - tl.clientWidth - savedScroll;
+    var trigger = 2 * 30.4375 * dayW;
     if (rightGap < trigger) extendRight();
     else if (savedScroll < trigger) extendLeft();
     maybeTrim();
@@ -1142,15 +1160,15 @@
     renderTimeline();
   }
   function extendLeft() {
-    const old = bufStartT;
+    var old = bufStartT;
     bufStartT = monthAddT(bufStartT, -6);
     savedScroll += (old - bufStartT) / MS * dayW;
     renderTimeline();
   }
   function maybeTrim() {
-    const viewL = dateAtLeft(), viewR = viewL + chartViewMs();
-    const KEEP = 18 * 30.4375 * MS, STEP = 6 * 30.4375 * MS;
-    let ns = bufStartT, ne = bufEndT;
+    var viewL = dateAtLeft(), viewR = viewL + chartViewMs();
+    var KEEP = 18 * 30.4375 * MS, STEP = 6 * 30.4375 * MS;
+    var ns = bufStartT, ne = bufEndT;
     while (viewL - ns > KEEP + STEP) ns = monthAddT(ns, 6);
     while (ne - viewR > KEEP + STEP) ne = monthAddT(ne, -6);
     if (ns !== bufStartT || ne !== bufEndT) {
@@ -1160,7 +1178,7 @@
     }
   }
   function postScrollUpdate() {
-    const a = deriveAnchor();
+    var a = deriveAnchor();
     if (a.y !== state.anchor.y || a.m !== state.anchor.m) state.anchor = a;
     renderToolbar();
     updateEmptyOverlay();
@@ -1168,13 +1186,13 @@
     anchorSaveTimer = setTimeout(save, 500);
   }
   function goToDate(t) {
-    const viewMs = Math.max(chartViewMs(), zoomDays(7) * dayW * MS);
-    const marginMs = 2.5 * 30.4375 * MS;
-    let delta = 0, changed = false;
-    while (bufStartT > t - marginMs) { const old = bufStartT; bufStartT = monthAddT(bufStartT, -6); delta += (old - bufStartT) / MS * dayW; changed = true; }
+    var viewMs = Math.max(chartViewMs(), zoomDays(7) * dayW * MS);
+    var marginMs = 2.5 * 30.4375 * MS;
+    var delta = 0, changed = false;
+    while (bufStartT > t - marginMs) { var old = bufStartT; bufStartT = monthAddT(bufStartT, -6); delta += (old - bufStartT) / MS * dayW; changed = true; }
     while (bufEndT < t + viewMs + marginMs) { bufEndT = monthAddT(bufEndT, 6); changed = true; }
     if (changed) { savedScroll += delta; renderTimeline(); }
-    const x = Math.max(0, (t - bufStartT) / MS * dayW);
+    var x = Math.max(0, (t - bufStartT) / MS * dayW);
     savedScroll = x;
     tl.scrollLeft = x;
     maybeTrim();
@@ -1182,14 +1200,14 @@
   }
   function step(dir) {
     if (state.tab === 'list' && state.listFrom != null && state.listTo != null) {
-      const dur = Math.max(state.listTo - state.listFrom, MS);
+      var dur = Math.max(state.listTo - state.listFrom, MS);
       state.listFrom += dir * dur;
       state.listTo += dir * dur;
       save(); renderToolbar(); renderList();
       return;
     }
     if (state.zoom === 7) {
-      const t = Math.floor(dateAtLeft() / MS) * MS + dir * 7 * MS;
+      var t = Math.floor(dateAtLeft() / MS) * MS + dir * 7 * MS;
       goToDate(t);
     } else {
       goToDate(Date.UTC(state.anchor.y, state.anchor.m + dir * state.zoom, 1));
@@ -1198,25 +1216,25 @@
 
   /* ── list view ── */
   function rowHTML(ev) {
-    const badge = isFL(ev) ? '<span class="flbadge">FL</span>' : '';
-    return `<button class="lrow${isFL(ev) ? ' has-fl' : ''}" data-id="${ev.id}">
-      <span class="ldot" style="background:${barColor(ev)}"></span>
-      <span class="ln">${esc(ev.name)}${badge}</span>
-      <span class="ls">${esc(ev.section)}</span>
-      <span class="ld">${esc(fmtRange(ev))}</span>
-      <span class="llu">${ev.days}d</span></button>`;
+    var badge = isFL(ev) ? '<span class="flbadge">FL</span>' : '';
+    return '<button class="lrow' + (isFL(ev) ? ' has-fl' : '') + '" data-id="' + ev.id + '">' +
+      '<span class="ldot" style="background:' + barColor(ev) + '"></span>' +
+      '<span class="ln">' + esc(ev.name) + badge + '</span>' +
+      '<span class="ls">' + esc(ev.section) + '</span>' +
+      '<span class="ld">' + esc(fmtRange(ev)) + '</span>' +
+      '<span class="llu">' + ev.days + 'd</span></button>';
   }
   function informalHTML(inV) {
-    const s = state.sort;
-    const list = inV.slice().sort(
-      s === 'name' ? (a, b) => a.name.localeCompare(b.name) :
-      s === 'section' ? (a, b) => a.section === b.section ? a.start - b.start : a.section.localeCompare(b.section) :
-      (a, b) => a.start - b.start || a.name.localeCompare(b.name));
+    var s = state.sort;
+    var list = inV.slice().sort(
+      s === 'name' ? function (a, b) { return a.name.localeCompare(b.name); } :
+      s === 'section' ? function (a, b) { return a.section === b.section ? a.start - b.start : a.section.localeCompare(b.section); } :
+      function (a, b) { return a.start - b.start || a.name.localeCompare(b.name); });
     if (s !== 'date') return list.map(rowHTML).join('');
-    let curKey = '', curLabel = '', buf = [];
-    const groups = [];
-    list.forEach(ev => {
-      const d = new Date(ev.start), key = d.getUTCFullYear() + '-' + d.getUTCMonth();
+    var curKey = '', curLabel = '', buf = [];
+    var groups = [];
+    list.forEach(function (ev) {
+      var d = new Date(ev.start), key = d.getUTCFullYear() + '-' + d.getUTCMonth();
       if (key !== curKey) {
         if (buf.length) groups.push({ label: curLabel, evs: buf });
         buf = []; curKey = key;
@@ -1225,16 +1243,17 @@
       buf.push(ev);
     });
     if (buf.length) groups.push({ label: curLabel, evs: buf });
-    return groups.map(g =>
-      `<div class="lg"><div class="lg-head">${esc(g.label)}<span>${g.evs.length}</span></div>` +
-      g.evs.map(rowHTML).join('') + `</div>`).join('');
+    return groups.map(function (g) {
+      return '<div class="lg"><div class="lg-head">' + esc(g.label) + '<span>' + g.evs.length + '</span></div>' +
+        g.evs.map(rowHTML).join('') + '</div>';
+    }).join('');
   }
   function analyticalHTML(inV) {
-    const cols = [['event','Event'],['section','Section'],['start','Start'],['end','End'],['days','Days']];
-    const { col, dir } = state.tsort;
-    const mul = dir === 'asc' ? 1 : -1;
-    const list = inV.slice().sort((a, b) => {
-      let r = 0;
+    var cols = [['event','Event'],['section','Section'],['start','Start'],['end','End'],['days','Days']];
+    var col = state.tsort.col, dir = state.tsort.dir;
+    var mul = dir === 'asc' ? 1 : -1;
+    var list = inV.slice().sort(function (a, b) {
+      var r = 0;
       if (col === 'event') r = a.name.localeCompare(b.name);
       else if (col === 'section') r = a.section.localeCompare(b.section) || a.name.localeCompare(b.name);
       else if (col === 'start') r = a.start - b.start || a.name.localeCompare(b.name);
@@ -1242,133 +1261,137 @@
       else r = a.days - b.days || a.start - b.start;
       return r * mul;
     });
-    const head = cols.map(([c, l]) => {
-      const on = col === c;
-      return `<th data-col="${c}" class="${on ? 'on' : ''}${c === 'days' ? ' r' : ''}" title="Sort by ${l}"><span>${l}</span>` +
-        `<span class="tri"><i class="tu${on && dir === 'asc' ? ' act' : ''}"></i><i class="td${on && dir === 'desc' ? ' act' : ''}"></i></span></th>`;
+    var head = cols.map(function (c) {
+      var on = col === c[0];
+      return '<th data-col="' + c[0] + '" class="' + (on ? 'on' : '') + (c[0] === 'days' ? ' r' : '') + '" title="Sort by ' + c[1] + '"><span>' + c[1] + '</span>' +
+        '<span class="tri"><i class="tu' + (on && dir === 'asc' ? ' act' : '') + '"></i><i class="td' + (on && dir === 'desc' ? ' act' : '') + '"></i></span></th>';
     }).join('');
-    const rows = list.map(ev => `<tr data-id="${ev.id}" class="${isFL(ev) ? 'has-fl' : ''}">
-      <td><span class="ldot" style="background:${barColor(ev)}"></span>${esc(ev.name)}${isFL(ev) ? '<span class="flbadge">FL</span>' : ''}</td>
-      <td class="c-sec">${esc(ev.section)}</td>
-      <td class="c-dt">${fmtD(ev.start)}</td>
-      <td class="c-dt">${fmtD(ev.end)}</td>
-      <td class="c-dy">${ev.days}</td></tr>`).join('');
-    return `<table class="atable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+    var rows = list.map(function (ev) {
+      return '<tr data-id="' + ev.id + '" class="' + (isFL(ev) ? 'has-fl' : '') + '">' +
+        '<td><span class="ldot" style="background:' + barColor(ev) + '"></span>' + esc(ev.name) + (isFL(ev) ? '<span class="flbadge">FL</span>' : '') + '</td>' +
+        '<td class="c-sec">' + esc(ev.section) + '</td>' +
+        '<td class="c-dt">' + fmtD(ev.start) + '</td>' +
+        '<td class="c-dt">' + fmtD(ev.end) + '</td>' +
+        '<td class="c-dy">' + ev.days + '</td></tr>';
+    }).join('');
+    return '<table class="atable"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
   function renderList() {
-    const inV = computeInView();
-    const fmt = state.listFormat;
-    const ana = fmt === 'analytical';
-    const rng = state.listFrom != null ? esc(fmtListRange()) : esc(rangeLabel());
-    const head = `<div class="list-head">
-      <span>${inV.length} event${inV.length !== 1 ? 's' : ''}${rng ? ' · ' + rng : ''}</span>
-      <span class="lh-controls">
-        <div class="sortseg">${[['date','Date'],['name','Name'],['section','Section']].map(([v, l]) =>
-          `<button data-sort="${v}"${state.sort === v ? ' class="on"' : ''}${ana ? ' disabled' : ''}>${l}</button>`).join('')}</div>
-        <div class="seg">
-          <button data-fmt="informal"${fmt === 'informal' ? ' class="on"' : ''}>Informal</button>
-          <button data-fmt="analytical"${ana ? ' class="on"' : ''}>Analytical</button>
-        </div>
-      </span></div>`;
-    let body;
-    if (!inV.length) body = `<div class="list-empty">Nothing in this range — try different dates or loosen the filters.</div>`;
+    var inV = computeInView();
+    var fmt = state.listFormat;
+    var ana = fmt === 'analytical';
+    var rng = state.listFrom != null ? esc(fmtListRange()) : esc(rangeLabel());
+    var head = '<div class="list-head">' +
+      '<span>' + inV.length + ' event' + (inV.length !== 1 ? 's' : '') + (rng ? ' · ' + rng : '') + '</span>' +
+      '<span class="lh-controls">' +
+        '<div class="sortseg">' + [['date','Date'],['name','Name'],['section','Section']].map(function (v) {
+          return '<button data-sort="' + v[0] + '"' + (state.sort === v[0] ? ' class="on"' : '') + (ana ? ' disabled' : '') + '>' + v[1] + '</button>';
+        }).join('') + '</div>' +
+        '<div class="seg">' +
+          '<button data-fmt="informal"' + (fmt === 'informal' ? ' class="on"' : '') + '>Informal</button>' +
+          '<button data-fmt="analytical"' + (ana ? ' class="on"' : '') + '>Analytical</button>' +
+        '</div>' +
+      '</span></div>';
+    var body;
+    if (!inV.length) body = '<div class="list-empty">Nothing in this range — try different dates or loosen the filters.</div>';
     else body = ana ? analyticalHTML(inV) : informalHTML(inV);
-    const pane = $('#pane-list');
-    pane.innerHTML = head + `<div class="list-body">${body}</div>`;
+    var pane = $('#pane-list');
+    pane.innerHTML = head + '<div class="list-body">' + body + '</div>';
     pane.classList.toggle('fl-on', state.showFL);
-    if (state.vHeight) { const lb = pane.querySelector('.list-body'); if (lb) lb.style.height = state.vHeight + 'px'; }
+    if (state.vHeight) { var lb = pane.querySelector('.list-body'); if (lb) lb.style.height = state.vHeight + 'px'; }
   }
 
   /* ── themes pane ── */
   function renderThemes() {
-    const fonts = [
+    var fonts = [
       ['sans', 'Instrument Sans', 'clean sans — the default'],
       ['serif', 'Fraunces', 'bookish serif'],
       ['mono', 'IBM Plex Mono', 'technical mono']
     ];
-    const c = state.colors;
-    const loNames = Object.keys(state.loadouts).sort((a, b) => a.localeCompare(b));
-    const loSel = loNames.includes(state.lastLoadout) ? state.lastLoadout : '';
+    var c = state.colors;
+    var loNames = Object.keys(state.loadouts).sort(function (a, b) { return a.localeCompare(b); });
+    var loSel = loNames.includes(state.lastLoadout) ? state.lastLoadout : '';
 
-    const groupsHTML = sections.map(sec => {
-      const ov = c.sections[sec];
-      const on = !!c.secOverride[sec];
-      const evs = orderedItems(sec);
-      return `<div class="cgroup">
-        <div class="crow">
-          <button class="csw${ov ? '' : ' auto'}" data-secname="${esc(sec)}" style="background:${sectionColor(sec)}" title="Set section colour"></button>
-          <span class="cn"><b>${esc(sec)}</b></span>
-          <button class="ovbtn${on ? ' on' : ''}" data-ovsec="${esc(sec)}"
-            title="${on ? 'Events in this section are using the section colour — click to release them' : 'Make every event in this section use the section colour'}">${on ? 'overriding' : 'override events'}</button>
-        </div>
-        ${evs.map(nm => {
-          const own = c.events[nm];
-          const col = own ? resolveColour(own) : palette()[eventColorIdx(nm)];
-          return `<div class="crow cevt">
-            <button class="csw${own ? '' : ' auto'}" data-cname="${esc(nm)}" style="background:${col}" title="Set colour"></button>
-            <span class="cn">${esc(nm)}</span>${own ? '<span class="ov">custom</span>' : ''}
-          </div>`;
-        }).join('')}
-      </div>`;
+    var groupsHTML = sections.map(function (sec) {
+      var ov = c.sections[sec];
+      var on = !!c.secOverride[sec];
+      var evs = orderedItems(sec);
+      var evRows = evs.map(function (nm) {
+        var own = c.events[nm];
+        var col = own ? resolveColour(own) : palette()[eventColorIdx(nm)];
+        return '<div class="crow cevt">' +
+          '<button class="csw' + (own ? '' : ' auto') + '" data-cname="' + esc(nm) + '" style="background:' + col + '" title="Set colour"></button>' +
+          '<span class="cn">' + esc(nm) + '</span>' + (own ? '<span class="ov">custom</span>' : '') + '</div>';
+      }).join('');
+      return '<div class="cgroup">' +
+        '<div class="crow">' +
+          '<button class="csw' + (ov ? '' : ' auto') + '" data-secname="' + esc(sec) + '" style="background:' + sectionColor(sec) + '" title="Set section colour"></button>' +
+          '<span class="cn"><b>' + esc(sec) + '</b></span>' +
+          '<button class="ovbtn' + (on ? ' on' : '') + '" data-ovsec="' + esc(sec) + '" title="' +
+            (on ? 'Events in this section are using the section colour — click to release them' : 'Make every event in this section use the section colour') + '">' +
+            (on ? 'overriding' : 'override events') + '</button>' +
+        '</div>' + evRows + '</div>';
     }).join('');
 
-    $('#pane-themes').innerHTML = `<div class="settings">
-      <div class="set-group"><h3>Font <span class="h-note">applies to the whole page, remembered</span></h3>
-        <div class="fontopts">${fonts.map(f => `<button class="fontopt${state.font === f[0] ? ' on' : ''}" data-font="${f[0]}">
-          <span class="fprev" style="font-family:var(--f-${f[0]})">${f[1]}</span>
-          <span class="fname">${f[2]}</span></button>`).join('')}</div>
-      </div>
-      <div class="set-group"><h3>Display</h3>
-        <div class="setrow"><span class="lab">Row density<small>how tall each event line is</small></span>
-          <div class="seg"><button data-density="comfortable" class="${state.density === 'comfortable' ? 'on' : ''}">Comfortable</button><button data-density="compact" class="${state.density === 'compact' ? 'on' : ''}">Compact</button></div></div>
-        <div class="setrow"><span class="lab">Weekend shading<small>faint tint on Sat/Sun when zoomed in</small></span>
-          <label class="sw"><input type="checkbox" id="wkndSw" ${state.weekends ? 'checked' : ''}><i></i></label></div>
-        <div class="setrow"><span class="lab">Event labels<small>on the bars when they fit, beside them when they don't</small></span>
-          <label class="sw"><input type="checkbox" id="lblSw" ${state.labels ? 'checked' : ''}><i></i></label></div>
-        <div class="setrow"><span class="lab">FL highlighting<small>the FL button on the Calendar &amp; List tabs</small></span>
-          <label class="sw"><input type="checkbox" id="flSw" ${state.showFL ? 'checked' : ''}><i></i></label></div>
-      </div>
-      <div class="set-group">
-        <h3>Colours <span class="h-note">defaults are per-event, grouped by section</span>
-          <button class="mini2" id="resetColours" style="margin-left:auto" title="Return to the Default layout">Reset colours</button></h3>
-        <p class="dhint" style="margin:0 0 10px">Default template — ${defaultFound ? 'loaded from ' + esc(TEMPLATE_FILE) : 'not found; add ' + esc(TEMPLATE_FILE) + ' to this folder anytime'}.</p>
-        <div class="lorow">
-          <select class="loselect" id="loSelect" ${loNames.length ? '' : 'disabled'}>
-            ${loNames.length
-              ? loNames.map(n => `<option value="${esc(n)}"${n === loSel ? ' selected' : ''}>${esc(n)}</option>`).join('')
-              : '<option value="">no load-outs saved yet</option>'}
-          </select>
-          <button class="mini" id="loSave">save as…</button>
-          <button class="mini" id="loUpdate" ${loSel ? '' : 'disabled'}>update</button>
-          <button class="mini" id="loDelete" ${loSel ? '' : 'disabled'}>delete</button>
-        </div>
-        <div class="lorow">
-          <button class="mini" id="loExport" title="Download your current colours + every saved load-out as a file">export file</button>
-          <button class="mini" id="loImport" title="Load colour layouts from an exported file">import file…</button>
-          <span id="loStatus"></span>
-        </div>
-        <div class="lorow loinput" id="loInputRow" hidden>
-          <input id="loName" type="text" placeholder="load-out name — e.g. Default" maxlength="24">
-          <button class="mini" id="loConfirm">save</button>
-          <button class="mini" id="loCancel">cancel</button>
-        </div>
-        <div class="csub"><b>sections &amp; events</b>
-          <span class="csub-acts"><span class="csub-lab">event override:</span>
-            <button class="mini2" data-ovall="1" title="Every section's colour overrides its events">all</button>
-            <button class="mini2" data-ovnone="1" title="No section overrides its events">none</button></span></div>
-        ${groupsHTML || '<p class="dhint">No data loaded yet.</p>'}
-      </div>
-      <div class="set-group"><h3>Data <span class="h-note">Download event data</span></h3>
-        <div class="dbtns">
-          <button class="mini" id="expReadable">Event data - Readable form</button>
-          <button class="mini" id="expMachine">Event data - Machine form</button>
-        </div>
-        <p class="dstat" id="expStatus"></p>
-      </div>
-      <div class="set-group"><h3>Reset</h3>
-        <button class="danger" id="resetBtn">${resetArmed ? 'Click again to confirm' : 'Reset all settings'}</button>
-      </div>
-    </div>`;
+    $('#pane-themes').innerHTML = '<div class="settings">' +
+      '<div class="set-group"><h3>Font <span class="h-note">applies to the whole page, remembered</span></h3>' +
+        '<div class="fontopts">' + fonts.map(function (f) {
+          return '<button class="fontopt' + (state.font === f[0] ? ' on' : '') + '" data-font="' + f[0] + '">' +
+            '<span class="fprev" style="font-family:var(--f-' + f[0] + ')">' + f[1] + '</span>' +
+            '<span class="fname">' + f[2] + '</span></button>';
+        }).join('') + '</div>' +
+      '</div>' +
+      '<div class="set-group"><h3>Display</h3>' +
+        '<div class="setrow"><span class="lab">Row density<small>how tall each event line is</small></span>' +
+          '<div class="seg"><button data-density="comfortable" class="' + (state.density === 'comfortable' ? 'on' : '') + '">Comfortable</button><button data-density="compact" class="' + (state.density === 'compact' ? 'on' : '') + '">Compact</button></div></div>' +
+        '<div class="setrow"><span class="lab">Weekend shading<small>faint tint on Sat/Sun when zoomed in</small></span>' +
+          '<label class="sw"><input type="checkbox" id="wkndSw"' + (state.weekends ? ' checked' : '') + '><i></i></label></div>' +
+        '<div class="setrow"><span class="lab">Event labels<small>on the bars when they fit, beside them when they don\'t</small></span>' +
+          '<label class="sw"><input type="checkbox" id="lblSw"' + (state.labels ? ' checked' : '') + '><i></i></label></div>' +
+        '<div class="setrow"><span class="lab">FL highlighting<small>the FL button on the Calendar &amp; List tabs</small></span>' +
+          '<label class="sw"><input type="checkbox" id="flSw"' + (state.showFL ? ' checked' : '') + '><i></i></label></div>' +
+      '</div>' +
+      '<div class="set-group">' +
+        '<h3>Colours <span class="h-note">defaults are per-event, grouped by section</span>' +
+          '<button class="mini2" id="resetColours" style="margin-left:auto" title="Return to the Default layout">Reset colours</button></h3>' +
+        '<p class="dhint" style="margin:0 0 10px">Default template — ' + (defaultFound ? 'loaded from ' + esc(TEMPLATE_FILE) : 'not found; add ' + esc(TEMPLATE_FILE) + ' to this folder anytime') + '.</p>' +
+        '<div class="lorow">' +
+          '<select class="loselect" id="loSelect"' + (loNames.length ? '' : ' disabled') + '>' +
+            (loNames.length
+              ? loNames.map(function (n) { return '<option value="' + esc(n) + '"' + (n === loSel ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('')
+              : '<option value="">no load-outs saved yet</option>') +
+          '</select>' +
+          '<button class="mini" id="loSave">save as…</button>' +
+          '<button class="mini" id="loUpdate"' + (loSel ? '' : ' disabled') + '>update</button>' +
+          '<button class="mini" id="loDelete"' + (loSel ? '' : ' disabled') + '>delete</button>' +
+        '</div>' +
+        '<div class="lorow">' +
+          '<button class="mini" id="loExport" title="Download your current colours + every saved load-out as a file">export file</button>' +
+          '<button class="mini" id="loImport" title="Load colour layouts from an exported file">import file…</button>' +
+          '<span id="loStatus"></span>' +
+        '</div>' +
+        '<div class="lorow loinput" id="loInputRow" hidden>' +
+          '<input id="loName" type="text" placeholder="load-out name — e.g. Default" maxlength="24">' +
+          '<button class="mini" id="loConfirm">save</button>' +
+          '<button class="mini" id="loCancel">cancel</button>' +
+        '</div>' +
+        '<div class="csub"><b>sections &amp; events</b>' +
+          '<span class="csub-acts"><span class="csub-lab">event override:</span>' +
+            '<button class="mini2" data-ovall="1" title="Every section\'s colour overrides its events">all</button>' +
+            '<button class="mini2" data-ovnone="1" title="No section overrides its events">none</button></span></div>' +
+        (groupsHTML || '<p class="dhint">No data loaded yet.</p>') +
+      '</div>' +
+      '<div class="set-group"><h3>Data <span class="h-note">Download event data</span></h3>' +
+        '<div class="dbtns">' +
+          '<button class="mini" id="expReadable">Event data - Readable form</button>' +
+          '<button class="mini" id="expMachine">Event data - Machine form</button>' +
+        '</div>' +
+        '<p class="dstat" id="expStatus"></p>' +
+      '</div>' +
+      '<div class="set-group"><h3>Reset</h3>' +
+        '<button class="danger" id="resetBtn">' + (resetArmed ? 'Click again to confirm' : 'Reset all settings') + '</button>' +
+      '</div>' +
+    '</div>';
   }
 
   function renderPane(t) {
@@ -1378,21 +1401,24 @@
   }
   function refresh() { renderToolbar(); updateBadge(); renderPane(state.tab); }
   function setTab(t) {
-    state.tab = t; save();
-    document.querySelectorAll('.tab').forEach(b => {
-      const on = b.dataset.tab === t;
-      b.classList.toggle('active', on); b.setAttribute('aria-selected', on);
+    state.tab = t;
+    save();
+    document.querySelectorAll('.tab').forEach(function (b) {
+      var on = b.dataset.tab === t;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on);
     });
     $('#card').classList.toggle('on-themes', t === 'themes');
-    ['calendar', 'list', 'themes'].forEach(p =>
-      $('#pane-' + p).classList.toggle('active', p === t));
+    ['calendar', 'list', 'themes'].forEach(function (p) {
+      $('#pane-' + p).classList.toggle('active', p === t);
+    });
     if (t === 'list' && state.listFrom == null) {
       state.listFrom = Date.UTC(state.anchor.y, state.anchor.m, 1);
       state.listTo = state.listFrom + (Math.round(zoomDays(state.zoom)) - 1) * MS;
     }
     if (t === 'calendar') {
       if (pendingZoomRebuild) { pendingZoomRebuild = false; rebuildAroundAnchor(); }
-      else { const old = dayW; refitDayW(); savedScroll = savedScroll / old * dayW; }
+      else { var old = dayW; refitDayW(); savedScroll = savedScroll / old * dayW; }
     }
     renderPane(t);
     renderToolbar();
@@ -1400,10 +1426,12 @@
 
   /* ── colour load-outs / default template ── */
   function loStatus(msg, warn) {
-    const el = $('#loStatus'); if (!el) return;
-    el.textContent = msg; el.classList.toggle('warn', !!warn);
+    var el = $('#loStatus');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.toggle('warn', !!warn);
     clearTimeout(loStatusTimer);
-    loStatusTimer = setTimeout(() => { if (el.isConnected) el.textContent = ''; }, 3200);
+    loStatusTimer = setTimeout(function () { if (el.isConnected) el.textContent = ''; }, 3200);
   }
   function resetColours() {
     if (DEFAULT_LAYOUT) {
@@ -1419,174 +1447,201 @@
       state.lastLoadout = '';
       loStatus('colours reset to automatic');
     }
-    save(); buildDrawer(); renderPane('themes');
+    save();
+    buildDrawer();
+    renderPane('themes');
     if (state.tab === 'calendar') renderTimeline();
   }
   function exportColours() {
-    const data = { format: 'bigfarm-colours', version: 1, exported: new Date().toISOString(), current: state.colors, loadouts: state.loadouts };
+    var data = { format: 'bigfarm-colours', version: 1, exported: new Date().toISOString(), current: state.colors, loadouts: state.loadouts };
     downloadText(JSON.stringify(data, null, 2), 'bigfarm-colours.json');
     loStatus('exported colours + load-outs');
   }
   function importColoursText(text) {
-    let obj;
+    var obj;
     try { obj = JSON.parse(text); } catch (e) { loStatus("couldn't read that as JSON", true); return; }
-    let applied = false, imported = 0;
+    var applied = false, imported = 0;
     if (obj && typeof obj === 'object') {
       if (obj.loadouts && typeof obj.loadouts === 'object') {
-        for (const [n, v] of Object.entries(obj.loadouts)) {
-          if (n && v && typeof v === 'object') { state.loadouts[n] = normalizeLayout(v); imported++; }
+        for (var n in obj.loadouts) {
+          if (n && obj.loadouts[n] && typeof obj.loadouts[n] === 'object') { state.loadouts[n] = normalizeLayout(obj.loadouts[n]); imported++; }
         }
       }
-      const cur = obj.current || ((obj.sections || obj.events || obj.secOverride) ? obj : null);
+      var cur = obj.current || ((obj.sections || obj.events || obj.secOverride) ? obj : null);
       if (cur) { state.colors = normalizeLayout(cur); applied = true; }
     }
     if (!applied && !imported) { loStatus('no colour layouts found in that file', true); return; }
     if (!state.loadouts[state.lastLoadout]) state.lastLoadout = '';
-    save(); buildDrawer();
+    save();
+    buildDrawer();
     setTab('themes');
     loStatus('imported' + (imported ? ' ' + imported + ' load-out' + (imported > 1 ? 's' : '') : '') + (applied ? ' + current colours' : ''));
   }
   function fetchDefaultTemplate() {
     fetch(TEMPLATE_FILE)
-      .then(r => { if (!r.ok) throw new Error('missing'); return r.json(); })
-      .then(o => {
-        const cur = (o && typeof o === 'object' && o.current) ? o.current : o;
+      .then(function (r) { if (!r.ok) throw new Error('missing'); return r.json(); })
+      .then(function (o) {
+        var cur = (o && typeof o === 'object' && o.current) ? o.current : o;
         DEFAULT_LAYOUT = normalizeLayout(cur);
         defaultFound = true;
         if (!hasOverrides(state.colors)) {
           state.colors = clone(DEFAULT_LAYOUT);
-          buildDrawer(); refresh();
+          buildDrawer();
+          refresh();
         } else if (state.tab === 'themes') {
           renderPane('themes');
         }
       })
-      .catch(() => {});
+      .catch(function () {});
   }
 
   /* ── exports ── */
   function downloadText(text, name) {
-    const blob = new Blob([text], { type: 'text/plain' });
-    const a = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    a.href = url; a.download = name;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    var blob = new Blob([text], { type: 'text/plain' });
+    var a = document.createElement('a');
+    var url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
   function exportEvents(machine) {
-    const el = $('#expStatus');
+    var el = $('#expStatus');
     if (!events.length) { el.textContent = 'nothing loaded to export'; return; }
-    let text;
+    var text;
     if (machine) {
-      text = events.map(e => {
-        const o = { start: isoOf(e.start), end: isoOf(e.end), event: e.name, section: e.section };
+      text = events.map(function (e) {
+        var o = { start: isoOf(e.start), end: isoOf(e.end), event: e.name, section: e.section };
         if (e.fl) o.fl = true;
         return JSON.stringify(o);
       }).join('\n');
     } else {
-      text = events.slice().sort((a, b) => a.start - b.start).map(e => {
-        const s = dmy(e.start);
+      text = events.slice().sort(function (a, b) { return a.start - b.start; }).map(function (e) {
+        var s = dmy(e.start);
         return (e.start === e.end ? s : s + ' → ' + dmy(e.end)) + ' · ' + e.name + (e.fl ? ' - FL' : '');
       }).join('\n');
     }
     downloadText(text + '\n', machine ? 'Events Machine.txt' : 'Events Readable.txt');
     el.textContent = 'exported ' + events.length + ' events';
-    setTimeout(() => { if (el.isConnected) el.textContent = ''; }, 2500);
+    setTimeout(function () { if (el.isConnected) el.textContent = ''; }, 2500);
   }
 
-  /* ── the event pane (info + links) — auto-sized, interactive ── */
-  const tip = $('#tip');
+  /* ── the event pane (info + links) — interactive, auto-sized ── */
+  var tip = $('#tip');
   function showTip(anchorEl) {
-    const ev = events.find(x => x.id === +anchorEl.dataset.id);
+    var ev = events.find(function (x) { return x.id === +anchorEl.dataset.id; });
     if (!ev) return;
-    const col = barColor(ev);
-    const ls = lookupLinks(ev);
-    let html = `<div class="tt" style="border-color:${col}"><b>${esc(ev.name)}</b>
-      <span class="sec">${esc(ev.section)}</span>
-      <span class="td">${esc(fmtRange(ev))} · ${ev.days} day${ev.days > 1 ? 's' : ''}</span>
-      ${isFL(ev) ? '<span class="fl">COUNTS FOR FL</span>' : ''}`;
+    var col = barColor(ev);
+    var ls = lookupLinks(ev);
+    var html = '<div class="tt" style="border-color:' + col + '"><b>' + esc(ev.name) + '</b>' +
+      '<span class="sec">' + esc(ev.section) + '</span>' +
+      '<span class="td">' + esc(fmtRange(ev)) + ' · ' + ev.days + (ev.days > 1 ? ' days' : ' day') + '</span>' +
+      (isFL(ev) ? '<span class="fl">COUNTS FOR FL</span>' : '');
     if (ls.length) {
-      html += '<div class="tlinks">' + ls.map(l => {
-        const st = l.color ? ` style="color:${l.color}"` : '';
-        const chip = l.color ? ` style="background:${l.color}"` : '';
-        return `<a class="tlink" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer"${st}>` +
-          `<i${chip}></i><span>${esc(l.text)}</span>` +
+      html += '<div class="tlinks">';
+      ls.forEach(function (l) {
+        var st = l.color ? ' style="color:' + l.color + '"' : '';
+        var chip = l.color ? ' style="background:' + l.color + '"' : '';
+        html += '<a class="tlink" href="' + esc(l.url) + '" target="_blank" rel="noopener noreferrer"' + st + '>' +
+          '<i' + chip + '></i><span>' + esc(l.text) + '</span>' +
           '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></a>';
-      }).join('') + '</div>';
+      });
+      html += '</div>';
     }
-    html += `<button type="button" class="pj" data-jump="${ev.id}">view on calendar</button></div>`;
+    html += '<button type="button" class="pj" data-jump="' + ev.id + '">view on calendar</button></div>';
     tip.innerHTML = html;
     tip.style.display = 'block';
-    const w = tip.offsetWidth, h = tip.offsetHeight;
-    const r = anchorEl.getBoundingClientRect();
-    let x = r.left + Math.min(r.width / 2, 140) - w / 2;
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var r = anchorEl.getBoundingClientRect();
+    var x = r.left + Math.min(r.width / 2, 140) - w / 2;
     x = Math.min(Math.max(8, x), innerWidth - w - 8);
-    let y = r.top - h - 8;
+    var y = r.top - h - 8;
     if (y < 8) y = r.bottom + 8;
     if (y + h > innerHeight - 8) y = Math.max(8, innerHeight - h - 8);
-    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
   }
   function hideTip() { tip.style.display = 'none'; }
-  /* clicks inside the pane: the jump button acts; links open new tabs; nothing closes it */
-  tip.addEventListener('click', e => {
-    const j = e.target.closest('.pj');
+  /* clicks inside the pane: the jump button acts, links open new tabs, nothing closes it */
+  tip.addEventListener('click', function (e) {
+    var j = e.target.closest('.pj');
     if (j) { pinned = false; hideTip(); jumpToEvent(+j.dataset.jump); }
   });
 
   /* ── popovers ── */
-  const pop = $('#pop');
-  let popAnchor = null, popHandler = null;
+  var pop = $('#pop');
+  var popAnchor = null, popHandler = null;
   function openPop(anchor, title, html, handler) {
-    pop.innerHTML = `<div class="poptitle">${title}</div>` + html;
-    popHandler = handler; popAnchor = anchor;
+    pop.innerHTML = '<div class="poptitle">' + title + '</div>' + html;
+    popHandler = handler;
+    popAnchor = anchor;
     pop.style.display = 'block';
-    const r = anchor.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
-    let x = Math.min(Math.max(8, r.left), innerWidth - pw - 8);
-    let y = r.bottom + 6; if (y + ph > innerHeight - 8) y = Math.max(8, r.top - ph - 6);
-    pop.style.left = x + 'px'; pop.style.top = y + 'px';
+    var r = anchor.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
+    var x = Math.min(Math.max(8, r.left), innerWidth - pw - 8);
+    var y = r.bottom + 6;
+    if (y + ph > innerHeight - 8) y = Math.max(8, r.top - ph - 6);
+    pop.style.left = x + 'px';
+    pop.style.top = y + 'px';
   }
   function closePop() { pop.style.display = 'none'; popAnchor = null; popHandler = null; }
-  pop.addEventListener('click', e => { if (popHandler) popHandler(e); });
-  document.addEventListener('mousedown', e => {
+  pop.addEventListener('click', function (e) { if (popHandler) popHandler(e); });
+  document.addEventListener('mousedown', function (e) {
     if (pop.style.display === 'block' && !pop.contains(e.target) && !(popAnchor && popAnchor.contains(e.target))) closePop();
   });
 
   function openMonthPop() {
     openPop($('#rangeBtn'), 'jump to month',
-      `<div class="pgrid">${M_S.map((m, i) =>
-        `<button class="pm${i === state.anchor.m ? ' on' : ''}" data-m="${i}">${m}</button>`).join('')}</div>`,
-      e => { const b = e.target.closest('[data-m]'); if (!b) return;
+      '<div class="pgrid">' + M_S.map(function (m, i) {
+        return '<button class="pm' + (i === state.anchor.m ? ' on' : '') + '" data-m="' + i + '">' + m + '</button>';
+      }).join('') + '</div>',
+      function (e) {
+        var b = e.target.closest('[data-m]');
+        if (!b) return;
         goToDate(Date.UTC(state.anchor.y, +b.dataset.m, 1));
-        closePop(); });
+        closePop();
+      });
   }
   function openYearPop() {
-    const ys = years.length ? years : [state.anchor.y];
-    const min = Math.min(...ys, now0.getFullYear()) - 1, max = Math.max(...ys, now0.getFullYear()) + 1;
-    const list = []; for (let y = min; y <= max; y++) list.push(y);
+    var ys = years.length ? years : [state.anchor.y];
+    var min = Math.min.apply(null, ys.concat([now0.getFullYear()])) - 1;
+    var max = Math.max.apply(null, ys.concat([now0.getFullYear()])) + 1;
+    var list = [];
+    for (var y = min; y <= max; y++) list.push(y);
     openPop($('#yearBtn'), 'jump to year',
-      `<div class="pgrid y">${list.map(y =>
-        `<button class="pm${y === state.anchor.y ? ' on' : ''}" data-y="${y}">${y}</button>`).join('')}</div>`,
-      e => { const b = e.target.closest('[data-y]'); if (!b) return;
+      '<div class="pgrid y">' + list.map(function (y2) {
+        return '<button class="pm' + (y2 === state.anchor.y ? ' on' : '') + '" data-y="' + y2 + '">' + y2 + '</button>';
+      }).join('') + '</div>',
+      function (e) {
+        var b = e.target.closest('[data-y]');
+        if (!b) return;
         goToDate(Date.UTC(+b.dataset.y, 0, 1));
-        closePop(); });
+        closePop();
+      });
   }
   function openColorPop(kind, key, anchor) {
-    const store = state.colors[kind === 'event' ? 'events' : 'sections'];
-    const cur = store[key];
+    var store = state.colors[kind === 'event' ? 'events' : 'sections'];
+    var cur = store[key];
     openPop(anchor, 'colour · ' + key,
-      `<div class="swrow">${palette().map((c, i) =>
-        `<button class="swb" data-p="${i}" style="background:${c}" title="palette"></button>`).join('')}</div>
-       <div class="custom-row"><input type="color" id="cPick" value="${cur && cur.t === 'h' ? cur.v : '#C25B3C'}">
-       <span class="lbl">custom</span><button class="mini2" id="cReset" style="margin-left:auto">${kind === 'event' ? 'use section colour' : 'use default colour'}</button></div>`,
-      e => {
-        const sw = e.target.closest('[data-p]');
+      '<div class="swrow">' + palette().map(function (c, i) {
+        return '<button class="swb" data-p="' + i + '" style="background:' + c + '" title="palette"></button>';
+      }).join('') + '</div>' +
+      '<div class="custom-row"><input type="color" id="cPick" value="' + (cur && cur.t === 'h' ? cur.v : '#C25B3C') + '">' +
+      '<span class="lbl">custom</span><button class="mini2" id="cReset" style="margin-left:auto">' + (kind === 'event' ? 'use section colour' : 'use default colour') + '</button></div>',
+      function (e) {
+        var sw = e.target.closest('[data-p]');
         if (sw) { store[key] = { t: 'p', i: +sw.dataset.p }; after(); return; }
         if (e.target.closest('#cReset')) { delete store[key]; after(); return; }
       });
-    pop.querySelector('#cPick').addEventListener('input', e => {
-      store[key] = { t: 'h', v: e.target.value }; after(true);
+    pop.querySelector('#cPick').addEventListener('input', function (e) {
+      store[key] = { t: 'h', v: e.target.value };
+      after(true);
     });
     function after(keepOpen) {
-      save(); buildDrawer(); renderPane('themes');
+      save();
+      buildDrawer();
+      renderPane('themes');
       if (state.tab === 'calendar') renderTimeline();
       if (!keepOpen) closePop();
     }
@@ -1594,41 +1649,35 @@
 
   /* ── filter drawer ── */
   function buildDrawer() {
-    const body = $('#drawerBody');
+    var body = $('#drawerBody');
     if (!sections.length) { body.innerHTML = '<p class="d-empty">No data loaded yet.</p>'; $('#drawerFoot').textContent = ''; return; }
-    let html = `
-      <div class="dselbar">
-        <b>Select</b>
-        <span class="dg-acts">
-          <button class="mini2" data-topall="1" title="Check everything">All</button>
-          <button class="mini2" data-topnone="1" title="Uncheck everything">None</button>
-        </span>
-      </div>
-      <input class="dsearch" type="search" placeholder="find an event…">`;
-    sections.forEach(sec => {
-      const cnt = events.filter(e => e.section === sec).length;
-      const evs = orderedItems(sec);
-      html += `<div class="dgroup" data-sec="${esc(sec)}">
-        <label class="drow dsec">
-          <span class="dot" style="background:${sectionColor(sec)}"></span>
-          <span class="dv">${esc(sec)}</span><span class="cnt">${cnt}</span>
-          <input type="checkbox" data-g="sections" value="${esc(sec)}" ${filtersLive.sec.has(sec) ? 'checked' : ''} title="Toggle the whole section">
-        </label>
-        <div class="dgrid">
-          ${evs.map(nm =>
-            `<label class="drow devt"><span class="dv">${esc(nm)}</span>
-             <input type="checkbox" data-g="items" value="${esc(nm)}" ${filtersLive.it.has(nm) ? 'checked' : ''}></label>`).join('')}
-        </div>
-      </div>`;
+    var html = '<div class="dselbar"><b>Select</b><span class="dg-acts">' +
+        '<button class="mini2" data-topall="1" title="Check everything">All</button>' +
+        '<button class="mini2" data-topnone="1" title="Uncheck everything">None</button></span></div>' +
+      '<input class="dsearch" type="search" placeholder="find an event…">';
+    sections.forEach(function (sec) {
+      var cnt = events.filter(function (e) { return e.section === sec; }).length;
+      var evs = orderedItems(sec);
+      html += '<div class="dgroup" data-sec="' + esc(sec) + '">' +
+        '<label class="drow dsec">' +
+          '<span class="dot" style="background:' + sectionColor(sec) + '"></span>' +
+          '<span class="dv">' + esc(sec) + '</span><span class="cnt">' + cnt + '</span>' +
+          '<input type="checkbox" data-g="sections" value="' + esc(sec) + '"' + (filtersLive.sec.has(sec) ? ' checked' : '') + ' title="Toggle the whole section"></label>' +
+        '<div class="dgrid">' +
+          evs.map(function (nm) {
+            return '<label class="drow devt"><span class="dv">' + esc(nm) + '</span>' +
+              '<input type="checkbox" data-g="items" value="' + esc(nm) + '"' + (filtersLive.it.has(nm) ? ' checked' : '') + '></label>';
+          }).join('') +
+        '</div></div>';
     });
-    html += `<div class="dgroup" data-sec="__years">
-      <div class="dg-head"><b>Years</b><span class="dg-acts">
-        <button class="mini2" data-allyr="1">all</button>
-        <button class="mini2" data-noneyr="1">none</button></span></div>
-      <div class="dgrid">${years.map(y =>
-        `<label class="drow devt"><span class="dv">${y}</span>
-         <input type="checkbox" data-g="years" value="${y}" ${filtersLive.yr.has(String(y)) ? 'checked' : ''}></label>`).join('')}</div>
-    </div>`;
+    html += '<div class="dgroup" data-sec="__years">' +
+      '<div class="dg-head"><b>Years</b><span class="dg-acts">' +
+        '<button class="mini2" data-allyr="1">all</button>' +
+        '<button class="mini2" data-noneyr="1">none</button></span></div>' +
+      '<div class="dgrid">' + years.map(function (y) {
+        return '<label class="drow devt"><span class="dv">' + y + '</span>' +
+          '<input type="checkbox" data-g="years" value="' + y + '"' + (filtersLive.yr.has(String(y)) ? ' checked' : '') + '></label>';
+      }).join('') + '</div></div>';
     body.innerHTML = html;
     updateDrawerFoot();
   }
@@ -1636,7 +1685,7 @@
     $('#drawerFoot').textContent = 'showing ' + filtered.length + ' of ' + events.length + ' events';
   }
   function toggleFilter(g, v, on) {
-    const list = state.filters[g], i = list.indexOf(v);
+    var list = state.filters[g], i = list.indexOf(v);
     if (!on && i < 0) list.push(v);
     if (on && i >= 0) list.splice(i, 1);
   }
@@ -1652,63 +1701,64 @@
   }
 
   /* ── logo ── */
-  const homeLogo = $('#homeLogo'), homeFall = $('#homeFall');
-  let darkLogoOK = false;
-  const logoProbe = new Image();
-  logoProbe.onload = () => { darkLogoOK = true; syncLogo(); };
+  var homeLogo = $('#homeLogo'), homeFall = $('#homeFall');
+  var darkLogoOK = false;
+  var logoProbe = new Image();
+  logoProbe.onload = function () { darkLogoOK = true; syncLogo(); };
   logoProbe.src = 'logo-dark.png';
   function syncLogo() {
     if (!homeLogo || homeLogo.hidden) return;
-    const want = (state.theme !== 'light' && darkLogoOK) ? 'logo-dark.png' : 'logo.png';
+    var want = (state.theme !== 'light' && darkLogoOK) ? 'logo-dark.png' : 'logo.png';
     if (homeLogo.getAttribute('src') !== want) homeLogo.src = want;
   }
-  homeLogo.addEventListener('error', () => {
+  homeLogo.addEventListener('error', function () {
     if (homeLogo.getAttribute('src') === 'logo-dark.png') { homeLogo.src = 'logo.png'; return; }
-    homeLogo.hidden = true; homeFall.hidden = false;
+    homeLogo.hidden = true;
+    homeFall.hidden = false;
   });
 
   /* ── resizable panes ── */
   function applyVHeight() {
-    const h = state.vHeight;
+    var h = state.vHeight;
     tl.style.height = h ? h + 'px' : '';
-    const lb = document.querySelector('#pane-list .list-body');
+    var lb = document.querySelector('#pane-list .list-body');
     if (lb) lb.style.height = h ? h + 'px' : '';
   }
-  const vResize = $('#vResize');
-  let vhDrag = null;
+  var vResize = $('#vResize');
+  var vhDrag = null;
   function activePaneEl() {
     return state.tab === 'list' ? (document.querySelector('#pane-list .list-body') || $('#pane-list')) : tl;
   }
-  vResize.addEventListener('pointerdown', e => {
-    e.preventDefault();                              /* blocks text selection & accidental text-drags */
+  vResize.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
     try { window.getSelection().removeAllRanges(); } catch (err) {}
     vResize.setPointerCapture(e.pointerId);
     vResize.classList.add('drag');
-    const c = activePaneEl();
+    var c = activePaneEl();
     vhDrag = { y: e.clientY, h: c ? c.offsetHeight : 420 };
   });
-  vResize.addEventListener('pointermove', e => {
+  vResize.addEventListener('pointermove', function (e) {
     if (!vhDrag) return;
     /* handle sits below the window: drag DOWN grows it, drag UP shrinks it */
-    const h = Math.max(240, Math.min(2200, vhDrag.h + (e.clientY - vhDrag.y)));
+    var h = Math.max(240, Math.min(2200, vhDrag.h + (e.clientY - vhDrag.y)));
     state.vHeight = h;
     applyVHeight();
   });
-  vResize.addEventListener('pointerup', () => {
+  vResize.addEventListener('pointerup', function () {
     if (!vhDrag) return;
     vhDrag = null;
     vResize.classList.remove('drag');
     save();
   });
-  vResize.addEventListener('dblclick', () => {
+  vResize.addEventListener('dblclick', function () {
     state.vHeight = null;
     applyVHeight();
     save();
   });
 
-  const drawerResize = $('#drawerResize');
-  let dwDrag = null;
-  drawerResize.addEventListener('pointerdown', e => {
+  var drawerResize = $('#drawerResize');
+  var dwDrag = null;
+  drawerResize.addEventListener('pointerdown', function (e) {
     e.preventDefault();
     try { window.getSelection().removeAllRanges(); } catch (err) {}
     drawerResize.setPointerCapture(e.pointerId);
@@ -1716,13 +1766,13 @@
     drawerEl.style.transition = 'none';
     dwDrag = { x: e.clientX, w: drawerEl.offsetWidth };
   });
-  drawerResize.addEventListener('pointermove', e => {
+  drawerResize.addEventListener('pointermove', function (e) {
     if (!dwDrag) return;
-    const max = Math.max(300, Math.min(innerWidth - 24, 1100));
-    const w = Math.max(300, Math.min(max, dwDrag.w + (e.clientX - dwDrag.x)));
+    var max = Math.max(300, Math.min(innerWidth - 24, 1100));
+    var w = Math.max(300, Math.min(max, dwDrag.w + (e.clientX - dwDrag.x)));
     drawerEl.style.width = w + 'px';
   });
-  drawerResize.addEventListener('pointerup', () => {
+  drawerResize.addEventListener('pointerup', function () {
     if (!dwDrag) return;
     dwDrag = null;
     drawerResize.classList.remove('drag');
@@ -1730,37 +1780,41 @@
     state.drawerW = drawerEl.offsetWidth;
     save();
   });
-  drawerResize.addEventListener('dblclick', () => {
+  drawerResize.addEventListener('dblclick', function () {
     state.drawerW = null;
     drawerEl.style.width = '';
     save();
   });
 
   /* ── interactions ── */
-  $('#tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) setTab(b.dataset.tab); });
-  $('#themeBtn').addEventListener('click', () => {
+  $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('.tab'); if (b) setTab(b.dataset.tab); });
+  $('#themeBtn').addEventListener('click', function () {
     state.theme = { light: 'grey', grey: 'dark', dark: 'light' }[state.theme];
-    applyTheme(); palCache.theme = null; syncLogo(); save();
-    buildDrawer(); refresh();
+    applyTheme();
+    palCache.theme = null;
+    syncLogo();
+    save();
+    buildDrawer();
+    refresh();
   });
   function applyTheme() {
     document.body.dataset.theme = state.theme;
-    const icons = {
+    var icons = {
       light: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>',
       grey: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>',
       dark: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>'
     };
     $('#themeIc').innerHTML = icons[state.theme];
-    $('#themeLb').textContent = state.theme[0].toUpperCase() + state.theme.slice(1);
+    $('#themeLb').textContent = state.theme.charAt(0).toUpperCase() + state.theme.slice(1);
     syncLogo();
   }
   function applyFont() { document.body.dataset.font = state.font; }
 
-  $('#prevBtn').addEventListener('click', () => step(-1));
-  $('#nextBtn').addEventListener('click', () => step(1));
-  $('#todayBtn').addEventListener('click', () => {
+  $('#prevBtn').addEventListener('click', function () { step(-1); });
+  $('#nextBtn').addEventListener('click', function () { step(1); });
+  $('#todayBtn').addEventListener('click', function () {
     if (state.tab === 'list') {
-      const n = new Date();
+      var n = new Date();
       state.listFrom = Date.UTC(n.getFullYear(), n.getMonth(), 1);
       state.listTo = monthAddT(state.listFrom, 1) - MS;
       save(); renderToolbar(); renderList();
@@ -1770,32 +1824,37 @@
   });
   $('#rangeBtn').addEventListener('click', openMonthPop);
   $('#yearBtn').addEventListener('click', openYearPop);
-  $('#flBtn').addEventListener('click', () => {
+  $('#flBtn').addEventListener('click', function () {
     state.showFL = !state.showFL;
     $('#flBtn').classList.toggle('on', state.showFL);
     $('#flBtn').setAttribute('aria-pressed', state.showFL);
-    refresh(); save();
+    refresh();
+    save();
   });
   $('#fromDate').addEventListener('change', function () {
-    const t = parseISO(this.value);
+    var t = parseISO(this.value);
     if (t == null) return;
     state.listFrom = t;
     if (state.listTo == null || state.listTo < state.listFrom) state.listTo = state.listFrom;
     save(); renderToolbar(); renderList();
   });
   $('#toDate').addEventListener('change', function () {
-    const t = parseISO(this.value);
+    var t = parseISO(this.value);
     if (t == null) return;
     state.listTo = t;
     if (state.listFrom == null || state.listFrom > state.listTo) state.listFrom = state.listTo;
     save(); renderToolbar(); renderList();
   });
 
-  $('#zoomSeg').addEventListener('click', e => {
-    const b = e.target.closest('[data-z]'); if (!b) return;
-    const z = +b.dataset.z; if (z === state.zoom) return;
-    state.zoom = z; state.scale = 1; updateScaleUI();
-    document.querySelectorAll('#zoomSeg button').forEach(x => x.classList.toggle('on', x === b));
+  $('#zoomSeg').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-z]');
+    if (!b) return;
+    var z = +b.dataset.z;
+    if (z === state.zoom) return;
+    state.zoom = z;
+    state.scale = 1;
+    updateScaleUI();
+    document.querySelectorAll('#zoomSeg button').forEach(function (x) { x.classList.toggle('on', x === b); });
     if (state.tab === 'list') {
       if (state.listFrom != null) state.listTo = state.listFrom + (Math.round(zoomDays(z)) - 1) * MS;
       pendingZoomRebuild = true;
@@ -1807,65 +1866,69 @@
   });
   function rebuildAroundAnchor() {
     refitDayW();
-    const aT = Date.UTC(state.anchor.y, state.anchor.m, 1);
-    const ahead = BUF_MONTHS + Math.ceil(zoomDays(state.zoom) / 30.4375);
+    var aT = Date.UTC(state.anchor.y, state.anchor.m, 1);
+    var ahead = BUF_MONTHS + Math.ceil(zoomDays(state.zoom) / 30.4375);
     bufStartT = monthAddT(aT, -BUF_MONTHS);
     bufEndT = monthAddT(aT, ahead);
     savedScroll = (aT - bufStartT) / MS * dayW;
-    renderTimeline(); renderToolbar(); updateEmptyOverlay();
+    renderTimeline();
+    renderToolbar();
+    updateEmptyOverlay();
   }
   function setScale(f) {
-    const center = dateAtLeft() + chartViewMs() / 2;
-    state.scale = Math.min(3, Math.max(0.4, +(state.scale * f).toFixed(3));
+    var center = dateAtLeft() + chartViewMs() / 2;
+    state.scale = Math.min(3, Math.max(0.4, +(state.scale * f).toFixed(3)));
     refitDayW();
     savedScroll = Math.max(0, (center - bufStartT) / MS * dayW - Math.max(tl.clientWidth - laneW(), 0) / 2);
     renderTimeline(); renderToolbar(); updateEmptyOverlay(); updateScaleUI(); save();
   }
   function updateScaleUI() { $('#zPct').textContent = Math.round(state.scale * 100) + '%'; }
-  $('#zIn').addEventListener('click', () => setScale(1.2));
-  $('#zOut').addEventListener('click', () => setScale(1 / 1.2));
+  $('#zIn').addEventListener('click', function () { setScale(1.2); });
+  $('#zOut').addEventListener('click', function () { setScale(1 / 1.2); });
 
-  $('#filterBtn').addEventListener('click', () => document.body.classList.add('drawer-open'));
-  $('#scrim').addEventListener('click', () => document.body.classList.remove('drawer-open'));
-  $('#drawerClose').addEventListener('click', () => document.body.classList.remove('drawer-open'));
-  $('#drawerReset').addEventListener('click', () => {
+  $('#filterBtn').addEventListener('click', function () { document.body.classList.add('drawer-open'); });
+  $('#scrim').addEventListener('click', function () { document.body.classList.remove('drawer-open'); });
+  $('#drawerClose').addEventListener('click', function () { document.body.classList.remove('drawer-open'); });
+  $('#drawerReset').addEventListener('click', function () {
     state.filters = { sections: [], items: [], years: [] };
     rebuildAfterFilter();
   });
-  $('#drawerBody').addEventListener('change', e => {
-    const c = e.target.closest('input[data-g]'); if (!c) return;
-    const g = c.dataset.g, on = c.checked;
+  $('#drawerBody').addEventListener('change', function (e) {
+    var c = e.target.closest('input[data-g]');
+    if (!c) return;
+    var g = c.dataset.g, on = c.checked;
     toggleFilter(g, c.value, on);
     if (g === 'sections') {
-      const evs = orderedItems(c.value);
-      evs.forEach(nm => toggleFilter('items', nm, on));
-      const grp = c.closest('.dgroup');
-      if (grp) grp.querySelectorAll('input[data-g="items"]').forEach(cb => { cb.checked = on; });
+      var evs = orderedItems(c.value);
+      evs.forEach(function (nm) { toggleFilter('items', nm, on); });
+      var grp = c.closest('.dgroup');
+      if (grp) grp.querySelectorAll('input[data-g="items"]').forEach(function (cb) { cb.checked = on; });
     }
     buildFilterSets(); computeFiltered(); recomputeLanes();
     updateBadge(); refresh(); updateDrawerFoot(); save();
   });
-  $('#drawerBody').addEventListener('click', e => {
+  $('#drawerBody').addEventListener('click', function (e) {
     if (e.target.closest('[data-topall]')) { setTopAll(true); return; }
     if (e.target.closest('[data-topnone]')) { setTopAll(false); return; }
-    const g = e.target.closest('.dgroup'); if (!g) return;
+    var g = e.target.closest('.dgroup');
+    if (!g) return;
     if (g.getAttribute('data-sec') === '__years') {
       if (e.target.closest('[data-allyr]')) setYears(true);
       if (e.target.closest('[data-noneyr]')) setYears(false);
     }
   });
-  $('#drawerBody').addEventListener('input', e => {
+  $('#drawerBody').addEventListener('input', function (e) {
     if (!e.target.classList.contains('dsearch')) return;
-    const q = e.target.value.toLowerCase();
-    document.querySelectorAll('#drawerBody .dgroup').forEach(g => {
+    var q = e.target.value.toLowerCase();
+    document.querySelectorAll('#drawerBody .dgroup').forEach(function (g) {
       if (g.getAttribute('data-sec') === '__years') { g.style.display = q ? 'none' : ''; return; }
-      const secRow = g.querySelector('.dsec');
-      const secName = secRow.querySelector('.dv').textContent.toLowerCase();
-      const secMatch = secName.includes(q);
+      var secRow = g.querySelector('.dsec');
+      var secName = secRow.querySelector('.dv').textContent.toLowerCase();
+      var secMatch = secName.indexOf(q) >= 0;
       secRow.style.display = secMatch ? '' : 'none';
-      let any = secMatch;
-      g.querySelectorAll('.devt').forEach(r => {
-        const m = secMatch || r.textContent.toLowerCase().includes(q);
+      var any = secMatch;
+      g.querySelectorAll('.devt').forEach(function (r) {
+        var m = secMatch || r.textContent.toLowerCase().indexOf(q) >= 0;
         r.style.display = m ? '' : 'none';
         if (m) any = true;
       });
@@ -1873,16 +1936,16 @@
     });
   });
 
-  tl.addEventListener('scroll', () => {
-    hideTip(); pinned = false;
+  tl.addEventListener('scroll', function () {
+    hideTip();
+    pinned = false;
     if (scrollRaf) return;
-    scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; handleScrollFrame(); });
+    scrollRaf = requestAnimationFrame(function () { scrollRaf = 0; handleScrollFrame(); });
   }, { passive: true });
 
-  tl.addEventListener('click', e => {
-    const j = e.target.closest('#jumpFirst');
-    if (j) {
-      const ev = filtered.slice().sort((a, b) => a.start - b.start)[0];
+  tl.addEventListener('click', function (e) {
+    if (e.target.closest('#jumpFirst')) {
+      var ev = filtered.slice().sort(function (a, b) { return a.start - b.start; })[0];
       if (ev) goToDate(ev.start);
       return;
     }
@@ -1891,66 +1954,72 @@
       rebuildAfterFilter();
       return;
     }
-    const b = e.target.closest('.bar');
+    var b = e.target.closest('.bar');
     if (b) { pinned = true; showTip(b); }
     else { pinned = false; hideTip(); }
   });
 
-  /* the pane never closes from its own clicks — only from outside, Esc, or scrolling */
-  document.addEventListener('click', e => {
+  /* the pane never closes from its own clicks — only outside clicks, Esc, or scrolling */
+  document.addEventListener('click', function (e) {
     if (!e.target.closest('.bar') && !e.target.closest('#tip')) { pinned = false; hideTip(); }
   });
 
-  $('#pane-list').addEventListener('click', e => {
-    const th = e.target.closest('.atable th[data-col]');
+  $('#pane-list').addEventListener('click', function (e) {
+    var th = e.target.closest('.atable th[data-col]');
     if (th) {
-      const c = th.dataset.col;
+      var c = th.dataset.col;
       if (state.tsort.col === c) state.tsort.dir = state.tsort.dir === 'asc' ? 'desc' : 'asc';
       else state.tsort = { col: c, dir: 'asc' };
-      renderList(); save(); return;
+      renderList(); save();
+      return;
     }
-    const f = e.target.closest('[data-fmt]');
+    var f = e.target.closest('[data-fmt]');
     if (f) { state.listFormat = f.dataset.fmt; renderList(); save(); return; }
-    const s = e.target.closest('[data-sort]');
+    var s = e.target.closest('[data-sort]');
     if (s && !s.disabled) { state.sort = s.dataset.sort; renderList(); save(); return; }
-    const r = e.target.closest('[data-id]');
+    var r = e.target.closest('[data-id]');
     if (r) { pinned = true; showTip(r); }
   });
-  $('#pane-list').addEventListener('scroll', () => { pinned = false; hideTip(); }, true);
+  $('#pane-list').addEventListener('scroll', function () { pinned = false; hideTip(); }, true);
 
   function jumpToEvent(id) {
-    const ev = events.find(x => x.id === id); if (!ev) return;
-    pinned = false; hideTip();
+    var ev = events.find(function (x) { return x.id === id; });
+    if (!ev) return;
+    pinned = false;
+    hideTip();
     setTab('calendar');
     goToDate(ev.start);
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const b = tl.querySelector('.bar[data-id="' + id + '"]');
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      var b = tl.querySelector('.bar[data-id="' + id + '"]');
       if (b) {
         b.scrollIntoView({ block: 'nearest', inline: 'center' });
         savedScroll = tl.scrollLeft;
         b.classList.add('flash');
-        setTimeout(() => b.classList.remove('flash'), 1500);
+        setTimeout(function () { b.classList.remove('flash'); }, 1500);
       }
-    }));
+    }); });
     save();
   }
 
   /* themes pane */
-  $('#pane-themes').addEventListener('click', e => {
+  $('#pane-themes').addEventListener('click', function (e) {
     if (e.target.closest('#loSave')) { $('#loInputRow').hidden = false; $('#loName').focus(); return; }
     if (e.target.closest('#loCancel')) { $('#loInputRow').hidden = true; return; }
     if (e.target.closest('#loConfirm')) {
-      const name = ($('#loName').value || '').trim();
+      var name = ($('#loName').value || '').trim();
       if (!name) { $('#loName').focus(); return; }
       state.loadouts[name] = clone(state.colors);
-      state.lastLoadout = name; save(); renderPane('themes'); return;
+      state.lastLoadout = name;
+      save(); renderPane('themes');
+      return;
     }
     if (e.target.closest('#loUpdate')) {
       if (!state.lastLoadout || !state.loadouts[state.lastLoadout]) return;
-      state.loadouts[state.lastLoadout] = clone(state.colors); save();
-      const b = e.target.closest('#loUpdate');
+      state.loadouts[state.lastLoadout] = clone(state.colors);
+      save();
+      var b = e.target.closest('#loUpdate');
       b.textContent = 'updated';
-      setTimeout(() => { if (b.isConnected) b.textContent = 'update'; }, 1200);
+      setTimeout(function () { if (b.isConnected) b.textContent = 'update'; }, 1200);
       return;
     }
     if (e.target.closest('#loDelete')) {
@@ -1962,40 +2031,48 @@
     if (e.target.closest('#resetColours')) { resetColours(); return; }
     if (e.target.closest('#expReadable')) { exportEvents(false); return; }
     if (e.target.closest('#expMachine')) { exportEvents(true); return; }
-    const ovT = e.target.closest('[data-ovsec]');
+    var ovT = e.target.closest('[data-ovsec]');
     if (ovT) {
-      const sec = ovT.dataset.ovsec;
+      var sec = ovT.dataset.ovsec;
       if (state.colors.secOverride[sec]) delete state.colors.secOverride[sec];
       else state.colors.secOverride[sec] = true;
-      save(); buildDrawer(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); return;
+      save(); buildDrawer(); renderPane('themes');
+      if (state.tab === 'calendar') renderTimeline();
+      return;
     }
     if (e.target.closest('[data-ovall]')) {
-      sections.forEach(s => state.colors.secOverride[s] = true);
-      save(); buildDrawer(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); return;
+      sections.forEach(function (s) { state.colors.secOverride[s] = true; });
+      save(); buildDrawer(); renderPane('themes');
+      if (state.tab === 'calendar') renderTimeline();
+      return;
     }
     if (e.target.closest('[data-ovnone]')) {
       state.colors.secOverride = {};
-      save(); buildDrawer(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); return;
+      save(); buildDrawer(); renderPane('themes');
+      if (state.tab === 'calendar') renderTimeline();
+      return;
     }
-    const ssw = e.target.closest('[data-secname]');
+    var ssw = e.target.closest('[data-secname]');
     if (ssw) { openColorPop('section', ssw.dataset.secname, ssw); return; }
-    const f = e.target.closest('.fontopt');
+    var f = e.target.closest('.fontopt');
     if (f) { state.font = f.dataset.font; applyFont(); renderPane('themes'); refresh(); save(); return; }
-    const d = e.target.closest('[data-density]');
+    var d = e.target.closest('[data-density]');
     if (d) { state.density = d.dataset.density; renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
-    const sw = e.target.closest('[data-cname]');
+    var sw = e.target.closest('[data-cname]');
     if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
     if (e.target.closest('#resetBtn')) {
-      if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(() => { resetArmed = false; }, 3000); }
+      if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(function () { resetArmed = false; }, 3000); }
       else { try { localStorage.removeItem(LS_KEY); } catch (e2) {} location.reload(); }
     }
   });
-  $('#pane-themes').addEventListener('change', e => {
+  $('#pane-themes').addEventListener('change', function (e) {
     if (e.target.id === 'loSelect') {
-      const n = e.target.value;
+      var n = e.target.value;
       if (n && state.loadouts[n]) {
         state.colors = clone(state.loadouts[n]);
-        state.lastLoadout = n; save(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline();
+        state.lastLoadout = n;
+        save(); renderPane('themes');
+        if (state.tab === 'calendar') renderTimeline();
       }
       return;
     }
@@ -2003,56 +2080,65 @@
     if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); if (state.tab === 'calendar') renderTimeline(); }
     if (e.target.id === 'flSw') { state.showFL = e.target.checked; $('#flBtn').classList.toggle('on', state.showFL); refresh(); save(); }
   });
-  $('#pane-themes').addEventListener('keydown', e => {
+  $('#pane-themes').addEventListener('keydown', function (e) {
     if (e.target.id === 'loName' && e.key === 'Enter') { e.preventDefault(); $('#loConfirm').click(); }
   });
-  $('#colImport').addEventListener('change', e => {
-    const f = e.target.files[0]; if (!f) return;
-    f.text().then(t => importColoursText(t)); e.target.value = '';
+  $('#colImport').addEventListener('change', function (e) {
+    var f = e.target.files[0];
+    if (!f) return;
+    var fi = f;
+    fi.text().then(function (t) { importColoursText(t); });
+    e.target.value = '';
   });
 
-  document.addEventListener('click', e => {
+  document.addEventListener('click', function (e) {
     if (e.target.closest('#noticeLoad')) $('#fileInput').click();
     if (e.target.closest('#noticeClose')) { noticeDismissed = true; updateNotice(); }
   });
 
-  $('#fileInput').addEventListener('change', e => {
-    const f = e.target.files[0]; if (!f) return;
-    f.text().then(t => applyText(t, f.name, 'session')); e.target.value = '';
+  $('#fileInput').addEventListener('change', function (e) {
+    var f = e.target.files[0];
+    if (!f) return;
+    var ff = f;
+    ff.text().then(function (t) { applyText(t, ff.name, 'session'); });
+    e.target.value = '';
   });
-  let dragDepth = 0;
+
+  var dragDepth = 0;
   function draggingFiles(e) {
     return !!(e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files'));
   }
-  addEventListener('dragenter', e => {
+  addEventListener('dragenter', function (e) {
     e.preventDefault();
-    if (!draggingFiles(e)) return;      /* text drags and the like are ignored — no upload overlay */
+    if (!draggingFiles(e)) return;
     if (++dragDepth === 1) $('#drop').classList.add('on');
   });
-  addEventListener('dragover', e => e.preventDefault());
-  addEventListener('dragleave', e => {
+  addEventListener('dragover', function (e) { e.preventDefault(); });
+  addEventListener('dragleave', function (e) {
     e.preventDefault();
     if (--dragDepth <= 0) { dragDepth = 0; $('#drop').classList.remove('on'); }
   });
-  addEventListener('drop', e => {
+  addEventListener('drop', function (e) {
     e.preventDefault();
-    dragDepth = 0; $('#drop').classList.remove('on');
+    dragDepth = 0;
+    $('#drop').classList.remove('on');
     if (!draggingFiles(e)) return;
-    const f = e.dataTransfer.files[0]; if (f) f.text().then(t => applyText(t, f.name, 'session'));
+    var f = e.dataTransfer.files[0];
+    if (f) f.text().then(function (t) { applyText(t, f.name, 'session'); });
   });
 
-  document.addEventListener('keydown', e => {
+  document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { pinned = false; hideTip(); closePop(); document.body.classList.remove('drawer-open'); }
   });
 
-  new ResizeObserver(() => {
+  new ResizeObserver(function () {
     if (state.tab !== 'calendar') return;
     cancelAnimationFrame(roTimer);
-    roTimer = requestAnimationFrame(() => {
-      const w = tl.clientWidth;
+    roTimer = requestAnimationFrame(function () {
+      var w = tl.clientWidth;
       if (Math.abs(w - lastW) <= 8) return;
       lastW = w;
-      const center = dateAtLeft() + chartViewMs() / 2;
+      var center = dateAtLeft() + chartViewMs() / 2;
       refitDayW();
       savedScroll = Math.max(0, (center - bufStartT) / MS * dayW - Math.max(tl.clientWidth - laneW(), 0) / 2);
       renderTimeline(); renderToolbar(); updateEmptyOverlay();
@@ -2061,13 +2147,14 @@
 
   /* ── init ── */
   loadSettings();
-  applyTheme(); applyFont();
+  applyTheme();
+  applyFont();
   $('#flBtn').classList.toggle('on', state.showFL);
   $('#flBtn').setAttribute('aria-pressed', state.showFL);
-  document.querySelectorAll('#zoomSeg button').forEach(b => b.classList.toggle('on', +b.dataset.z === state.zoom));
+  document.querySelectorAll('#zoomSeg button').forEach(function (b) { b.classList.toggle('on', +b.dataset.z === state.zoom); });
   updateScaleUI();
   refitDayW();
-  const initAT = Date.UTC(state.anchor.y, state.anchor.m, 1);
+  var initAT = Date.UTC(state.anchor.y, state.anchor.m, 1);
   bufStartT = monthAddT(initAT, -BUF_MONTHS);
   bufEndT = monthAddT(initAT, BUF_MONTHS + Math.ceil(zoomDays(state.zoom) / 30.4375));
   savedScroll = (initAT - bufStartT) / MS * dayW;
@@ -2075,7 +2162,8 @@
   applyVHeight();
   if (state.drawerW) drawerEl.style.width = Math.min(state.drawerW, Math.max(300, innerWidth - 24)) + 'px';
   setTab(state.tab);
-  updateNotice(); updateBadge();
+  updateNotice();
+  updateBadge();
   loadData();
   fetchDefaultTemplate();
   fetchEventLinks();
