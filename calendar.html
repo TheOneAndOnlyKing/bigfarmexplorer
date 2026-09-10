@@ -60,9 +60,10 @@
   * { scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
 
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 11px 22px; border-bottom: 1px solid var(--line); }
-  .home { display: flex; align-items: center; text-decoration: none; color: inherit; min-height: 34px; }
+  .home { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; min-height: 34px; }
   .homelogo { display: block; height: 32px; width: auto; max-width: 260px; object-fit: contain; }
   .homefall { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
+  .bt { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
   .themebtn { display: flex; align-items: center; gap: 8px; padding: 7px 13px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
   .themebtn:hover { color: var(--ink); border-color: var(--line2); }
 
@@ -95,7 +96,7 @@
   .pane { display: none; }
   .pane.active { display: block; }
   .tl-wrap { position: relative; }
-  .tl { position: relative; overflow: auto; height: clamp(340px, calc(100vh - 270px), 1000px); }
+  .tl { position: relative; overflow: auto; height: clamp(340px, calc(100vh - 280px), 1000px); }
   .tl-inner { position: relative; }
   .tl-head { position: sticky; top: 0; z-index: 6; display: flex; background: var(--card); border-bottom: 1px solid var(--line); }
   .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: center; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
@@ -141,6 +142,12 @@
   .mini:hover { color: var(--accent); border-color: var(--accent); }
   .mini:disabled { opacity: .45; cursor: default; }
 
+  /* height drag handle under the panes */
+  .vresize { display: flex; align-items: center; justify-content: center; height: 16px; cursor: row-resize; border-top: 1px solid var(--line); touch-action: none; }
+  .vresize span { width: 46px; height: 4px; border-radius: 2px; background: var(--line2); transition: background .15s; }
+  .vresize:hover span, .vresize.drag span { background: var(--accent); }
+  .card.on-themes .vresize { display: none; }
+
   .list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 18px; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
   .lh-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
   .sortseg, .seg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
@@ -149,7 +156,7 @@
   .sortseg button.on, .seg button.on { background: var(--accent); color: var(--on-accent); }
   .sortseg button:disabled { opacity: .35; cursor: default; }
   .sortseg button:disabled:hover { color: var(--muted); }
-  .list-body { height: clamp(300px, calc(100vh - 314px), 956px); overflow: auto; padding: 4px 0 12px; }
+  .list-body { height: clamp(300px, calc(100vh - 324px), 956px); overflow: auto; padding: 4px 0 12px; }
   .lg-head { display: flex; align-items: baseline; gap: 10px; padding: 14px 18px 6px; font-family: var(--f-serif); font-weight: 600; font-size: 14px; }
   .lg-head span { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
   .lrow { width: 100%; display: grid; grid-template-columns: 14px 1fr auto auto 44px; align-items: center; gap: 12px; text-align: left; padding: 8px 18px; border-radius: 10px; }
@@ -254,16 +261,18 @@
   .scrim { position: fixed; inset: 0; z-index: 39; background: rgba(20,22,16,.28); opacity: 0; pointer-events: none; transition: opacity .25s; }
   body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
   body.drawer-open { overflow: hidden; }
-  .drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; width: min(360px, 92vw); background: var(--card); border-right: 1px solid var(--line); transform: translateX(-102%); transition: transform .25s ease; display: flex; flex-direction: column; }
+  .drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; width: min(470px, 92vw); background: var(--card); border-right: 1px solid var(--line); transform: translateX(-102%); transition: transform .25s ease; display: flex; flex-direction: column; }
   body.drawer-open .drawer { transform: none; }
   .d-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--line); }
   .d-head b { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
   .dclose { color: var(--muted); padding: 4px; }
   .dclose:hover { color: var(--ink); }
   .d-scroll { flex: 1; overflow: auto; padding: 14px 18px; }
+  .dselbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .dselbar b { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
   .dsearch { width: 100%; padding: 7px 10px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px; }
   .dsearch:focus { outline: none; border-color: var(--accent); }
-  .dgroup { margin-bottom: 20px; }
+  .dgroup { margin-bottom: 18px; }
   .dg-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
   .dg-head b { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
   .dg-acts { display: flex; gap: 4px; }
@@ -271,6 +280,7 @@
   .drow:hover { background: var(--accent-soft); }
   .drow .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
   .drow .dv { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .drow.dsec .dv { font-weight: 600; }
   .drow.devt .dv { padding-left: 16px; font-size: 12.5px; }
   .drow .cnt { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
   .drow input { appearance: none; width: 16px; height: 16px; flex: none; margin-left: auto; border: 1.5px solid var(--muted); border-radius: 5px; display: grid; place-items: center; cursor: pointer; }
@@ -278,6 +288,10 @@
   .drow input:checked::after { content: ""; width: 8px; height: 4px; border-left: 2px solid var(--on-accent); border-bottom: 2px solid var(--on-accent); transform: rotate(-45deg) translate(0, -1px); }
   .dgrid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6px; }
   .d-foot { padding: 12px 18px; border-top: 1px solid var(--line); font-family: var(--f-mono); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  /* width drag handle on the drawer's right edge */
+  .d-resize { position: absolute; top: 0; right: 0; bottom: 0; width: 10px; cursor: col-resize; touch-action: none; z-index: 5; }
+  .d-resize::after { content: ""; position: absolute; top: 50%; right: 3px; width: 3px; height: 40px; transform: translateY(-50%); border-radius: 2px; background: var(--line2); transition: background .15s; }
+  .d-resize:hover::after, .d-resize.drag::after { background: var(--accent); }
 
   .pop { position: fixed; z-index: 60; display: none; background: var(--card); border: 1px solid var(--line2); border-radius: 12px; box-shadow: 0 8px 30px rgba(20,22,14,.22); padding: 10px; }
   .pgrid { display: grid; grid-template-columns: repeat(3, 62px); gap: 4px; }
@@ -308,6 +322,7 @@
 
   @media (max-width: 760px) {
     .view-count { display: none; }
+    .bt { display: none; }
     .homelogo { max-width: 56vw; height: 28px; }
     #filterBtn { margin-right: auto; }
     .wrap { padding: 14px 12px 30px; }
@@ -326,6 +341,7 @@
   <a class="home" href="index.html" title="Bigfarm Explorer — home">
     <img class="homelogo" id="homeLogo" src="logo.png" alt="Bigfarm Explorer">
     <span class="homefall" id="homeFall" hidden>Bigfarm Explorer</span>
+    <span class="bt">Bigfarm Calendar</span>
   </a>
   <button class="themebtn" id="themeBtn"><span id="themeIc"></span><span id="themeLb">Light</span></button>
 </header>
@@ -379,6 +395,8 @@
     <section class="pane" id="pane-list"></section>
     <section class="pane" id="pane-themes"></section>
 
+    <div class="vresize" id="vResize" title="Drag to resize the window height — double-click to reset"><span></span></div>
+
     <div class="cardfoot">
       <button class="filterbtn" id="filterBtn">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6.5 7.5V19l-3-1.5v-5z"/></svg>
@@ -401,6 +419,7 @@
   <div class="d-head"><b>Filters</b><button class="dclose" id="drawerClose" aria-label="Close filters"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <div class="d-scroll" id="drawerBody"></div>
   <div class="d-foot"><span id="drawerFoot"></span><button class="mini2" id="drawerReset">reset</button></div>
+  <div class="d-resize" id="drawerResize" title="Drag to resize the pane — double-click to reset"></div>
 </aside>
 
 <div class="pop" id="pop"></div>
@@ -418,10 +437,7 @@
 (function () {
   'use strict';
 
-  /* ══════════════ CONFIG ══════════════
-     Data file: the calendar tries, in order — events.jsonl, Events Machine.txt,
-     Events Machine.jsonl — then falls back to built-in sample data.
-     A default colour template is fetched from defaultcolourtemplate.json.   */
+  /* ══════════════ CONFIG ══════════════ */
   const LS_KEY = 'bigfarm-calendar-v1';
   const MS = 86400000;
   const BUF_MONTHS = 6;
@@ -540,6 +556,7 @@
     sort: 'date', scale: 1, showFL: false,
     listFormat: 'informal', tsort: { col: 'start', dir: 'asc' },
     listFrom: null, listTo: null,
+    drawerW: null, vHeight: null,
     colors: { sections: {}, events: {}, secOverride: {} },
     loadouts: {}, lastLoadout: '',
     filters: { sections: [], items: [], years: [] }
@@ -552,6 +569,7 @@
   let pendingZoomRebuild = false;
 
   const tl = $('#tl');
+  const drawerEl = $('#drawer');
   let bufStartT = 0, bufEndT = 0, dayW = 20, savedScroll = 0, lastW = 0;
   let laneRows = new Map(), secCounts = new Map(), capWarns = new Set();
   let scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0, loStatusTimer = 0;
@@ -563,6 +581,7 @@
       labels: state.labels, sort: state.sort, scale: state.scale, showFL: state.showFL,
       listFormat: state.listFormat, tsort: state.tsort,
       listFrom: state.listFrom, listTo: state.listTo,
+      drawerW: state.drawerW, vHeight: state.vHeight,
       colors: state.colors, loadouts: state.loadouts, lastLoadout: state.lastLoadout,
       filters: state.filters
     })); } catch (e) {}
@@ -610,6 +629,8 @@
       if (s.anchor && isFinite(s.anchor.y)) state.anchor = { y: s.anchor.y, m: s.anchor.m || 0 };
       if (isFinite(s.listFrom)) state.listFrom = s.listFrom;
       if (isFinite(s.listTo)) state.listTo = s.listTo;
+      if (isFinite(s.drawerW) && s.drawerW > 0) state.drawerW = s.drawerW;
+      if (isFinite(s.vHeight) && s.vHeight > 0) state.vHeight = s.vHeight;
       if (s.colors) state.colors = normalizeLayout(s.colors);
       if (s.loadouts && typeof s.loadouts === 'object') {
         const lo = {};
@@ -651,7 +672,6 @@
         list.push({
           id: id++, name, base, section, fl,
           start: st, end: en,
-          /* length counted the way you read it: 3rd → 6th = 3 days */
           days: Math.max(1, Math.round((en - st) / MS)),
           row: 0, seamL: false, seamR: false, flInferred: false
         });
@@ -671,7 +691,6 @@
     computeFLInference();
     recomputeLanes();
   }
-  /* events of one section, in your listed order (unknown ones after, alphabetical) */
   function orderedItems(sec) {
     const set = new Set(events.filter(e => e.section === sec).map(e => e.base));
     const out = [];
@@ -712,19 +731,20 @@
     return state.filters.sections.length + state.filters.items.length + state.filters.years.length;
   }
   function rebuildAfterFilter() {
-    buildFilterSets(); computeFiltered(); computeFLInference(); recomputeLanes();
+    buildFilterSets(); computeFiltered(); recomputeLanes();
     buildDrawer(); updateBadge(); refresh(); save();
   }
 
-  /* ── FL inference: ≥2 days running, FL active, no other weekly active ── */
+  /* ── FL inference — always computed from the FULL loaded data, so the FL
+     button stays correct even when the league itself is filtered out ── */
   function computeFLInference() {
-    filtered.forEach(e => { e.flInferred = false; });
+    events.forEach(e => { e.flInferred = false; });
     const flDays = new Set();
-    filtered.filter(e => e.base === FL_NAME).forEach(e => {
+    events.filter(e => e.base === FL_NAME).forEach(e => {
       for (let d = e.start; d <= e.end; d += MS) flDays.add(d);
     });
     if (!flDays.size) return;
-    const weeklies = filtered.filter(e => WEEKLY_SET.has(e.base));
+    const weeklies = events.filter(e => WEEKLY_SET.has(e.base));
     weeklies.forEach(e => {
       const blockers = weeklies.filter(w => w !== e && w.start <= e.end && e.start <= w.end);
       let n = 0;
@@ -738,9 +758,7 @@
   }
   function isFL(e) { return e.fl || e.flInferred; }
 
-  /* ── packing with noon-to-noon bars: a 3rd→6th event runs noon of the 3rd
-     to noon of the 6th — exactly 3 days wide, and chained events hand over
-     halfway through the day they share ── */
+  /* ── packing (noon-to-noon bars) ── */
   function orderOf(e) {
     const rec = EV_SEC.get(e.base);
     return rec ? rec.idx : 1000 + e.base.charCodeAt(0);
@@ -810,7 +828,7 @@
     return palette()[eventColorIdx(ev.base)];
   }
 
-  /* ── zoom / range helpers ── */
+  /* ── zoom / range ── */
   function zoomDays(z) { return z === 7 ? 7 : z * 30.4375; }
   function laneW() { return innerWidth < 760 ? 120 : 172; }
   const MINW = { 7: 30, 1: 8, 3: 5, 6: 1.6, 12: 1.2 };
@@ -829,7 +847,7 @@
   function computeInView() {
     let a, b;
     if (state.listFrom != null && state.listTo != null) {
-      a = state.listFrom; b = state.listTo + MS;   /* “to” is inclusive */
+      a = state.listFrom; b = state.listTo + MS;
     } else {
       a = Date.UTC(state.anchor.y, state.anchor.m, 1);
       b = a + zoomDays(state.zoom) * MS;
@@ -902,7 +920,7 @@
       <button class="nx" id="noticeClose" aria-label="Dismiss">×</button></div>`;
   }
 
-  /* ── timeline rendering ── */
+  /* ── timeline ── */
   function renderTimeline() {
     const LANE_W = laneW();
     const rowH = state.density === 'compact' ? 24 : 34;
@@ -952,7 +970,6 @@
     if (todayT >= bufStartT && todayT < bufEndT)
       grid += `<div class="gtoday" style="left:${Math.round(xOf(todayT))}px"></div>`;
 
-    /* bars — noon to noon, labels inside when they fit, beside the bar when they don't */
     const flOn = state.showFL;
     const half = dayW / 2;
     const sgap = Math.min(dayW / 2, 3);
@@ -1076,7 +1093,6 @@
     clearTimeout(anchorSaveTimer);
     anchorSaveTimer = setTimeout(save, 500);
   }
-  /* instant jump — always reliable, from either tab */
   function goToDate(t) {
     const viewMs = Math.max(chartViewMs(), zoomDays(7) * dayW * MS);
     const marginMs = 2.5 * 30.4375 * MS;
@@ -1186,6 +1202,7 @@
     const pane = $('#pane-list');
     pane.innerHTML = head + `<div class="list-body">${body}</div>`;
     pane.classList.toggle('fl-on', state.showFL);
+    if (state.vHeight) { const lb = pane.querySelector('.list-body'); if (lb) lb.style.height = state.vHeight + 'px'; }
   }
 
   /* ── themes pane ── */
@@ -1267,10 +1284,10 @@
             <button class="mini2" data-ovnone="1" title="No section overrides its events">none</button></span></div>
         ${groupsHTML || '<p class="dhint">No data loaded yet.</p>'}
       </div>
-      <div class="set-group"><h3>Data <span class="h-note">exports everything currently loaded</span></h3>
+      <div class="set-group"><h3>Data <span class="h-note">Download event data</span></h3>
         <div class="dbtns">
-          <button class="mini" id="expReadable">Export event data — Readable</button>
-          <button class="mini" id="expMachine">Export event data — Machine</button>
+          <button class="mini" id="expReadable">Event data - Readable form</button>
+          <button class="mini" id="expMachine">Event data - Machine form</button>
         </div>
         <p class="dstat" id="expStatus"></p>
       </div>
@@ -1304,6 +1321,7 @@
       else { const old = dayW; refitDayW(); savedScroll = savedScroll / old * dayW; }
     }
     renderPane(t);
+    renderToolbar();
   }
 
   /* ── colour load-outs / default template ── */
@@ -1478,20 +1496,28 @@
     }
   }
 
-  /* ── filter drawer (sections + events grouped, two columns) ── */
+  /* ── filter drawer: sections + events grouped, section checkbox cascades ── */
   function buildDrawer() {
     const body = $('#drawerBody');
     if (!sections.length) { body.innerHTML = '<p class="d-empty">No data loaded yet.</p>'; $('#drawerFoot').textContent = ''; return; }
-    let html = '<input class="dsearch" type="search" placeholder="find an event…">';
+    let html = `
+      <div class="dselbar">
+        <b>Select</b>
+        <span class="dg-acts">
+          <button class="mini2" data-topall="1" title="Check everything">All</button>
+          <button class="mini2" data-topnone="1" title="Uncheck everything">None</button>
+        </span>
+      </div>
+      <input class="dsearch" type="search" placeholder="find an event…">`;
     sections.forEach(sec => {
       const cnt = events.filter(e => e.section === sec).length;
       const evs = orderedItems(sec);
       html += `<div class="dgroup" data-sec="${esc(sec)}">
-        <div class="dg-head"><b>${esc(sec)}</b><span class="dg-acts">
-          <button class="mini2" data-allsec="1">all</button><button class="mini2" data-nonesec="1">none</button></span></div>
-        <label class="drow dsec"><span class="dot" style="background:${sectionColor(sec)}"></span>
+        <label class="drow dsec">
+          <span class="dot" style="background:${sectionColor(sec)}"></span>
           <span class="dv">${esc(sec)}</span><span class="cnt">${cnt}</span>
-          <input type="checkbox" data-g="sections" value="${esc(sec)}" ${filtersLive.sec.has(sec) ? 'checked' : ''}></label>
+          <input type="checkbox" data-g="sections" value="${esc(sec)}" ${filtersLive.sec.has(sec) ? 'checked' : ''} title="Toggle the whole section">
+        </label>
         <div class="dgrid">
           ${evs.map(nm =>
             `<label class="drow devt"><span class="dv">${esc(nm)}</span>
@@ -1501,7 +1527,8 @@
     });
     html += `<div class="dgroup" data-sec="__years">
       <div class="dg-head"><b>Years</b><span class="dg-acts">
-        <button class="mini2" data-allyr="1">all</button><button class="mini2" data-noneyr="1">none</button></span></div>
+        <button class="mini2" data-allyr="1">all</button>
+        <button class="mini2" data-noneyr="1">none</button></span></div>
       <div class="dgrid">${years.map(y =>
         `<label class="drow devt"><span class="dv">${y}</span>
          <input type="checkbox" data-g="years" value="${y}" ${filtersLive.yr.has(String(y)) ? 'checked' : ''}></label>`).join('')}</div>
@@ -1517,13 +1544,10 @@
     if (!on && i < 0) list.push(v);
     if (on && i >= 0) list.splice(i, 1);
   }
-  function setGroup(sec, on) {
-    const evs = orderedItems(sec);
-    const si = state.filters.sections.indexOf(sec);
-    if (on) { if (si >= 0) state.filters.sections.splice(si, 1); }
-    else if (si < 0) state.filters.sections.push(sec);
-    state.filters.items = state.filters.items.filter(x => !evs.includes(x));
-    if (!on) evs.forEach(x => { if (!state.filters.items.includes(x)) state.filters.items.push(x); });
+  function setTopAll(on) {
+    state.filters = on
+      ? { sections: [], items: [], years: [] }
+      : { sections: sections.slice(), items: items.slice(), years: years.map(String) };
     rebuildAfterFilter();
   }
   function setYears(on) {
@@ -1531,7 +1555,7 @@
     rebuildAfterFilter();
   }
 
-  /* ── logo (no BE fallback — plain text if the image is ever missing) ── */
+  /* ── logo ── */
   const homeLogo = $('#homeLogo'), homeFall = $('#homeFall');
   let darkLogoOK = false;
   const logoProbe = new Image();
@@ -1545,6 +1569,70 @@
   homeLogo.addEventListener('error', () => {
     if (homeLogo.getAttribute('src') === 'logo-dark.png') { homeLogo.src = 'logo.png'; return; }
     homeLogo.hidden = true; homeFall.hidden = false;
+  });
+
+  /* ── resizable panes ── */
+  function applyVHeight() {
+    const h = state.vHeight;
+    tl.style.height = h ? h + 'px' : '';
+    const lb = document.querySelector('#pane-list .list-body');
+    if (lb) lb.style.height = h ? h + 'px' : '';
+  }
+  const vResize = $('#vResize');
+  let vhDrag = null;
+  function activePaneEl() {
+    return state.tab === 'list' ? (document.querySelector('#pane-list .list-body') || $('#pane-list')) : tl;
+  }
+  vResize.addEventListener('pointerdown', e => {
+    vResize.setPointerCapture(e.pointerId);
+    vResize.classList.add('drag');
+    const c = activePaneEl();
+    vhDrag = { y: e.clientY, h: c ? c.offsetHeight : 420 };
+  });
+  vResize.addEventListener('pointermove', e => {
+    if (!vhDrag) return;
+    const h = Math.max(240, Math.min(2200, vhDrag.h + (vhDrag.y - e.clientY)));
+    state.vHeight = h;
+    applyVHeight();
+  });
+  vResize.addEventListener('pointerup', () => {
+    if (!vhDrag) return;
+    vhDrag = null;
+    vResize.classList.remove('drag');
+    save();
+  });
+  vResize.addEventListener('dblclick', () => {
+    state.vHeight = null;
+    applyVHeight();
+    save();
+  });
+
+  const drawerResize = $('#drawerResize');
+  let dwDrag = null;
+  drawerResize.addEventListener('pointerdown', e => {
+    drawerResize.setPointerCapture(e.pointerId);
+    drawerResize.classList.add('drag');
+    drawerEl.style.transition = 'none';
+    dwDrag = { x: e.clientX, w: drawerEl.offsetWidth };
+  });
+  drawerResize.addEventListener('pointermove', e => {
+    if (!dwDrag) return;
+    const max = Math.max(300, Math.min(innerWidth - 24, 1100));
+    const w = Math.max(300, Math.min(max, dwDrag.w + (e.clientX - dwDrag.x)));
+    drawerEl.style.width = w + 'px';
+  });
+  drawerResize.addEventListener('pointerup', () => {
+    if (!dwDrag) return;
+    dwDrag = null;
+    drawerResize.classList.remove('drag');
+    drawerEl.style.transition = '';
+    state.drawerW = drawerEl.offsetWidth;
+    save();
+  });
+  drawerResize.addEventListener('dblclick', () => {
+    state.drawerW = null;
+    drawerEl.style.width = '';
+    save();
   });
 
   /* ── interactions ── */
@@ -1645,17 +1733,23 @@
   });
   $('#drawerBody').addEventListener('change', e => {
     const c = e.target.closest('input[data-g]'); if (!c) return;
-    toggleFilter(c.dataset.g, c.value, c.checked);
-    buildFilterSets(); computeFiltered(); computeFLInference(); recomputeLanes();
+    const g = c.dataset.g, on = c.checked;
+    toggleFilter(g, c.value, on);
+    /* a section checkbox cascades its value onto all of its events */
+    if (g === 'sections') {
+      const evs = orderedItems(c.value);
+      evs.forEach(nm => toggleFilter('items', nm, on));
+      const grp = c.closest('.dgroup');
+      if (grp) grp.querySelectorAll('input[data-g="items"]').forEach(cb => { cb.checked = on; });
+    }
+    buildFilterSets(); computeFiltered(); recomputeLanes();
     updateBadge(); refresh(); updateDrawerFoot(); save();
   });
   $('#drawerBody').addEventListener('click', e => {
+    if (e.target.closest('[data-topall]')) { setTopAll(true); return; }
+    if (e.target.closest('[data-topnone]')) { setTopAll(false); return; }
     const g = e.target.closest('.dgroup'); if (!g) return;
-    const sec = g.getAttribute('data-sec');
-    if (sec !== '__years') {
-      if (e.target.closest('[data-allsec]')) setGroup(sec, true);
-      if (e.target.closest('[data-nonesec]')) setGroup(sec, false);
-    } else {
+    if (g.getAttribute('data-sec') === '__years') {
       if (e.target.closest('[data-allyr]')) setYears(true);
       if (e.target.closest('[data-noneyr]')) setYears(false);
     }
@@ -1862,6 +1956,8 @@
   bufEndT = monthAddT(initAT, BUF_MONTHS + Math.ceil(zoomDays(state.zoom) / 30.4375));
   savedScroll = (initAT - bufStartT) / MS * dayW;
   lastW = tl.clientWidth;
+  applyVHeight();
+  if (state.drawerW) drawerEl.style.width = Math.min(state.drawerW, Math.max(300, innerWidth - 24)) + 'px';
   setTab(state.tab);
   updateNotice(); updateBadge();
   loadData();
