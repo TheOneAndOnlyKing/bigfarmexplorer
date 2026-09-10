@@ -60,6 +60,7 @@
   * { scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
 
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 11px 22px; border-bottom: 1px solid var(--line); }
+  .home-wrap { display: flex; align-items: center; gap: 12px; min-height: 34px; }
   .home { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; min-height: 34px; }
   .homelogo { display: block; height: 32px; width: auto; max-width: 260px; object-fit: contain; }
   .homefall { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
@@ -318,8 +319,6 @@
   .tlink i { flex: none; width: 10px; height: 10px; border-radius: 3px; margin-top: 2px; background: currentColor; }
   .tlink span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; min-width: 0; overflow-wrap: anywhere; }
   .tlink svg { flex: none; margin-left: 6px; margin-top: 2px; opacity: .6; }
-  .pj { align-self: flex-start; margin-top: 8px; padding: 4px 9px; border: 1px solid rgba(140,140,140,.5); border-radius: 6px; background: none; color: inherit; cursor: pointer; font-family: var(--f-mono); font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
-  .pj:hover { opacity: 1; border-color: currentColor; }
 
   .drop { position: fixed; inset: 14px; z-index: 100; display: none; align-items: center; justify-content: center; border: 2px dashed var(--accent); border-radius: 18px; background: var(--accent-soft); }
   .drop.on { display: flex; }
@@ -345,11 +344,13 @@
 <body data-theme="light" data-font="sans">
 
 <header class="topbar">
-  <a class="home" href="index.html" title="Bigfarm Explorer — home">
-    <img class="homelogo" id="homeLogo" src="logo.png" alt="Bigfarm Explorer">
-    <span class="homefall" id="homeFall" hidden>Bigfarm Explorer</span>
+  <div class="home-wrap">
+    <a class="home" href="index.html" title="Bigfarm Explorer — home">
+      <img class="homelogo" id="homeLogo" src="logo.png" alt="Bigfarm Explorer">
+      <span class="homefall" id="homeFall" hidden>Bigfarm Explorer</span>
+    </a>
     <span class="bt">Bigfarm Calendar</span>
-  </a>
+  </div>
   <button class="themebtn" id="themeBtn"><span id="themeIc"></span><span id="themeLb">Light</span></button>
 </header>
 
@@ -447,7 +448,6 @@
   /* ══════════════ CONFIG ══════════════ */
   var LS_KEY = 'bigfarm-calendar-v1';
   var MS = 86400000;
-  var BUF_MONTHS = 6;
   var DATA_FILES = ['events.jsonl', 'Events Machine.txt', 'Events Machine.jsonl'];
   var TEMPLATE_FILE = 'defaultcolourtemplate.json';
   var EVENTLINKS_FILE = 'eventlinks.json';
@@ -668,8 +668,7 @@
   /* ── event links (eventlinks.json) ── */
   function normLinkColour(c) {
     if (typeof c !== 'string') return null;
-    var s = c.trim();
-    if (!s) return null;
+    var s = c.trim().replace(/^#+/, '#');   /* forgives a doubled ## from hand-editing */
     if (s.charAt(0) !== '#') s = '#' + s;
     if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
     if (/^#[0-9a-fA-F]{3}$/.test(s)) return '#' + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2) + s.charAt(3) + s.charAt(3);
@@ -679,7 +678,16 @@
     if (typeof o === 'string') o = { url: o };
     if (!o || typeof o !== 'object') return null;
     var url = o.url || o.link || o.href;
-    if (typeof url !== 'string' || !/^https?:\/\//i.test(url.trim())) return null;
+    if (!url) {
+      /* recovery for a hand-edit slip: the URL pasted in place of its "url" label */
+      for (var k in o) {
+        if (/^https?:\/\//i.test(k) && typeof o[k] !== 'object') { url = k; break; }
+      }
+    }
+    if (typeof url !== 'string' || !/^https?:\/\//i.test(url.trim())) {
+      console.warn('eventlinks: a line for "' + (o.text || '?') + '" has no usable url — skipped');
+      return null;
+    }
     var text = (o.text || o.label || o.title || url).trim();
     if (!text) return null;
     return { text: text, url: url.trim(), color: normLinkColour(o.color || o.colour) };
@@ -690,7 +698,11 @@
     Object.keys(obj).forEach(function (k) {
       if (k.charAt(0) === '_') return;
       var v = obj[k];
-      if (!Array.isArray(v)) { console.warn('eventlinks: "' + k + '" is not a list — skipped'); return; }
+      if (!Array.isArray(v)) {
+        if (v && typeof v === 'object') v = [v];
+        else if (typeof v === 'string') v = [v];
+        else { console.warn('eventlinks: "' + k + '" is not a list — skipped'); return; }
+      }
       var list = v.map(normLink).filter(Boolean);
       var dropped = v.length - list.length;
       if (dropped) console.warn('eventlinks: ' + dropped + ' bad entr' + (dropped === 1 ? 'y' : 'ies') + ' under "' + k + '" — skipped');
@@ -698,8 +710,27 @@
     });
     return out;
   }
+  /* the file is edited by hand, so tolerate the usual slips before giving up:
+     missing commas between entries, or a URL pasted without its "url" label */
+  function parseLinkFile(text) {
+    try { return JSON.parse(text); } catch (e) {}
+    var fixed = text
+      .replace(/\}\s*\{/g, '},{')
+      .replace(/,\s*"(https?:\/\/[^"]*)"\s*,\s*"(url|text|color|colour)"/g, ', "url": "$1", "$2"');
+    try { return JSON.parse(fixed); }
+    catch (e2) { return null; }
+  }
+  var linkLC = { src: null, map: null };
   function lookupLinks(ev) {
-    return eventLinks[ev.name] || eventLinks[ev.base] || eventLinks[ev.section] || [];
+    if (eventLinks[ev.name]) return eventLinks[ev.name];
+    if (eventLinks[ev.base]) return eventLinks[ev.base];
+    if (eventLinks[ev.section]) return eventLinks[ev.section];
+    /* case-insensitive fallback — so "village fair" in the file still matches "Village Fair" */
+    if (linkLC.src !== eventLinks) {
+      linkLC = { src: eventLinks, map: {} };
+      Object.keys(eventLinks).forEach(function (k) { linkLC.map[k.toLowerCase()] = eventLinks[k]; });
+    }
+    return linkLC.map[ev.name.toLowerCase()] || linkLC.map[ev.base.toLowerCase()] || linkLC.map[ev.section.toLowerCase()] || [];
   }
   function warnUnknownLinkKeys() {
     var known = new Set(items.concat(sections));
@@ -709,13 +740,21 @@
   }
   function fetchEventLinks() {
     fetch(EVENTLINKS_FILE)
-      .then(function (r) { if (!r.ok) throw new Error('missing'); return r.json(); })
-      .then(function (o) {
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(function (t) {
+        var o = parseLinkFile(t.replace(/^\uFEFF/, ''));
+        if (o == null) {
+          console.warn('eventlinks.json is not valid JSON and could not be auto-repaired — its links were skipped. Check the file at jsonlint.com');
+          return;
+        }
         eventLinks = normalizeLinks(o);
         linksFromFile = true;
         if (items.length) warnUnknownLinkKeys();
       })
-      .catch(function () {});
+      .catch(function (err) {
+        console.warn('eventlinks.json could not be loaded (' + err.message + '). ' +
+          'Make sure the file sits next to calendar.html and is named exactly "eventlinks.json" (all lowercase — the host is case-sensitive).');
+      });
   }
 
   /* ── data loading ── */
@@ -921,6 +960,8 @@
 
   /* ── zoom / range ── */
   function zoomDays(z) { return z === 7 ? 7 : z * 30.4375; }
+  /* spare data kept loaded around the view: 1 month on each side in 1W mode, 6 months otherwise */
+  function bufMonths() { return state.zoom === 7 ? 1 : 6; }
   function laneW() { return innerWidth < 760 ? 120 : 172; }
   var MINW = { 7: 30, 1: 8, 3: 5, 6: 1.6, 12: 1.2 };
   function refitDayW() {
@@ -1107,7 +1148,7 @@
         '<div class="lane-label" style="width:' + LANE_W + 'px">' +
           '<span class="dot" style="background:' + sectionColor(sec) + '"></span>' + capFlag +
           '<span class="ltxt"><b>' + esc(sec) + '</b><small>' + (total
-            ? total + ' event' + (total > 1 ? 's' : '') + ' · ' + nRows + (nRows > 1 ? ' lines' : ' line')
+            ? total + ' event' + (total > 1 ? 's' : '')
             : 'hidden') + '</small></span>' +
         '</div>' +
         '<div class="lane-chart" style="width:' + chartW + 'px;height:' + nRows * rowH + 'px">' + barsHTML + '</div>' +
@@ -1149,28 +1190,29 @@
   function handleScrollFrame() {
     savedScroll = tl.scrollLeft;
     var rightGap = tl.scrollWidth - tl.clientWidth - savedScroll;
-    var trigger = 2 * 30.4375 * dayW;
+    var trigger = (state.zoom === 7 ? 1 : 2) * 30.4375 * dayW;
     if (rightGap < trigger) extendRight();
     else if (savedScroll < trigger) extendLeft();
     maybeTrim();
     postScrollUpdate();
   }
   function extendRight() {
-    bufEndT = monthAddT(bufEndT, 6);
+    bufEndT = monthAddT(bufEndT, bufMonths());
     renderTimeline();
   }
   function extendLeft() {
     var old = bufStartT;
-    bufStartT = monthAddT(bufStartT, -6);
+    bufStartT = monthAddT(bufStartT, -bufMonths());
     savedScroll += (old - bufStartT) / MS * dayW;
     renderTimeline();
   }
   function maybeTrim() {
     var viewL = dateAtLeft(), viewR = viewL + chartViewMs();
-    var KEEP = 18 * 30.4375 * MS, STEP = 6 * 30.4375 * MS;
+    var BM = bufMonths();
+    var KEEP = 3 * BM * 30.4375 * MS, STEP = BM * 30.4375 * MS;
     var ns = bufStartT, ne = bufEndT;
-    while (viewL - ns > KEEP + STEP) ns = monthAddT(ns, 6);
-    while (ne - viewR > KEEP + STEP) ne = monthAddT(ne, -6);
+    while (viewL - ns > KEEP + STEP) ns = monthAddT(ns, BM);
+    while (ne - viewR > KEEP + STEP) ne = monthAddT(ne, -BM);
     if (ns !== bufStartT || ne !== bufEndT) {
       savedScroll -= (ns - bufStartT) / MS * dayW;
       bufStartT = ns; bufEndT = ne;
@@ -1187,10 +1229,10 @@
   }
   function goToDate(t) {
     var viewMs = Math.max(chartViewMs(), zoomDays(7) * dayW * MS);
-    var marginMs = 2.5 * 30.4375 * MS;
+    var marginMs = (state.zoom === 7 ? 1 : 2.5) * 30.4375 * MS;
     var delta = 0, changed = false;
-    while (bufStartT > t - marginMs) { var old = bufStartT; bufStartT = monthAddT(bufStartT, -6); delta += (old - bufStartT) / MS * dayW; changed = true; }
-    while (bufEndT < t + viewMs + marginMs) { bufEndT = monthAddT(bufEndT, 6); changed = true; }
+    while (bufStartT > t - marginMs) { var old = bufStartT; bufStartT = monthAddT(bufStartT, -bufMonths()); delta += (old - bufStartT) / MS * dayW; changed = true; }
+    while (bufEndT < t + viewMs + marginMs) { bufEndT = monthAddT(bufEndT, bufMonths()); changed = true; }
     if (changed) { savedScroll += delta; renderTimeline(); }
     var x = Math.max(0, (t - bufStartT) / MS * dayW);
     savedScroll = x;
@@ -1550,7 +1592,7 @@
       });
       html += '</div>';
     }
-    html += '<button type="button" class="pj" data-jump="' + ev.id + '">view on calendar</button></div>';
+    html += '</div>';
     tip.innerHTML = html;
     tip.style.display = 'block';
     var w = tip.offsetWidth, h = tip.offsetHeight;
@@ -1564,11 +1606,6 @@
     tip.style.top = y + 'px';
   }
   function hideTip() { tip.style.display = 'none'; }
-  /* clicks inside the pane: the jump button acts, links open new tabs, nothing closes it */
-  tip.addEventListener('click', function (e) {
-    var j = e.target.closest('.pj');
-    if (j) { pinned = false; hideTip(); jumpToEvent(+j.dataset.jump); }
-  });
 
   /* ── popovers ── */
   var pop = $('#pop');
@@ -1729,27 +1766,49 @@
   function activePaneEl() {
     return state.tab === 'list' ? (document.querySelector('#pane-list .list-body') || $('#pane-list')) : tl;
   }
+  /* while dragging: holding the cursor near the top/bottom of the screen scrolls the page for
+     you — gently where the zone starts, quicker at the very edge — and the window keeps
+     growing/shrinking to follow, so you never run out of room at the screen border */
+  var EDGE_ZONE = 70, EDGE_SPEED = 16, vEdgeRaf = 0;
+  function dragHeight() {
+    return Math.max(240, Math.min(2200, vhDrag.h + (vhDrag.lastY - vhDrag.y) + vhDrag.sc));
+  }
+  function applyDragHeight() {
+    state.vHeight = dragHeight();
+    applyVHeight();
+  }
+  function vEdgeScroll() {
+    if (!vhDrag) { vEdgeRaf = 0; return; }
+    var y = vhDrag.lastY, v = 0;
+    if (y > innerHeight - EDGE_ZONE) v = 2 + (EDGE_SPEED - 2) * Math.min(1, (y - (innerHeight - EDGE_ZONE)) / EDGE_ZONE);
+    else if (y < EDGE_ZONE) v = -(2 + (EDGE_SPEED - 2) * Math.min(1, (EDGE_ZONE - y) / EDGE_ZONE));
+    if (v) { window.scrollBy(0, v); vhDrag.sc += v; applyDragHeight(); }
+    vEdgeRaf = requestAnimationFrame(vEdgeScroll);
+  }
   vResize.addEventListener('pointerdown', function (e) {
     e.preventDefault();
     try { window.getSelection().removeAllRanges(); } catch (err) {}
     vResize.setPointerCapture(e.pointerId);
     vResize.classList.add('drag');
     var c = activePaneEl();
-    vhDrag = { y: e.clientY, h: c ? c.offsetHeight : 420 };
+    vhDrag = { y: e.clientY, h: c ? c.offsetHeight : 420, lastY: e.clientY, sc: 0 };
+    if (!vEdgeRaf) vEdgeRaf = requestAnimationFrame(vEdgeScroll);
   });
   vResize.addEventListener('pointermove', function (e) {
     if (!vhDrag) return;
+    vhDrag.lastY = e.clientY;
     /* handle sits below the window: drag DOWN grows it, drag UP shrinks it */
-    var h = Math.max(240, Math.min(2200, vhDrag.h + (e.clientY - vhDrag.y)));
-    state.vHeight = h;
-    applyVHeight();
+    applyDragHeight();
   });
-  vResize.addEventListener('pointerup', function () {
+  function vResizeEnd() {
     if (!vhDrag) return;
     vhDrag = null;
+    if (vEdgeRaf) { cancelAnimationFrame(vEdgeRaf); vEdgeRaf = 0; }
     vResize.classList.remove('drag');
     save();
-  });
+  }
+  vResize.addEventListener('pointerup', vResizeEnd);
+  vResize.addEventListener('pointercancel', vResizeEnd);
   vResize.addEventListener('dblclick', function () {
     state.vHeight = null;
     applyVHeight();
@@ -1867,8 +1926,8 @@
   function rebuildAroundAnchor() {
     refitDayW();
     var aT = Date.UTC(state.anchor.y, state.anchor.m, 1);
-    var ahead = BUF_MONTHS + Math.ceil(zoomDays(state.zoom) / 30.4375);
-    bufStartT = monthAddT(aT, -BUF_MONTHS);
+    var ahead = bufMonths() + Math.ceil(zoomDays(state.zoom) / 30.4375);
+    bufStartT = monthAddT(aT, -bufMonths());
     bufEndT = monthAddT(aT, ahead);
     savedScroll = (aT - bufStartT) / MS * dayW;
     renderTimeline();
@@ -1961,7 +2020,7 @@
 
   /* the pane never closes from its own clicks — only outside clicks, Esc, or scrolling */
   document.addEventListener('click', function (e) {
-    if (!e.target.closest('.bar') && !e.target.closest('#tip')) { pinned = false; hideTip(); }
+    if (!e.target.closest('.bar') && !e.target.closest('#tip') && !e.target.closest('#pane-list [data-id]')) { pinned = false; hideTip(); }
   });
 
   $('#pane-list').addEventListener('click', function (e) {
@@ -1981,25 +2040,6 @@
     if (r) { pinned = true; showTip(r); }
   });
   $('#pane-list').addEventListener('scroll', function () { pinned = false; hideTip(); }, true);
-
-  function jumpToEvent(id) {
-    var ev = events.find(function (x) { return x.id === id; });
-    if (!ev) return;
-    pinned = false;
-    hideTip();
-    setTab('calendar');
-    goToDate(ev.start);
-    requestAnimationFrame(function () { requestAnimationFrame(function () {
-      var b = tl.querySelector('.bar[data-id="' + id + '"]');
-      if (b) {
-        b.scrollIntoView({ block: 'nearest', inline: 'center' });
-        savedScroll = tl.scrollLeft;
-        b.classList.add('flash');
-        setTimeout(function () { b.classList.remove('flash'); }, 1500);
-      }
-    }); });
-    save();
-  }
 
   /* themes pane */
   $('#pane-themes').addEventListener('click', function (e) {
@@ -2155,8 +2195,8 @@
   updateScaleUI();
   refitDayW();
   var initAT = Date.UTC(state.anchor.y, state.anchor.m, 1);
-  bufStartT = monthAddT(initAT, -BUF_MONTHS);
-  bufEndT = monthAddT(initAT, BUF_MONTHS + Math.ceil(zoomDays(state.zoom) / 30.4375));
+  bufStartT = monthAddT(initAT, -bufMonths());
+  bufEndT = monthAddT(initAT, bufMonths() + Math.ceil(zoomDays(state.zoom) / 30.4375));
   savedScroll = (initAT - bufStartT) / MS * dayW;
   lastW = tl.clientWidth;
   applyVHeight();
