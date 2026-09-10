@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- bigfarm calendar — v4 (icons folder, list-tab footer hidden, filter fixes) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -147,6 +148,7 @@
   .vresize span { width: 48px; height: 5px; border-radius: 3px; background: #3E7FC1; transition: background .15s, width .15s; }
   .vresize:hover span, .vresize.drag span { background: #2A5E97; width: 62px; }
   .card.on-themes .vresize { display: none; }
+  .card.on-list .cardfoot { display: none; }
 
   .list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 18px; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
   .lh-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
@@ -169,6 +171,10 @@
   .list-empty { padding: 60px 20px; text-align: center; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; }
   .flbadge { display: inline-flex; font-family: var(--f-mono); font-size: 8.5px; font-weight: 700; letter-spacing: .08em; background: var(--accent); color: var(--on-accent); border-radius: 3px; padding: 1px 4px; margin-left: 8px; vertical-align: 1px; }
   #pane-list.fl-on .lrow:not(.has-fl), #pane-list.fl-on .atable tbody tr:not(.has-fl) { opacity: .45; }
+  .evico { width: 13px; height: 13px; object-fit: contain; flex: none; pointer-events: none; }
+  .bl .evico, .blo .evico { margin-right: 4px; vertical-align: -2px; }
+  .lrow .evico { width: 14px; height: 14px; }
+  .atable .evico { margin-right: 9px; vertical-align: -0.5px; }
   .atable { width: 100%; min-width: 560px; border-collapse: collapse; }
   .atable th { position: sticky; top: 0; z-index: 2; background: var(--card); font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line2); cursor: pointer; user-select: none; white-space: nowrap; }
   .atable th.r { text-align: right; }
@@ -756,6 +762,33 @@
       });
   }
 
+  /* ── event icons (icons/<event name>.png, optional per event) ──
+     Each event's base name is probed once; found icons are shown before the
+     event's name on calendar bars and in the list. Missing icons change nothing. */
+  var iconCache = new Map();
+  var iconRerenderTimer = 0;
+  function iconURL(base) { return 'icons/' + encodeURIComponent(base) + '.png'; }
+  function hasIcon(base) { return iconCache.get(base) === true; }
+  function iconHTML(base) {
+    return hasIcon(base) ? '<img class="evico" src="' + iconURL(base) + '" alt="" draggable="false">' : '';
+  }
+  function probeIcons() {
+    items.forEach(function (nm) {
+      if (iconCache.has(nm)) return;
+      iconCache.set(nm, false);
+      var im = new Image();
+      im.onload = function () { iconCache.set(nm, true); scheduleIconRerender(); };
+      im.onerror = function () { iconCache.set(nm, false); };
+      im.src = iconURL(nm);
+    });
+  }
+  function scheduleIconRerender() {
+    clearTimeout(iconRerenderTimer);
+    iconRerenderTimer = setTimeout(function () {
+      if (state.tab === 'calendar' || state.tab === 'list') renderPane(state.tab);
+    }, 80);
+  }
+
   /* ── data loading ── */
   function parseISO(v) {
     if (typeof v !== 'string') return null;
@@ -801,6 +834,7 @@
     if (!sections.length) sections = known.slice(0, 1);
     items = [...new Set(events.map(function (e) { return e.base; }))].sort(function (a, b) { return a.localeCompare(b); });
     years = [...new Set(events.map(function (e) { return new Date(e.start).getUTCFullYear(); }))].sort();
+    probeIcons();
     buildFilterSets();
     computeFiltered();
     computeFLInference();
@@ -945,6 +979,7 @@
     var rec = EV_SEC.get(base);
     return rec ? rec.idx % 8 : 5;
   }
+  /* a section's colour: your saved choice first, otherwise the automatic palette colour */
   function sectionColor(sec) {
     var ov = state.colors.sections[sec];
     if (ov) return resolveColour(ov);
@@ -1131,13 +1166,13 @@
           var inLbl = '', outLbl = '';
           if (state.labels) {
             if (w >= 40) {
-              inLbl = '<span class="bl" style="color:' + textColorFor(col) + '">' + esc(ev.name) + (ev.fl ? ' - FL' : '') + '</span>';
+              inLbl = '<span class="bl" style="color:' + textColorFor(col) + '">' + iconHTML(ev.base) + esc(ev.name) + (ev.fl ? ' - FL' : '') + '</span>';
             } else {
               var next = row.evs[i + 1];
               var limit = next ? xOf(next.start) + half + (next.seamL ? sgap / 2 : 0) : chartW;
               var room = limit - right - 8;
               if (room >= 34) {
-                outLbl = '<span class="blo' + (flOn && !isFl ? ' dim' : '') + '" style="left:' + (right + 5) + 'px;top:' + top + 'px;height:' + barH + 'px;max-width:' + Math.min(room, 170) + 'px">' + esc(ev.name) + (ev.fl ? ' · FL' : '') + '</span>';
+                outLbl = '<span class="blo' + (flOn && !isFl ? ' dim' : '') + '" style="left:' + (right + 5) + 'px;top:' + top + 'px;height:' + barH + 'px;max-width:' + Math.min(room, 170) + 'px">' + iconHTML(ev.base) + esc(ev.name) + (ev.fl ? ' · FL' : '') + '</span>';
               }
             }
           }
@@ -1261,7 +1296,9 @@
   function rowHTML(ev) {
     var badge = isFL(ev) ? '<span class="flbadge">FL</span>' : '';
     return '<button class="lrow' + (isFL(ev) ? ' has-fl' : '') + '" data-id="' + ev.id + '">' +
-      '<span class="ldot" style="background:' + barColor(ev) + '"></span>' +
+      (hasIcon(ev.base)
+        ? iconHTML(ev.base)
+        : '<span class="ldot" style="background:' + barColor(ev) + '"></span>') +
       '<span class="ln">' + esc(ev.name) + badge + '</span>' +
       '<span class="ls">' + esc(ev.section) + '</span>' +
       '<span class="ld">' + esc(fmtRange(ev)) + '</span>' +
@@ -1311,7 +1348,9 @@
     }).join('');
     var rows = list.map(function (ev) {
       return '<tr data-id="' + ev.id + '" class="' + (isFL(ev) ? 'has-fl' : '') + '">' +
-        '<td><span class="ldot" style="background:' + barColor(ev) + '"></span>' + esc(ev.name) + (isFL(ev) ? '<span class="flbadge">FL</span>' : '') + '</td>' +
+        '<td>' + (hasIcon(ev.base)
+          ? iconHTML(ev.base)
+          : '<span class="ldot" style="background:' + barColor(ev) + '"></span>') + esc(ev.name) + (isFL(ev) ? '<span class="flbadge">FL</span>' : '') + '</td>' +
         '<td class="c-sec">' + esc(ev.section) + '</td>' +
         '<td class="c-dt">' + fmtD(ev.start) + '</td>' +
         '<td class="c-dt">' + fmtD(ev.end) + '</td>' +
@@ -1452,6 +1491,7 @@
       b.setAttribute('aria-selected', on);
     });
     $('#card').classList.toggle('on-themes', t === 'themes');
+    $('#card').classList.toggle('on-list', t === 'list');
     ['calendar', 'list', 'themes'].forEach(function (p) {
       $('#pane-' + p).classList.toggle('active', p === t);
     });
@@ -1658,9 +1698,9 @@
         closePop();
       });
   }
-  /* colour picker — rebuilt: custom colours commit on both `input` (live drag) and `change`
-     (confirm in browsers that only fire that), the active palette swatch is marked, and the
-     pop shows its current state with an explicit done button */
+  /* colour picker — custom colours commit on both `input` (live drag) and `change` (confirm),
+     the active palette swatch is marked, and the pop shows its current state with an explicit
+     done button. Events: "reset to automatic". Sections: "reset to default". */
   function openColorPop(kind, key, anchor) {
     var store = state.colors[kind === 'event' ? 'events' : 'sections'];
     var cur = store[key];
@@ -1709,7 +1749,6 @@
         : pal2 ? 'palette colour in use' : 'automatic colour';
       if (!keepOpen) closePop();
     }
-    /* set the initial state text */
     (function () {
       var st = pop.querySelector('#cState');
       if (st) st.textContent = (cur && cur.t === 'h') ? 'custom colour in use'
@@ -1723,7 +1762,7 @@
     if (!sections.length) { body.innerHTML = '<p class="d-empty">No data loaded yet.</p>'; $('#drawerFoot').textContent = ''; return; }
     var html = '<div class="dselbar"><b>Select</b><span class="dg-acts">' +
         '<button class="mini2" data-topall="1" title="Check everything">All</button>' +
-        '<button class="mini2" data-topnone="1" title="Uncheck everything">None</button></span></div>' +
+        '<button class="mini2" data-topnone="1" title="Uncheck all sections &amp; events">None</button></span></div>' +
       '<input class="dsearch" type="search" placeholder="find an event…">';
     sections.forEach(function (sec) {
       var cnt = events.filter(function (e) { return e.section === sec; }).length;
@@ -1759,10 +1798,12 @@
     if (!on && i < 0) list.push(v);
     if (on && i >= 0) list.splice(i, 1);
   }
+  /* the top All/None governs sections & events only — years are a separate
+     refinement with their own all/none buttons and are left untouched here */
   function setTopAll(on) {
     state.filters = on
       ? { sections: [], items: [], years: [] }
-      : { sections: sections.slice(), items: items.slice(), years: years.map(String) };
+      : { sections: sections.slice(), items: items.slice(), years: state.filters.years.slice() };
     rebuildAfterFilter();
   }
   function setYears(on) {
@@ -1990,11 +2031,24 @@
     if (!c) return;
     var g = c.dataset.g, on = c.checked;
     toggleFilter(g, c.value, on);
+    if (g === 'items' && on) {
+      /* switching an event on while its section is off implies the section on,
+         otherwise the event could never show (a disabled section hides everything under it) */
+      var evx = events.find(function (x) { return x.base === c.value; });
+      if (evx) {
+        var si = state.filters.sections.indexOf(evx.section);
+        if (si >= 0) {
+          state.filters.sections.splice(si, 1);
+          var grp = c.closest('.dgroup');
+          if (grp) { var scb = grp.querySelector('input[data-g="sections"]'); if (scb) scb.checked = true; }
+        }
+      }
+    }
     if (g === 'sections') {
       var evs = orderedItems(c.value);
       evs.forEach(function (nm) { toggleFilter('items', nm, on); });
-      var grp = c.closest('.dgroup');
-      if (grp) grp.querySelectorAll('input[data-g="items"]').forEach(function (cb) { cb.checked = on; });
+      var grp2 = c.closest('.dgroup');
+      if (grp2) grp2.querySelectorAll('input[data-g="items"]').forEach(function (cb) { cb.checked = on; });
     }
     buildFilterSets(); computeFiltered(); recomputeLanes();
     updateBadge(); refresh(); updateDrawerFoot(); save();
