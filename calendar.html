@@ -142,10 +142,10 @@
   .mini:hover { color: var(--accent); border-color: var(--accent); }
   .mini:disabled { opacity: .45; cursor: default; }
 
-  /* height drag handle under the panes */
-  .vresize { display: flex; align-items: center; justify-content: center; height: 16px; cursor: row-resize; border-top: 1px solid var(--line); touch-action: none; }
-  .vresize span { width: 46px; height: 4px; border-radius: 2px; background: var(--line2); transition: background .15s; }
-  .vresize:hover span, .vresize.drag span { background: var(--accent); }
+  /* height drag handle — at the very bottom of the card */
+  .vresize { display: flex; align-items: center; justify-content: center; height: 18px; cursor: row-resize; border-top: 1px solid var(--line); touch-action: none; user-select: none; -webkit-user-select: none; }
+  .vresize span { width: 48px; height: 5px; border-radius: 3px; background: #3E7FC1; transition: background .15s, width .15s; }
+  .vresize:hover span, .vresize.drag span { background: #2A5E97; width: 62px; }
   .card.on-themes .vresize { display: none; }
 
   .list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 18px; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
@@ -288,10 +288,9 @@
   .drow input:checked::after { content: ""; width: 8px; height: 4px; border-left: 2px solid var(--on-accent); border-bottom: 2px solid var(--on-accent); transform: rotate(-45deg) translate(0, -1px); }
   .dgrid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6px; }
   .d-foot { padding: 12px 18px; border-top: 1px solid var(--line); font-family: var(--f-mono); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  /* width drag handle on the drawer's right edge */
   .d-resize { position: absolute; top: 0; right: 0; bottom: 0; width: 10px; cursor: col-resize; touch-action: none; z-index: 5; }
-  .d-resize::after { content: ""; position: absolute; top: 50%; right: 3px; width: 3px; height: 40px; transform: translateY(-50%); border-radius: 2px; background: var(--line2); transition: background .15s; }
-  .d-resize:hover::after, .d-resize.drag::after { background: var(--accent); }
+  .d-resize::after { content: ""; position: absolute; top: 50%; right: 3px; width: 3px; height: 40px; transform: translateY(-50%); border-radius: 2px; background: #3E7FC1; transition: background .15s; }
+  .d-resize:hover::after, .d-resize.drag::after { background: #2A5E97; }
 
   .pop { position: fixed; z-index: 60; display: none; background: var(--card); border: 1px solid var(--line2); border-radius: 12px; box-shadow: 0 8px 30px rgba(20,22,14,.22); padding: 10px; }
   .pgrid { display: grid; grid-template-columns: repeat(3, 62px); gap: 4px; }
@@ -307,12 +306,21 @@
   .pop input[type="color"] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 7px; background: none; cursor: pointer; }
   .pop .lbl { font-size: 12px; color: var(--muted); }
 
-  .tip { position: fixed; z-index: 90; pointer-events: none; display: none; }
-  .tt { background: var(--tipbg); color: var(--tipink); border-left: 3px solid; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; max-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,.25); font-size: 12px; }
+  /* the event pane — interactive, auto-sized */
+  .tip { position: fixed; z-index: 90; display: none; }
+  .tt { background: var(--tipbg); color: var(--tipink); border-left: 3px solid; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; max-width: 340px; max-height: min(64vh, 520px); overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,.25); font-size: 12px; }
   .tt b { font-weight: 600; }
   .tt .sec { opacity: .65; font-size: 11.5px; }
   .tt .td { font-family: var(--f-mono); font-size: 10.5px; opacity: .8; margin-top: 2px; }
-  .tt .fl { font-family: var(--f-mono); font-size: 9px; font-weight: 700; letter-spacing: .1em; background: rgba(255,255,255,.25); border-radius: 3px; padding: 1px 4px; align-self: flex-start; margin-top: 4px; }
+  .tt .fl { font-family: var(--f-mono); font-size: 9px; font-weight: 700; letter-spacing: .1em; background: rgba(140,140,140,.3); border-radius: 3px; padding: 1px 4px; align-self: flex-start; margin-top: 4px; }
+  .tlinks { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(140,140,140,.4); }
+  .tlink { display: flex; align-items: flex-start; gap: 8px; text-decoration: none; padding: 3px 6px; margin: 0 -6px; border-radius: 6px; font-size: 12px; line-height: 1.4; color: inherit; }
+  .tlink:hover { background: rgba(140,140,140,.22); }
+  .tlink i { flex: none; width: 10px; height: 10px; border-radius: 3px; margin-top: 2px; background: currentColor; }
+  .tlink span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; min-width: 0; overflow-wrap: anywhere; }
+  .tlink svg { flex: none; margin-left: 6px; margin-top: 2px; opacity: .6; }
+  .pj { align-self: flex-start; margin-top: 8px; padding: 4px 9px; border: 1px solid rgba(140,140,140,.5); border-radius: 6px; background: none; color: inherit; cursor: pointer; font-family: var(--f-mono); font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
+  .pj:hover { opacity: 1; border-color: currentColor; }
 
   .drop { position: fixed; inset: 14px; z-index: 100; display: none; align-items: center; justify-content: center; border: 2px dashed var(--accent); border-radius: 18px; background: var(--accent-soft); }
   .drop.on { display: flex; }
@@ -395,8 +403,6 @@
     <section class="pane" id="pane-list"></section>
     <section class="pane" id="pane-themes"></section>
 
-    <div class="vresize" id="vResize" title="Drag to resize the window height — double-click to reset"><span></span></div>
-
     <div class="cardfoot">
       <button class="filterbtn" id="filterBtn">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6.5 7.5V19l-3-1.5v-5z"/></svg>
@@ -411,6 +417,8 @@
         <button data-z="7">1W</button><button data-z="1">1M</button><button data-z="3">3M</button><button data-z="6">6M</button><button data-z="12">1Y</button>
       </div>
     </div>
+
+    <div class="vresize" id="vResize" title="Drag to resize the window height — double-click to reset"><span></span></div>
   </div>
 </div>
 
@@ -443,6 +451,7 @@
   const BUF_MONTHS = 6;
   const DATA_FILES = ['events.jsonl', 'Events Machine.txt', 'Events Machine.jsonl'];
   const TEMPLATE_FILE = 'defaultcolourtemplate.json';
+  const EVENTLINKS_FILE = 'eventlinks.json';
 
   const SECTION_ORDER = [
     { name: 'Weekly events', cap: 0, events: ['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship'] },
@@ -501,6 +510,17 @@
     '{"start":"2025-09-23","end":"2025-09-25","event":"Landscape Architect","section":"Minor events"}',
     '{"start":"2025-09-20","end":"2025-09-28","event":"My bees are gone!","section":"Minor events"}'
   ].join('\n');
+
+  /* links shown when the sample data is in use (eventlinks.json replaces these) */
+  const SAMPLE_LINKS = {
+    'Village Fair': [
+      { text: 'Example link — replace in eventlinks.json', url: 'https://www.example.com/village-fair', color: '#3E7FC1' }
+    ],
+    'Landscape Architect': [
+      { text: 'Example link — replace in eventlinks.json', url: 'https://www.example.com/landscape', color: '#C25B3C' },
+      { text: 'Second line example', url: 'https://www.example.com/more-info', color: '#42968B' }
+    ]
+  };
 
   /* ── helpers ── */
   const M_L = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -566,6 +586,7 @@
   let filtersLive = { sec: new Set(), it: new Set(), yr: new Set() };
   let noticeDismissed = false, pinned = false, resetArmed = false;
   let DEFAULT_LAYOUT = null, defaultFound = false;
+  let eventLinks = {}, linksFromFile = false;
   let pendingZoomRebuild = false;
 
   const tl = $('#tl');
@@ -642,6 +663,58 @@
     } catch (e) {}
   }
 
+  /* ── event links (eventlinks.json) ── */
+  function normLinkColour(c) {
+    if (typeof c !== 'string') return null;
+    let s = c.trim();
+    if (!s) return null;
+    if (s[0] !== '#') s = '#' + s;
+    if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
+    if (/^#[0-9a-fA-F]{3}$/.test(s)) return '#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3];
+    return null;
+  }
+  function normLink(o) {
+    if (typeof o === 'string') o = { url: o };
+    if (!o || typeof o !== 'object') return null;
+    const url = o.url || o.link || o.href;
+    if (typeof url !== 'string' || !/^https?:\/\//i.test(url.trim())) return null;
+    const text = (o.text || o.label || o.title || url).trim();
+    if (!text) return null;
+    return { text, url: url.trim(), color: normLinkColour(o.color || o.colour) };
+  }
+  function normalizeLinks(obj) {
+    const out = {};
+    if (!obj || typeof obj !== 'object') return out;
+    for (const [k, v] of Object.entries(obj)) {
+      if (k.startsWith('_')) continue;         /* the _readme key and friends */
+      if (!Array.isArray(v)) { console.warn('eventlinks: "' + k + '" is not a list — skipped'); continue; }
+      const list = v.map(normLink).filter(Boolean);
+      const dropped = v.length - list.length;
+      if (dropped) console.warn('eventlinks: ' + dropped + ' bad entr' + (dropped === 1 ? 'y' : 'ies') + ' under "' + k + '" — skipped');
+      if (list.length) out[k] = list;
+    }
+    return out;
+  }
+  function lookupLinks(ev) {
+    return eventLinks[ev.name] || eventLinks[ev.base] || eventLinks[ev.section] || [];
+  }
+  function warnUnknownLinkKeys() {
+    const known = new Set(items.concat(sections));
+    Object.keys(eventLinks).forEach(k => {
+      if (!known.has(k)) console.warn('eventlinks: no event or section named "' + k + '" — check the spelling');
+    });
+  }
+  function fetchEventLinks() {
+    fetch(EVENTLINKS_FILE)
+      .then(r => { if (!r.ok) throw new Error('missing'); return r.json(); })
+      .then(o => {
+        eventLinks = normalizeLinks(o);
+        linksFromFile = true;
+        if (items.length) warnUnknownLinkKeys();
+      })
+      .catch(() => {});
+  }
+
   /* ── data loading ── */
   function parseISO(v) {
     if (typeof v !== 'string') return null;
@@ -703,6 +776,8 @@
     events = r.list;
     source = kind || 'session';
     fileName = label; dataLoaded = true;
+    if (!linksFromFile) eventLinks = (kind === 'sample') ? SAMPLE_LINKS : {};
+    if (linksFromFile) warnUnknownLinkKeys();
     deriveAll(); buildDrawer(); updateNotice(); refresh();
   }
   async function loadData() {
@@ -735,8 +810,7 @@
     buildDrawer(); updateBadge(); refresh(); save();
   }
 
-  /* ── FL inference — always computed from the FULL loaded data, so the FL
-     button stays correct even when the league itself is filtered out ── */
+  /* ── FL inference (always from the full loaded data) ── */
   function computeFLInference() {
     events.forEach(e => { e.flInferred = false; });
     const flDays = new Set();
@@ -1419,22 +1493,44 @@
     setTimeout(() => { if (el.isConnected) el.textContent = ''; }, 2500);
   }
 
-  /* ── tooltip ── */
+  /* ── the event pane (info + links) — auto-sized, interactive ── */
   const tip = $('#tip');
-  function showTip(bar) {
-    const ev = events.find(x => x.id === +bar.dataset.id); if (!ev) return;
+  function showTip(anchorEl) {
+    const ev = events.find(x => x.id === +anchorEl.dataset.id);
+    if (!ev) return;
     const col = barColor(ev);
-    tip.innerHTML = `<div class="tt" style="border-color:${col}"><b>${esc(ev.name)}</b>
+    const ls = lookupLinks(ev);
+    let html = `<div class="tt" style="border-color:${col}"><b>${esc(ev.name)}</b>
       <span class="sec">${esc(ev.section)}</span>
       <span class="td">${esc(fmtRange(ev))} · ${ev.days} day${ev.days > 1 ? 's' : ''}</span>
-      ${isFL(ev) ? '<span class="fl">COUNTS FOR FL</span>' : ''}</div>`;
+      ${isFL(ev) ? '<span class="fl">COUNTS FOR FL</span>' : ''}`;
+    if (ls.length) {
+      html += '<div class="tlinks">' + ls.map(l => {
+        const st = l.color ? ` style="color:${l.color}"` : '';
+        const chip = l.color ? ` style="background:${l.color}"` : '';
+        return `<a class="tlink" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer"${st}>` +
+          `<i${chip}></i><span>${esc(l.text)}</span>` +
+          '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></a>';
+      }).join('') + '</div>';
+    }
+    html += `<button type="button" class="pj" data-jump="${ev.id}">view on calendar</button></div>`;
+    tip.innerHTML = html;
     tip.style.display = 'block';
-    const w = tip.offsetWidth, h = tip.offsetHeight, r = bar.getBoundingClientRect();
-    let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8);
-    let y = r.top - h - 8; if (y < 60) y = r.bottom + 8;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    const r = anchorEl.getBoundingClientRect();
+    let x = r.left + Math.min(r.width / 2, 140) - w / 2;
+    x = Math.min(Math.max(8, x), innerWidth - w - 8);
+    let y = r.top - h - 8;
+    if (y < 8) y = r.bottom + 8;
+    if (y + h > innerHeight - 8) y = Math.max(8, innerHeight - h - 8);
     tip.style.left = x + 'px'; tip.style.top = y + 'px';
   }
   function hideTip() { tip.style.display = 'none'; }
+  /* clicks inside the pane: the jump button acts; links open new tabs; nothing closes it */
+  tip.addEventListener('click', e => {
+    const j = e.target.closest('.pj');
+    if (j) { pinned = false; hideTip(); jumpToEvent(+j.dataset.jump); }
+  });
 
   /* ── popovers ── */
   const pop = $('#pop');
@@ -1496,7 +1592,7 @@
     }
   }
 
-  /* ── filter drawer: sections + events grouped, section checkbox cascades ── */
+  /* ── filter drawer ── */
   function buildDrawer() {
     const body = $('#drawerBody');
     if (!sections.length) { body.innerHTML = '<p class="d-empty">No data loaded yet.</p>'; $('#drawerFoot').textContent = ''; return; }
@@ -1584,6 +1680,8 @@
     return state.tab === 'list' ? (document.querySelector('#pane-list .list-body') || $('#pane-list')) : tl;
   }
   vResize.addEventListener('pointerdown', e => {
+    e.preventDefault();                              /* blocks text selection & accidental text-drags */
+    try { window.getSelection().removeAllRanges(); } catch (err) {}
     vResize.setPointerCapture(e.pointerId);
     vResize.classList.add('drag');
     const c = activePaneEl();
@@ -1591,7 +1689,8 @@
   });
   vResize.addEventListener('pointermove', e => {
     if (!vhDrag) return;
-    const h = Math.max(240, Math.min(2200, vhDrag.h + (vhDrag.y - e.clientY)));
+    /* handle sits below the window: drag DOWN grows it, drag UP shrinks it */
+    const h = Math.max(240, Math.min(2200, vhDrag.h + (e.clientY - vhDrag.y)));
     state.vHeight = h;
     applyVHeight();
   });
@@ -1610,6 +1709,8 @@
   const drawerResize = $('#drawerResize');
   let dwDrag = null;
   drawerResize.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    try { window.getSelection().removeAllRanges(); } catch (err) {}
     drawerResize.setPointerCapture(e.pointerId);
     drawerResize.classList.add('drag');
     drawerEl.style.transition = 'none';
@@ -1715,7 +1816,7 @@
   }
   function setScale(f) {
     const center = dateAtLeft() + chartViewMs() / 2;
-    state.scale = Math.min(3, Math.max(0.4, +(state.scale * f).toFixed(3)));
+    state.scale = Math.min(3, Math.max(0.4, +(state.scale * f).toFixed(3));
     refitDayW();
     savedScroll = Math.max(0, (center - bufStartT) / MS * dayW - Math.max(tl.clientWidth - laneW(), 0) / 2);
     renderTimeline(); renderToolbar(); updateEmptyOverlay(); updateScaleUI(); save();
@@ -1735,7 +1836,6 @@
     const c = e.target.closest('input[data-g]'); if (!c) return;
     const g = c.dataset.g, on = c.checked;
     toggleFilter(g, c.value, on);
-    /* a section checkbox cascades its value onto all of its events */
     if (g === 'sections') {
       const evs = orderedItems(c.value);
       evs.forEach(nm => toggleFilter('items', nm, on));
@@ -1795,8 +1895,10 @@
     if (b) { pinned = true; showTip(b); }
     else { pinned = false; hideTip(); }
   });
+
+  /* the pane never closes from its own clicks — only from outside, Esc, or scrolling */
   document.addEventListener('click', e => {
-    if (!e.target.closest('.bar')) { pinned = false; hideTip(); }
+    if (!e.target.closest('.bar') && !e.target.closest('#tip')) { pinned = false; hideTip(); }
   });
 
   $('#pane-list').addEventListener('click', e => {
@@ -1812,11 +1914,13 @@
     const s = e.target.closest('[data-sort]');
     if (s && !s.disabled) { state.sort = s.dataset.sort; renderList(); save(); return; }
     const r = e.target.closest('[data-id]');
-    if (r) jumpToEvent(+r.dataset.id);
+    if (r) { pinned = true; showTip(r); }
   });
+  $('#pane-list').addEventListener('scroll', () => { pinned = false; hideTip(); }, true);
 
   function jumpToEvent(id) {
     const ev = events.find(x => x.id === id); if (!ev) return;
+    pinned = false; hideTip();
     setTab('calendar');
     goToDate(ev.start);
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1917,11 +2021,23 @@
     f.text().then(t => applyText(t, f.name, 'session')); e.target.value = '';
   });
   let dragDepth = 0;
-  addEventListener('dragenter', e => { e.preventDefault(); if (++dragDepth === 1) $('#drop').classList.add('on'); });
+  function draggingFiles(e) {
+    return !!(e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files'));
+  }
+  addEventListener('dragenter', e => {
+    e.preventDefault();
+    if (!draggingFiles(e)) return;      /* text drags and the like are ignored — no upload overlay */
+    if (++dragDepth === 1) $('#drop').classList.add('on');
+  });
   addEventListener('dragover', e => e.preventDefault());
-  addEventListener('dragleave', e => { e.preventDefault(); if (--dragDepth <= 0) { dragDepth = 0; $('#drop').classList.remove('on'); } });
+  addEventListener('dragleave', e => {
+    e.preventDefault();
+    if (--dragDepth <= 0) { dragDepth = 0; $('#drop').classList.remove('on'); }
+  });
   addEventListener('drop', e => {
-    e.preventDefault(); dragDepth = 0; $('#drop').classList.remove('on');
+    e.preventDefault();
+    dragDepth = 0; $('#drop').classList.remove('on');
+    if (!draggingFiles(e)) return;
     const f = e.dataTransfer.files[0]; if (f) f.text().then(t => applyText(t, f.name, 'session'));
   });
 
@@ -1962,6 +2078,7 @@
   updateNotice(); updateBadge();
   loadData();
   fetchDefaultTemplate();
+  fetchEventLinks();
 })();
 </script>
 </body>
