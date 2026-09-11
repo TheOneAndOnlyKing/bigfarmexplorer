@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v4 (icons folder, list-tab footer hidden, filter fixes) -->
+<!-- bigfarm calendar — v5 (filter button back on List, sections dropdown in calendar corner) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -101,7 +101,11 @@
   .tl { position: relative; overflow: auto; height: clamp(340px, calc(100vh - 280px), 1000px); }
   .tl-inner { position: relative; }
   .tl-head { position: sticky; top: 0; z-index: 6; display: flex; background: var(--card); border-bottom: 1px solid var(--line); }
-  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: center; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .sectri { display: grid; place-items: center; width: 24px; height: 15px; border-radius: 5px; color: var(--muted); }
+  .sectri:hover { color: var(--ink); background: var(--accent-soft); }
+  .sectri svg { transition: transform .15s; }
+  .sectri.open svg { transform: rotate(180deg); }
   .tl-headcol { position: relative; flex: none; overflow: hidden; }
   .hm-row { position: relative; height: 32px; }
   .hd-row { position: relative; height: 34px; border-top: 1px solid var(--dayline); }
@@ -148,7 +152,9 @@
   .vresize span { width: 48px; height: 5px; border-radius: 3px; background: #3E7FC1; transition: background .15s, width .15s; }
   .vresize:hover span, .vresize.drag span { background: #2A5E97; width: 62px; }
   .card.on-themes .vresize { display: none; }
-  .card.on-list .cardfoot { display: none; }
+  /* on the List tab the footer keeps only the Filters button — the zoom/range
+     controls are Calendar-only, so they're hidden there */
+  .card.on-list .zoomstep, .card.on-list .zoom { display: none; }
 
   .list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 18px; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
   .lh-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
@@ -305,6 +311,14 @@
   .pm:hover { background: var(--accent-soft); color: var(--ink); }
   .pm.on { background: var(--accent); color: var(--on-accent); }
   .poptitle { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 2px 2px 8px; }
+  .pseclist { display: flex; flex-direction: column; min-width: 210px; max-height: 62vh; overflow: auto; }
+  .prow { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 7px; cursor: pointer; }
+  .prow:hover { background: var(--accent-soft); }
+  .prow .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+  .prow .psec { flex: 1; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .prow input { appearance: none; width: 15px; height: 15px; flex: none; border: 1.5px solid var(--muted); border-radius: 4px; display: grid; place-items: center; cursor: pointer; }
+  .prow input:checked { background: var(--accent); border-color: var(--accent); }
+  .prow input:checked::after { content: ""; width: 8px; height: 4px; border-left: 2px solid var(--on-accent); border-bottom: 2px solid var(--on-accent); transform: rotate(-45deg) translate(0, -1px); }
   .swrow { display: flex; flex-wrap: wrap; gap: 6px; max-width: 240px; }
   .swb { width: 26px; height: 26px; border-radius: 8px; border: 1.5px solid transparent; }
   .swb:hover { border-color: var(--ink); }
@@ -762,9 +776,7 @@
       });
   }
 
-  /* ── event icons (icons/<event name>.png, optional per event) ──
-     Each event's base name is probed once; found icons are shown before the
-     event's name on calendar bars and in the list. Missing icons change nothing. */
+  /* ── event icons (icons/<event name>.png, optional per event) ── */
   var iconCache = new Map();
   var iconRerenderTimer = 0;
   function iconURL(base) { return 'icons/' + encodeURIComponent(base) + '.png'; }
@@ -1193,7 +1205,12 @@
 
     tl.innerHTML = '<div class="tl-inner" style="width:' + (LANE_W + chartW) + 'px">' +
       '<div class="tl-head">' +
-        '<div class="tl-corner" style="width:' + LANE_W + 'px">sections</div>' +
+        '<div class="tl-corner" style="width:' + LANE_W + 'px">' +
+          '<span>sections</span>' +
+          '<button id="secTri" class="sectri" title="Choose which sections are shown" aria-label="Choose which sections are shown">' +
+            '<svg width="9" height="7" viewBox="0 0 10 8"><path d="M0 .5h10L5 7.5z" fill="currentColor"/></svg>' +
+          '</button>' +
+        '</div>' +
         '<div class="tl-headcol" style="width:' + chartW + 'px;' + gridBg + '">' +
           '<div class="hm-row">' + monthsHTML + '</div>' +
           (showDays ? '<div class="hd-row">' + daysHTML + '</div>' : '') +
@@ -1663,11 +1680,45 @@
     pop.style.left = x + 'px';
     pop.style.top = y + 'px';
   }
-  function closePop() { pop.style.display = 'none'; popAnchor = null; popHandler = null; }
+  function closePop() {
+    pop.style.display = 'none';
+    if (popAnchor && popAnchor.classList) popAnchor.classList.remove('open');
+    popAnchor = null; popHandler = null;
+  }
   pop.addEventListener('click', function (e) { if (popHandler) popHandler(e); });
   document.addEventListener('mousedown', function (e) {
     if (pop.style.display === 'block' && !pop.contains(e.target) && !(popAnchor && popAnchor.contains(e.target))) closePop();
   });
+
+  /* the little triangle in the calendar's corner: quick section show/hide.
+     Shares the same filter state as the Filters drawer, so both stay in sync. */
+  function openCornerPop() {
+    var btn = $('#secTri');
+    if (pop.style.display === 'block' && popAnchor === btn) { closePop(); return; }
+    var list = sections.map(function (sec) {
+      var on = filtersLive.sec.has(sec);
+      return '<label class="prow"><span class="dot" style="background:' + sectionColor(sec) + '"></span>' +
+        '<span class="psec">' + esc(sec) + '</span>' +
+        '<input type="checkbox" data-csec="' + esc(sec) + '"' + (on ? ' checked' : '') + '></label>';
+    }).join('');
+    openPop(btn, 'visible sections', '<div class="pseclist">' + list + '</div>', function () {});
+    btn.classList.add('open');
+    pop.querySelectorAll('input[data-csec]').forEach(function (cb) {
+      cb.addEventListener('change', function () {
+        var sec = cb.dataset.csec, on = cb.checked;
+        toggleFilter('sections', sec, on);
+        orderedItems(sec).forEach(function (nm) { toggleFilter('items', nm, on); });
+        buildFilterSets(); computeFiltered(); recomputeLanes();
+        updateBadge(); refresh(); updateDrawerFoot(); buildDrawer(); save();
+        /* renderTimeline() recreated the corner button — keep the pop's anchor
+           pointing at the live one so "click again to close" still works */
+        if (popAnchor && popAnchor.id === 'secTri') {
+          popAnchor = $('#secTri');
+          if (popAnchor) popAnchor.classList.add('open');
+        }
+      });
+    });
+  }
 
   function openMonthPop() {
     openPop($('#rangeBtn'), 'jump to month',
@@ -2100,6 +2151,7 @@
       rebuildAfterFilter();
       return;
     }
+    if (e.target.closest('#secTri')) { openCornerPop(); return; }
     var b = e.target.closest('.bar');
     if (b) { pinned = true; showTip(b); }
     else { pinned = false; hideTip(); }
