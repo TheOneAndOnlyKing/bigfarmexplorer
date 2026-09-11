@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v7 (no sample-notice flash while loading; corner label top-aligned, arrow to the right) -->
+<!-- bigfarm calendar — v8 (single-row header: month name replaces weekday letter on the 1st) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -101,18 +101,19 @@
   .tl { position: relative; overflow: auto; height: clamp(340px, calc(100vh - 280px), 1000px); }
   .tl-inner { position: relative; }
   .tl-head { position: sticky; top: 0; z-index: 6; display: flex; background: var(--card); border-bottom: 1px solid var(--line); }
-  /* corner label sits on the months row (top of the header), arrow to its right */
-  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: flex-start; justify-content: center; gap: 6px; padding: 9px 12px 0; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
-  .sectri { display: grid; place-items: center; width: 20px; height: 14px; border-radius: 5px; color: var(--muted); margin-top: -1px; }
+  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .sectri { display: grid; place-items: center; width: 20px; height: 14px; border-radius: 5px; color: var(--muted); }
   .sectri:hover { color: var(--ink); background: var(--accent-soft); }
   .sectri svg { transition: transform .15s; }
   .sectri.open svg { transform: rotate(180deg); }
   .tl-headcol { position: relative; flex: none; overflow: hidden; }
   .hm-row { position: relative; height: 32px; }
-  .hd-row { position: relative; height: 34px; border-top: 1px solid var(--dayline); }
+  .hd-row { position: relative; height: 34px; }
   .hmonth { position: absolute; top: 0; height: 100%; display: flex; align-items: center; padding-left: 8px; border-left: 1px solid var(--line); font-size: 11.5px; font-weight: 600; letter-spacing: .04em; overflow: hidden; white-space: nowrap; }
   .hday { position: absolute; top: 0; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
   .hday i { font-style: normal; font-size: 8.5px; color: var(--muted); }
+  /* the month name that replaces the weekday letter on the 1st */
+  .hday i.mo { color: var(--ink); font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
   .hday b { font-size: 11px; font-weight: 500; }
   .hday.we b, .hday.we i { color: var(--muted); }
   .hday.we { background: var(--wknd); }
@@ -1123,24 +1124,44 @@
     var showDays = dayW >= 16, showWD = dayW >= 24;
     var todayT = todayUTC();
 
+    /* When days are shown the header is a single row of day cells — the weekday
+       letter sits above the number, and on the 1st of a month the month name
+       takes the letter's place. Only on very wide zooms (no day cells) does a
+       separate months-only row appear, like before. */
     var monthsHTML = '';
-    months.forEach(function (mo, i) {
-      var x = Math.round(xOf(mo.t)), w = Math.round(mo.days * dayW);
-      var lb = w > 78 ? M_L[mo.mi] : M_S[mo.mi];
-      if (i === 0 || mo.mi === 0) lb += ' ' + mo.yr;
-      monthsHTML += '<div class="hmonth" style="left:' + x + 'px;width:' + w + 'px">' + lb + '</div>';
-    });
-    if (todayT >= bufStartT && todayT < bufEndT)
-      monthsHTML += '<div class="hflag" style="left:' + Math.round(xOf(todayT)) + 'px">today</div>';
+    if (!showDays) {
+      months.forEach(function (mo, i) {
+        var x = Math.round(xOf(mo.t)), w = Math.round(mo.days * dayW);
+        var lb = w > 78 ? M_L[mo.mi] : M_S[mo.mi];
+        if (i === 0 || mo.mi === 0) lb += ' ' + mo.yr;
+        monthsHTML += '<div class="hmonth" style="left:' + x + 'px;width:' + w + 'px">' + lb + '</div>';
+      });
+      if (todayT >= bufStartT && todayT < bufEndT)
+        monthsHTML += '<div class="hflag" style="left:' + Math.round(xOf(todayT)) + 'px">today</div>';
+    }
 
     var daysHTML = '';
     if (showDays) {
       var wd0 = new Date(bufStartT).getUTCDay();
+      var firstCell = true;
       for (var di = 0; di < totalDays; di++) {
-        var wd = (wd0 + di) % 7, dn = new Date(bufStartT + di * MS).getUTCDate();
-        daysHTML += '<div class="hday' + (wd === 0 || wd === 6 ? ' we' : '') + '" style="left:' + Math.round(di * dayW) + 'px;width:' + Math.ceil(dayW) + 'px">' +
-          (showWD ? '<i>' + WD[wd] + '</i>' : '') + '<b>' + dn + '</b></div>';
+        var ts = bufStartT + di * MS, dd = new Date(ts);
+        var wd = (wd0 + di) % 7, dn = dd.getUTCDate(), we = (wd === 0 || wd === 6) ? ' we' : '';
+        var top;
+        if (dn === 1) {
+          var mi = dd.getUTCMonth(), yr = dd.getUTCFullYear();
+          var ml = dayW >= 32 ? M_L[mi] : M_S[mi];
+          if (mi === 0 || firstCell) ml += ' ' + yr;
+          top = '<i class="mo">' + ml + '</i>';
+        } else {
+          top = showWD ? '<i>' + WD[wd] + '</i>' : '';
+        }
+        daysHTML += '<div class="hday' + we + '" style="left:' + Math.round(di * dayW) + 'px;width:' + Math.ceil(dayW) + 'px">' +
+          top + '<b>' + dn + '</b></div>';
+        firstCell = false;
       }
+      if (todayT >= bufStartT && todayT < bufEndT)
+        daysHTML += '<div class="hflag" style="left:' + Math.round(xOf(todayT)) + 'px">today</div>';
     }
     var gridBg = dayW >= 7
       ? 'background-image:repeating-linear-gradient(90deg,var(--dayline) 0 1px,transparent 1px ' + dayW + 'px);' : '';
@@ -1220,8 +1241,9 @@
           '</button>' +
         '</div>' +
         '<div class="tl-headcol" style="width:' + chartW + 'px;' + gridBg + '">' +
-          '<div class="hm-row">' + monthsHTML + '</div>' +
-          (showDays ? '<div class="hd-row">' + daysHTML + '</div>' : '') +
+          (showDays
+            ? '<div class="hd-row">' + daysHTML + '</div>'
+            : '<div class="hm-row">' + monthsHTML + '</div>') +
         '</div>' +
       '</div>' +
       '<div class="tl-lanewrap">' +
