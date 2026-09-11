@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v11 (themes text trimmed; bare lane counts; lanes ordered by Themes-tab event order) -->
+<!-- bigfarm calendar — v12 (working "Jump to nearest event"; overlay no longer dims lanes/labels) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -146,11 +146,13 @@
   .flb { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-style: normal; font-family: var(--f-mono); font-size: 8px; font-weight: 700; letter-spacing: .08em; background: var(--accent); color: var(--on-accent); border-radius: 3px; padding: 1px 3px; pointer-events: none; }
   @keyframes flash { 0%, 100% { box-shadow: none; } 15%, 45%, 75% { box-shadow: 0 0 0 3px var(--accent); } 30%, 60% { box-shadow: 0 0 0 3px transparent; } }
   .bar.flash { animation: flash 1.4s ease; }
-  .tl-empty { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; background: var(--card); background: color-mix(in srgb, var(--card) 86%, transparent); pointer-events: none; }
+  /* the "nothing here" overlay: fully transparent, and offset past the section
+     labels, so lanes, labels and dividing lines all stay fully visible */
+  .tl-empty { position: absolute; top: 0; right: 0; bottom: 0; left: 172px; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; pointer-events: none; }
   .tl-empty[hidden] { display: none; }
-  .tl-empty p { text-align: center; padding: 0 20px; }
+  .tl-empty p { text-align: center; padding: 8px 16px; margin: 0 20px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
   .tl-empty-btns { display: flex; gap: 8px; }
-  .tl-empty .mini { pointer-events: auto; font-style: normal; }
+  .tl-empty .mini { pointer-events: auto; font-style: normal; background: var(--card); }
   .mini { padding: 6px 13px; border: 1px solid var(--line); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
   .mini:hover { color: var(--accent); border-color: var(--accent); }
   .mini:disabled { opacity: .45; cursor: default; }
@@ -365,6 +367,7 @@
     .toolbar { grid-template-columns: auto 1fr; row-gap: 8px; }
     .tb-side.r { display: none; }
     #calCenter { width: auto; }   /* narrow screens: let the selector shrink again */
+    .tl-empty { left: 120px; }    /* narrower label column on small screens */
     .lrow { grid-template-columns: 14px 1fr 44px; }
     .ls, .ld { display: none; }
     .dgrid { grid-template-columns: 1fr; }
@@ -1297,7 +1300,7 @@
     el.hidden = any;
     if (!any) {
       el.innerHTML = '<p>Nothing on the calendar here — keep scrolling, or…</p><div class="tl-empty-btns">' +
-        (filtered.length ? '<button class="mini" id="jumpFirst">Jump to first event</button>' : '') +
+        (filtered.length ? '<button class="mini" id="jumpNear">Jump to nearest event</button>' : '') +
         (offCount() ? '<button class="mini" id="clearF">Clear filters</button>' : '') + '</div>';
     }
   }
@@ -2209,20 +2212,34 @@
   }, { passive: true });
 
   tl.addEventListener('click', function (e) {
-    if (e.target.closest('#jumpFirst')) {
-      var ev = filtered.slice().sort(function (a, b) { return a.start - b.start; })[0];
+    if (e.target.closest('#secTri')) { openCornerPop(); return; }
+    var b = e.target.closest('.bar');
+    if (b) { pinned = true; showTip(b); }
+    else { pinned = false; hideTip(); }
+  });
+
+  /* the "nothing here" overlay sits BESIDE #tl in the DOM, so clicks on its
+     buttons never bubble through #tl — they must be handled here */
+  function nearestEvent() {
+    var vr = visibleRange();
+    var best = null, bestD = Infinity;
+    filtered.forEach(function (ev) {
+      if (state.hiddenSecs.indexOf(ev.section) >= 0) return;
+      var d = ev.end < vr[0] ? vr[0] - ev.end : (ev.start >= vr[1] ? ev.start - vr[1] : 0);
+      if (d < bestD) { bestD = d; best = ev; }
+    });
+    return best;
+  }
+  $('#tlEmpty').addEventListener('click', function (e) {
+    if (e.target.closest('#jumpNear')) {
+      var ev = nearestEvent();
       if (ev) goToDate(ev.start);
       return;
     }
     if (e.target.closest('#clearF')) {
       state.filters = { sections: [], items: [], years: [] };
       rebuildAfterFilter();
-      return;
     }
-    if (e.target.closest('#secTri')) { openCornerPop(); return; }
-    var b = e.target.closest('.bar');
-    if (b) { pinned = true; showTip(b); }
-    else { pinned = false; hideTip(); }
   });
 
   /* the pane never closes from its own clicks — only outside clicks, Esc, or scrolling */
