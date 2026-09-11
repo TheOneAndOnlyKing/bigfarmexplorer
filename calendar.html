@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v9 (year on the 1st only when the cell fits it; Today centers the day) -->
+<!-- bigfarm calendar — v10 (stable nav arrows; day-snapped scroll position fixes double-press months) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -82,6 +82,10 @@
   .tb-side.r { justify-content: flex-end; }
   .tb-center { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .tb-mid { display: flex; align-items: center; gap: 8px; }
+  /* fixed-width center block: the arrows sit outside it, so no matter how the
+     month/year labels change ("September" vs "Sep – Feb", 1Y hiding the month
+     button, …) the arrows never shift — the contents just recenter */
+  #calCenter { width: 340px; justify-content: center; }
   .ghostbtn { padding: 6px 12px; border: 1px solid var(--line); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
   .ghostbtn:hover { color: var(--ink); border-color: var(--line2); }
   .ghostbtn.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
@@ -359,6 +363,7 @@
     .wrap { padding: 14px 12px 30px; }
     .toolbar { grid-template-columns: auto 1fr; row-gap: 8px; }
     .tb-side.r { display: none; }
+    #calCenter { width: auto; }   /* narrow screens: let the selector shrink again */
     .lrow { grid-template-columns: 14px 1fr 44px; }
     .ls, .ld { display: none; }
     .dgrid { grid-template-columns: 1fr; }
@@ -1020,8 +1025,12 @@
     var avail = Math.max(tl.clientWidth - laneW(), 120);
     dayW = Math.max(avail / zoomDays(state.zoom) * state.scale, MINW[state.zoom]);
   }
+  /* the scroll position is day-snapped: browsers report scrollLeft in whole
+     pixels, so without this rounding the derived date could sit a fraction of
+     a day before a month boundary — which made some months need two presses
+     of the arrow (the "shiver") before the label caught up */
   function dateAtLeft() { return bufStartT + Math.round(savedScroll / dayW) * MS; }
- function chartViewMs() { return (Math.max(tl.clientWidth - laneW(), 0) / dayW) * MS; }
+  function chartViewMs() { return (Math.max(tl.clientWidth - laneW(), 0) / dayW) * MS; }
   function visibleRange() { var a = dateAtLeft(); return [a, a + chartViewMs()]; }
   function deriveAnchor() {
     var t = Math.min(Math.max(dateAtLeft(), bufStartT), bufEndT - 1);
