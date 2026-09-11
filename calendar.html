@@ -1020,8 +1020,8 @@
     var avail = Math.max(tl.clientWidth - laneW(), 120);
     dayW = Math.max(avail / zoomDays(state.zoom) * state.scale, MINW[state.zoom]);
   }
-  function dateAtLeft() { return bufStartT + (savedScroll / dayW) * MS; }
-  function chartViewMs() { return (Math.max(tl.clientWidth - laneW(), 0) / dayW) * MS; }
+  function dateAtLeft() { return bufStartT + Math.round(savedScroll / dayW) * MS; }
+ function chartViewMs() { return (Math.max(tl.clientWidth - laneW(), 0) / dayW) * MS; }
   function visibleRange() { var a = dateAtLeft(); return [a, a + chartViewMs()]; }
   function deriveAnchor() {
     var t = Math.min(Math.max(dateAtLeft(), bufStartT), bufEndT - 1);
