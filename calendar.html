@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v12 (working "Jump to nearest event"; overlay no longer dims lanes/labels) -->
+<!-- bigfarm calendar — v13 (dark default; Today line/pill centred on the current day) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -121,7 +121,7 @@
   .hday b { font-size: 11px; font-weight: 500; }
   .hday.we b, .hday.we i { color: var(--muted); }
   .hday.we { background: var(--wknd); }
-  .hflag { position: absolute; top: 4px; transform: translateX(-50%); z-index: 2; background: var(--accent); color: var(--on-accent); font-family: var(--f-mono); font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase; padding: 1px 6px; border-radius: 99px; }
+  .hflag { position: absolute; top: 4px; transform: translateX(-50%); z-index: 2; background: var(--accent); color: var(--on-accent); font-family: var(--f-mono); font-size: 8.5px; letter-spacing: .1em; padding: 1px 6px; border-radius: 99px; }
   .tl-lanewrap { position: relative; }
   .tl-grid { position: absolute; top: 0; bottom: 0; pointer-events: none; z-index: 0; }
   .gmonth { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
@@ -1157,6 +1157,10 @@
     }
     var showDays = dayW >= 16, showWD = dayW >= 24;
     var todayT = todayUTC();
+    /* the Today marker is centred on the day: half a day-cell right of its
+       left edge (minus half the 2px line width) */
+    var todayX = Math.round(xOf(todayT) + dayW / 2 - 1);
+    var todayFlagX = Math.round(xOf(todayT) + dayW / 2);
 
     /* When days are shown the header is a single row of day cells — the weekday
        letter sits above the number, and on the 1st of a month the month name
@@ -1172,7 +1176,7 @@
         monthsHTML += '<div class="hmonth" style="left:' + x + 'px;width:' + w + 'px">' + lb + '</div>';
       });
       if (todayT >= bufStartT && todayT < bufEndT)
-        monthsHTML += '<div class="hflag" style="left:' + Math.round(xOf(todayT)) + 'px">today</div>';
+        monthsHTML += '<div class="hflag" style="left:' + todayFlagX + 'px">Today</div>';
     }
 
     var daysHTML = '';
@@ -1198,7 +1202,7 @@
         firstCell = false;
       }
       if (todayT >= bufStartT && todayT < bufEndT)
-        daysHTML += '<div class="hflag" style="left:' + Math.round(xOf(todayT)) + 'px">today</div>';
+        daysHTML += '<div class="hflag" style="left:' + todayFlagX + 'px">Today</div>';
     }
     var gridBg = dayW >= 7
       ? 'background-image:repeating-linear-gradient(90deg,var(--dayline) 0 1px,transparent 1px ' + dayW + 'px);' : '';
@@ -1212,7 +1216,7 @@
       for (; di2 < totalDays; di2 += 7) grid += '<div class="gwkd" style="left:' + Math.round(di2 * dayW) + 'px;width:' + dayW * 2 + 'px"></div>';
     }
     if (todayT >= bufStartT && todayT < bufEndT)
-      grid += '<div class="gtoday" style="left:' + Math.round(xOf(todayT)) + 'px"></div>';
+      grid += '<div class="gtoday" style="left:' + todayX + 'px"></div>';
 
     var flOn = state.showFL;
     var half = dayW / 2;
