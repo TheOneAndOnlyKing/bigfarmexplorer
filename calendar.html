@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v5 (filter button back on List, sections dropdown in calendar corner) -->
+<!-- bigfarm calendar — v6 (sections dropdown = calendar-lane visibility only, decoupled from filters) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -604,7 +604,8 @@
     drawerW: null, vHeight: null,
     colors: { sections: {}, events: {}, secOverride: {} },
     loadouts: {}, lastLoadout: '',
-    filters: { sections: [], items: [], years: [] }
+    filters: { sections: [], items: [], years: [] },
+    hiddenSecs: []   /* calendar-only lane visibility; NOT a filter — list & drawer unaffected */
   };
   var events = [], sections = [], items = [], years = [];
   var filtered = [], source = 'sample', fileName = '', dataLoaded = false;
@@ -629,7 +630,7 @@
       listFrom: state.listFrom, listTo: state.listTo,
       drawerW: state.drawerW, vHeight: state.vHeight,
       colors: state.colors, loadouts: state.loadouts, lastLoadout: state.lastLoadout,
-      filters: state.filters
+      filters: state.filters, hiddenSecs: state.hiddenSecs
     })); } catch (e) {}
   }
   function normVal(v) {
@@ -685,6 +686,7 @@
       }
       if (typeof s.lastLoadout === 'string' && state.loadouts[s.lastLoadout]) state.lastLoadout = s.lastLoadout;
       if (s.filters) state.filters = s.filters;
+      if (Array.isArray(s.hiddenSecs)) state.hiddenSecs = s.hiddenSecs.filter(function (x) { return typeof x === 'string'; });
     } catch (e) {}
   }
 
@@ -1157,6 +1159,9 @@
     var minBar = Math.max(2, Math.min(dayW * 0.4, 10));
     var lanesHTML = '';
     sections.forEach(function (sec) {
+      /* hidden via the corner triangle: the whole lane is skipped on the calendar.
+         This is display-only — filters, the drawer and the list view are untouched. */
+      if (state.hiddenSecs.indexOf(sec) >= 0) return;
       var rows = laneRows.get(sec) || [];
       var nRows = Math.max(rows.length, 1);
       var total = secCounts.get(sec) || 0;
@@ -1207,7 +1212,7 @@
       '<div class="tl-head">' +
         '<div class="tl-corner" style="width:' + LANE_W + 'px">' +
           '<span>sections</span>' +
-          '<button id="secTri" class="sectri" title="Choose which sections are shown" aria-label="Choose which sections are shown">' +
+          '<button id="secTri" class="sectri" title="Show or hide section lanes on the calendar (display only)" aria-label="Show or hide section lanes on the calendar">' +
             '<svg width="9" height="7" viewBox="0 0 10 8"><path d="M0 .5h10L5 7.5z" fill="currentColor"/></svg>' +
           '</button>' +
         '</div>' +
@@ -1230,7 +1235,7 @@
     if (!dataLoaded) { el.hidden = false; el.innerHTML = '<p>loading events…</p>'; return; }
     if (!events.length) { el.hidden = false; el.innerHTML = '<p>No events loaded.</p>'; return; }
     var vr = visibleRange();
-    var any = filtered.some(function (ev) { return ev.end >= vr[0] && ev.start < vr[1]; });
+    var any = filtered.some(function (ev) { return ev.end >= vr[0] && ev.start < vr[1] && state.hiddenSecs.indexOf(ev.section) < 0; });
     el.hidden = any;
     if (!any) {
       el.innerHTML = '<p>Nothing on the calendar here — keep scrolling, or…</p><div class="tl-empty-btns">' +
@@ -1690,28 +1695,30 @@
     if (pop.style.display === 'block' && !pop.contains(e.target) && !(popAnchor && popAnchor.contains(e.target))) closePop();
   });
 
-  /* the little triangle in the calendar's corner: quick section show/hide.
-     Shares the same filter state as the Filters drawer, so both stay in sync. */
+  /* the little triangle in the calendar's corner: lane visibility only.
+     Hidden lanes simply don't render — filters, the drawer, and the list view
+     are completely unaffected. */
   function openCornerPop() {
     var btn = $('#secTri');
     if (pop.style.display === 'block' && popAnchor === btn) { closePop(); return; }
     var list = sections.map(function (sec) {
-      var on = filtersLive.sec.has(sec);
+      var shown = state.hiddenSecs.indexOf(sec) < 0;
       return '<label class="prow"><span class="dot" style="background:' + sectionColor(sec) + '"></span>' +
         '<span class="psec">' + esc(sec) + '</span>' +
-        '<input type="checkbox" data-csec="' + esc(sec) + '"' + (on ? ' checked' : '') + '></label>';
+        '<input type="checkbox" data-hsec="' + esc(sec) + '"' + (shown ? ' checked' : '') + '></label>';
     }).join('');
-    openPop(btn, 'visible sections', '<div class="pseclist">' + list + '</div>', function () {});
+    openPop(btn, 'calendar lanes', '<div class="pseclist">' + list + '</div>', function () {});
     btn.classList.add('open');
-    pop.querySelectorAll('input[data-csec]').forEach(function (cb) {
+    pop.querySelectorAll('input[data-hsec]').forEach(function (cb) {
       cb.addEventListener('change', function () {
-        var sec = cb.dataset.csec, on = cb.checked;
-        toggleFilter('sections', sec, on);
-        orderedItems(sec).forEach(function (nm) { toggleFilter('items', nm, on); });
-        buildFilterSets(); computeFiltered(); recomputeLanes();
-        updateBadge(); refresh(); updateDrawerFoot(); buildDrawer(); save();
-        /* renderTimeline() recreated the corner button — keep the pop's anchor
-           pointing at the live one so "click again to close" still works */
+        var sec = cb.dataset.hsec;
+        var i = state.hiddenSecs.indexOf(sec);
+        if (cb.checked && i >= 0) state.hiddenSecs.splice(i, 1);
+        if (!cb.checked && i < 0) state.hiddenSecs.push(sec);
+        /* re-render only the calendar; the pop stays open on the new corner button */
+        renderTimeline();
+        updateEmptyOverlay();
+        save();
         if (popAnchor && popAnchor.id === 'secTri') {
           popAnchor = $('#secTri');
           if (popAnchor) popAnchor.classList.add('open');
