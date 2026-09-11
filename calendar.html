@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v8 (single-row header: month name replaces weekday letter on the 1st) -->
+<!-- bigfarm calendar — v9 (year on the 1st only when the cell fits it; Today centers the day) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1126,8 +1126,9 @@
 
     /* When days are shown the header is a single row of day cells — the weekday
        letter sits above the number, and on the 1st of a month the month name
-       takes the letter's place. Only on very wide zooms (no day cells) does a
-       separate months-only row appear, like before. */
+       takes the letter's place. The year is only included when the cell is wide
+       enough to hold it without spilling. On very wide zooms (no day cells) a
+       separate months-only row appears, like before. */
     var monthsHTML = '';
     if (!showDays) {
       months.forEach(function (mo, i) {
@@ -1150,8 +1151,10 @@
         var top;
         if (dn === 1) {
           var mi = dd.getUTCMonth(), yr = dd.getUTCFullYear();
-          var ml = dayW >= 32 ? M_L[mi] : M_S[mi];
-          if (mi === 0 || firstCell) ml += ' ' + yr;
+          var wantYr = (mi === 0 || firstCell);
+          var ml = wantYr && dayW >= 78 ? M_L[mi] + ' ' + yr
+                 : wantYr && dayW >= 52 ? M_S[mi] + ' ' + yr
+                 : (dayW >= 32 ? M_L[mi] : M_S[mi]);
           top = '<i class="mo">' + ml + '</i>';
         } else {
           top = showWD ? '<i>' + WD[wd] + '</i>' : '';
@@ -1310,14 +1313,19 @@
     clearTimeout(anchorSaveTimer);
     anchorSaveTimer = setTimeout(save, 500);
   }
-  function goToDate(t) {
+  /* goToDate(t, center): places t at the left edge by default; with center=true
+     the day t lands in the middle of the chart instead (used by the Today button) */
+  function goToDate(t, center) {
     var viewMs = Math.max(chartViewMs(), zoomDays(7) * dayW * MS);
     var marginMs = (state.zoom === 7 ? 1 : 2.5) * 30.4375 * MS;
+    var lo = center ? t - viewMs / 2 : t;
+    var hi = center ? t + viewMs / 2 : t + viewMs;
     var delta = 0, changed = false;
-    while (bufStartT > t - marginMs) { var old = bufStartT; bufStartT = monthAddT(bufStartT, -bufMonths()); delta += (old - bufStartT) / MS * dayW; changed = true; }
-    while (bufEndT < t + viewMs + marginMs) { bufEndT = monthAddT(bufEndT, bufMonths()); changed = true; }
+    while (bufStartT > lo - marginMs) { var old = bufStartT; bufStartT = monthAddT(bufStartT, -bufMonths()); delta += (old - bufStartT) / MS * dayW; changed = true; }
+    while (bufEndT < hi + marginMs) { bufEndT = monthAddT(bufEndT, bufMonths()); changed = true; }
     if (changed) { savedScroll += delta; renderTimeline(); }
-    var x = Math.max(0, (t - bufStartT) / MS * dayW);
+    var halfPx = center ? Math.max(tl.clientWidth - laneW(), 0) / 2 : 0;
+    var x = Math.max(0, (t - bufStartT) / MS * dayW - halfPx);
     savedScroll = x;
     tl.scrollLeft = x;
     maybeTrim();
@@ -2036,7 +2044,7 @@
       save(); renderToolbar(); renderList();
       return;
     }
-    goToDate(todayUTC());
+    goToDate(todayUTC(), true);   /* center the current day in the view */
   });
   $('#rangeBtn').addEventListener('click', openMonthPop);
   $('#yearBtn').addEventListener('click', openYearPop);
