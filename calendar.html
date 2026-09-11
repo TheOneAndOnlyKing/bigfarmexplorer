@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v10 (stable nav arrows; day-snapped scroll position fixes double-press months) -->
+<!-- bigfarm calendar — v11 (themes text trimmed; bare lane counts; lanes ordered by Themes-tab event order) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -129,12 +129,13 @@
   .gtoday { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); }
   .lane { display: flex; position: relative; z-index: 1; border-bottom: 1px solid var(--dayline); }
   .lane:last-child { border-bottom: none; }
-  .lane-label { position: sticky; left: 0; z-index: 3; flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--card); border-right: 1px solid var(--line); }
+  .lane-label { position: sticky; left: 0; z-index: 3; flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; background: var(--card); border-right: 1px solid var(--line); }
   .lane-label .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
   .capdot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
   .ltxt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
   .ltxt b { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .ltxt small { font-family: var(--f-mono); font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+  /* the bare event count, hugging the divider, vertically centred */
+  .lcount { margin-left: auto; flex: none; font-family: var(--f-mono); font-size: 10px; color: var(--muted); }
   .lane-chart { position: relative; flex: none; overflow: hidden; }
   .bar { position: absolute; border-radius: 6px; overflow: hidden; display: flex; align-items: center; padding: 0 8px; cursor: pointer; font-size: 10.5px; font-weight: 500; letter-spacing: .01em; transition: box-shadow .15s, filter .15s, opacity .2s; }
   .bar:hover { filter: brightness(1.06) saturate(1.05); box-shadow: 0 0 0 1.5px var(--card), 0 0 0 3px var(--accent); }
@@ -939,11 +940,12 @@
   }
   function isFL(e) { return e.fl || e.flInferred; }
 
-  /* ── packing (noon-to-noon bars) ── */
-  function orderOf(e) {
-    var rec = EV_SEC.get(e.base);
-    return rec ? rec.idx : 1000 + e.base.charCodeAt(0);
-  }
+  /* ── packing ──
+     Lanes follow the Themes-tab order of a section's events. Event types are
+     placed highest-listed first; an event always lands BELOW every overlapping
+     event listed above it (no matter which starts first), and an event that
+     overlaps nothing takes the top lane. Touching runs (end == start) share a
+     lane, as before. */
   function recomputeLanes() {
     laneRows = new Map(); secCounts = new Map(); capWarns = new Set();
     var bySec = new Map();
@@ -955,20 +957,40 @@
     var order = known.filter(function (n) { return bySec.has(n); })
       .concat([...bySec.keys()].filter(function (n) { return known.indexOf(n) < 0; }).sort());
     order.forEach(function (sec) {
-      var evs = bySec.get(sec).slice().sort(function (a, b) {
-        return a.start - b.start || orderOf(a) - orderOf(b) || a.id - b.id;
-      });
+      var evs = bySec.get(sec).slice();
       secCounts.set(sec, evs.length);
+      var ord = orderedItems(sec);
+      var prio = new Map();
+      ord.forEach(function (nm, i) { prio.set(nm, i); });
+      evs.sort(function (a, b) {
+        var pa = prio.has(a.base) ? prio.get(a.base) : ord.length;
+        var pb = prio.has(b.base) ? prio.get(b.base) : ord.length;
+        return pa - pb || a.start - b.start || a.id - b.id;
+      });
       var rows = [];
       evs.forEach(function (ev) {
         ev.row = 0; ev.seamL = false; ev.seamR = false;
-        var r = -1;
+        /* lowest row forced by overlapping runs already placed (they are all
+           listed at or above this event, so it must sit below them) */
+        var minRow = 0;
         for (var i = 0; i < rows.length; i++) {
-          if (ev.start >= rows[i].lastEnd) { r = i; break; }
+          for (var j = 0; j < rows[i].evs.length; j++) {
+            var o = rows[i].evs[j];
+            if (o.start < ev.end && ev.start < o.end) { if (i + 1 > minRow) minRow = i + 1; break; }
+          }
         }
-        if (r < 0) { r = rows.length; rows.push({ lastEnd: -Infinity, evs: [] }); }
+        /* first free row at or below that floor */
+        var r = -1;
+        for (var i2 = minRow; i2 < rows.length; i2++) {
+          var free = true;
+          for (var j2 = 0; j2 < rows[i2].evs.length; j2++) {
+            var o2 = rows[i2].evs[j2];
+            if (o2.start < ev.end && ev.start < o2.end) { free = false; break; }
+          }
+          if (free) { r = i2; break; }
+        }
+        if (r < 0) { r = rows.length; rows.push({ evs: [] }); }
         rows[r].evs.push(ev);
-        rows[r].lastEnd = ev.end;
         ev.row = r;
       });
       rows.forEach(function (row) {
@@ -1236,9 +1258,8 @@
       lanesHTML += '<div class="lane">' +
         '<div class="lane-label" style="width:' + LANE_W + 'px">' +
           '<span class="dot" style="background:' + sectionColor(sec) + '"></span>' + capFlag +
-          '<span class="ltxt"><b>' + esc(sec) + '</b><small>' + (total
-            ? total + ' event' + (total > 1 ? 's' : '')
-            : 'hidden') + '</small></span>' +
+          '<span class="ltxt"><b>' + esc(sec) + '</b></span>' +
+          '<span class="lcount">' + total + '</span>' +
         '</div>' +
         '<div class="lane-chart" style="width:' + chartW + 'px;height:' + nRows * rowH + 'px">' + barsHTML + '</div>' +
       '</div>';
@@ -1480,7 +1501,7 @@
     }).join('');
 
     $('#pane-themes').innerHTML = '<div class="settings">' +
-      '<div class="set-group"><h3>Font <span class="h-note">applies to the whole page, remembered</span></h3>' +
+      '<div class="set-group"><h3>Font</h3>' +
         '<div class="fontopts">' + fonts.map(function (f) {
           return '<button class="fontopt' + (state.font === f[0] ? ' on' : '') + '" data-font="' + f[0] + '">' +
             '<span class="fprev" style="font-family:var(--f-' + f[0] + ')">' + f[1] + '</span>' +
@@ -1498,9 +1519,7 @@
           '<label class="sw"><input type="checkbox" id="flSw"' + (state.showFL ? ' checked' : '') + '><i></i></label></div>' +
       '</div>' +
       '<div class="set-group">' +
-        '<h3>Colours <span class="h-note">defaults are per-event, grouped by section</span>' +
-          '<button class="mini2" id="resetColours" style="margin-left:auto" title="Return to the Default layout">Reset colours</button></h3>' +
-        '<p class="dhint" style="margin:0 0 10px">Default template — ' + (defaultFound ? 'loaded from ' + esc(TEMPLATE_FILE) : 'not found; add ' + esc(TEMPLATE_FILE) + ' to this folder anytime') + '.</p>' +
+        '<h3>Colours <button class="mini2" id="resetColours" style="margin-left:auto" title="Return to the Default layout">Reset colours</button></h3>' +
         '<div class="lorow">' +
           '<select class="loselect" id="loSelect"' + (loNames.length ? '' : ' disabled') + '>' +
             (loNames.length
