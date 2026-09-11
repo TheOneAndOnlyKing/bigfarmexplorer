@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v6 (sections dropdown = calendar-lane visibility only, decoupled from filters) -->
+<!-- bigfarm calendar — v7 (no sample-notice flash while loading; corner label top-aligned, arrow to the right) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -101,7 +101,9 @@
   .tl { position: relative; overflow: auto; height: clamp(340px, calc(100vh - 280px), 1000px); }
   .tl-inner { position: relative; }
   .tl-head { position: sticky; top: 0; z-index: 6; display: flex; background: var(--card); border-bottom: 1px solid var(--line); }
-  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }  .sectri { display: grid; place-items: center; width: 24px; height: 15px; border-radius: 5px; color: var(--muted); }
+  /* corner label sits on the months row (top of the header), arrow to its right */
+  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: flex-start; justify-content: center; gap: 6px; padding: 9px 12px 0; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .sectri { display: grid; place-items: center; width: 20px; height: 14px; border-radius: 5px; color: var(--muted); margin-top: -1px; }
   .sectri:hover { color: var(--ink); background: var(--accent-soft); }
   .sectri svg { transition: transform .15s; }
   .sectri.open svg { transform: rotate(180deg); }
@@ -1095,7 +1097,9 @@
   }
   function updateNotice() {
     var slot = $('#noticeSlot');
-    if (source !== 'sample' || noticeDismissed) { slot.innerHTML = ''; return; }
+    /* only mention the sample data once loading has actually finished —
+       never as a flash while the real file is still being fetched */
+    if (!dataLoaded || source !== 'sample' || noticeDismissed) { slot.innerHTML = ''; return; }
     slot.innerHTML = '<div class="notice">' +
       '<span>Showing <b>sample data</b>. Save your events as <b>Events Machine.txt</b> (or events.jsonl) in this folder — or ' +
       '<button class="mini" id="noticeLoad">load a file now</button>.</span>' +
