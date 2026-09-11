@@ -1,1 +1,245 @@
-
+{
+  "format": "bigfarm-colours",
+  "version": 1,
+  "exported": "2026-09-11T01:46:03.357Z",
+  "current": {
+    "sections": {
+      "Weekly events": {
+        "t": "h",
+        "v": "#dd562c"
+      },
+      "Monthly events": {
+        "t": "p",
+        "i": 5
+      },
+      "Seasons": {
+        "t": "h",
+        "v": "#793cc3"
+      },
+      "Temporary farms": {
+        "t": "h",
+        "v": "#df689b"
+      },
+      "Search events": {
+        "t": "p",
+        "i": 1
+      },
+      "Yearly events": {
+        "t": "h",
+        "v": "#3cc389"
+      },
+      "Minor events": {
+        "t": "h",
+        "v": "#c3b83c"
+      }
+    },
+    "events": {
+      "Hard Worker Event": {
+        "t": "h",
+        "v": "#d5b339"
+      },
+      "Fishing Hard Worker Event": {
+        "t": "h",
+        "v": "#5166d2"
+      },
+      "Cooperative Hard Worker Event": {
+        "t": "p",
+        "i": 2
+      },
+      "Village Fair": {
+        "t": "h",
+        "v": "#8f53ea"
+      },
+      "Cooperative Championship": {
+        "t": "p",
+        "i": 0
+      },
+      "Cruise Ship": {
+        "t": "h",
+        "v": "#1e87c8"
+      },
+      "Goldfish Rescue": {
+        "t": "p",
+        "i": 3
+      },
+      "Pleasure Park": {
+        "t": "p",
+        "i": 6
+      },
+      "Urgent Delivery": {
+        "t": "p",
+        "i": 7
+      },
+      "Shinkei-Suijaku": {
+        "t": "h",
+        "v": "#c28370"
+      },
+      "Greta's Dream World": {
+        "t": "h",
+        "v": "#a83b1a"
+      },
+      "Tessa's Dream World": {
+        "t": "h",
+        "v": "#5c6dc1"
+      },
+      "Tessa's Dream World (Missions)": {
+        "t": "h",
+        "v": "#65bb63"
+      },
+      "Farmer's League": {
+        "t": "h",
+        "v": "#61a866"
+      },
+      "Worldwide Championship": {
+        "t": "h",
+        "v": "#d6ad3d"
+      },
+      "Spring Season": {
+        "t": "h",
+        "v": "#2b9132"
+      },
+      "Summer Season": {
+        "t": "h",
+        "v": "#aab332"
+      },
+      "Autumn Season": {
+        "t": "h",
+        "v": "#a84729"
+      },
+      "Winter Season": {
+        "t": "h",
+        "v": "#2d62cd"
+      },
+      "Christmas Season": {
+        "t": "h",
+        "v": "#b93131"
+      },
+      "Festive Farm": {
+        "t": "h",
+        "v": "#1a57d1"
+      },
+      "Northern Lights Farm": {
+        "t": "h",
+        "v": "#27c8d3"
+      },
+      "Viking Farm": {
+        "t": "h",
+        "v": "#257dc1"
+      },
+      "Tropical Farm": {
+        "t": "h",
+        "v": "#d6b53d"
+      },
+      "Candy Farm": {
+        "t": "h",
+        "v": "#c931a8"
+      },
+      "Candy Search": {
+        "t": "h",
+        "v": "#97266d"
+      },
+      "Mushroom Search Event": {
+        "t": "h",
+        "v": "#8d4934"
+      },
+      "Valentine's Search Event": {
+        "t": "h",
+        "v": "#df43c3"
+      },
+      "Easter Egg Hunt": {
+        "t": "h",
+        "v": "#329538"
+      },
+      "Summer Time Search Event": {
+        "t": "h",
+        "v": "#cec92c"
+      },
+      "Halloween Search Event": {
+        "t": "h",
+        "v": "#c75d3d"
+      },
+      "Winter Search Event": {
+        "t": "h",
+        "v": "#4038b2"
+      },
+      "Global Point Event": {
+        "t": "h",
+        "v": "#43ad5d"
+      },
+      "Chinese New Year": {
+        "t": "h",
+        "v": "#af3c42"
+      },
+      "Saint Patrick's Day": {
+        "t": "h",
+        "v": "#33e636"
+      },
+      "Golden Week Event": {
+        "t": "h",
+        "v": "#c9d33c"
+      },
+      "Oktoberfest": {
+        "t": "h",
+        "v": "#ce5d3b"
+      },
+      "Santa's Workshop": {
+        "t": "h",
+        "v": "#3b56c4"
+      },
+      "Advent Calendar": {
+        "t": "h",
+        "v": "#32b2d2"
+      },
+      "Big Farm Anniversary Event": {
+        "t": "h",
+        "v": "#863cc3"
+      },
+      "Football Fever": {
+        "t": "h",
+        "v": "#339935"
+      },
+      "A Hint of Hawaii": {
+        "t": "h",
+        "v": "#d2e01a"
+      },
+      "Here's to Nature": {
+        "t": "h",
+        "v": "#258b1d"
+      },
+      "Not of this World": {
+        "t": "h",
+        "v": "#3c8cd7"
+      },
+      "Mysterious Asia": {
+        "t": "h",
+        "v": "#c24242"
+      },
+      "Culinary Campaign": {
+        "t": "h",
+        "v": "#52a761"
+      },
+      "Three Weddings and a Rigmarole": {
+        "t": "h",
+        "v": "#c33c92"
+      },
+      "A Hero for Piggles": {
+        "t": "h",
+        "v": "#3c8fc3"
+      },
+      "My bees are gone!": {
+        "t": "h",
+        "v": "#b7c035"
+      },
+      "Fortune Teller": {
+        "t": "h",
+        "v": "#c03535"
+      },
+      "Landscape Architect": {
+        "t": "h",
+        "v": "#6027b4"
+      }
+    },
+    "secOverride": {}
+  },
+  "loadouts": {}
+}
