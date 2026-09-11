@@ -101,8 +101,7 @@
   .tl { position: relative; overflow: auto; height: clamp(340px, calc(100vh - 280px), 1000px); }
   .tl-inner { position: relative; }
   .tl-head { position: sticky; top: 0; z-index: 6; display: flex; background: var(--card); border-bottom: 1px solid var(--line); }
-  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
-  .sectri { display: grid; place-items: center; width: 24px; height: 15px; border-radius: 5px; color: var(--muted); }
+  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }  .sectri { display: grid; place-items: center; width: 24px; height: 15px; border-radius: 5px; color: var(--muted); }
   .sectri:hover { color: var(--ink); background: var(--accent-soft); }
   .sectri svg { transition: transform .15s; }
   .sectri.open svg { transform: rotate(180deg); }
