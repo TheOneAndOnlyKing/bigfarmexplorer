@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- bigfarm calendar — v13 -->
+<!-- bigfarm calendar — v14 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1248,13 +1248,13 @@
           var inLbl = '', outLbl = '';
           if (state.labels) {
             if (w >= 40) {
-              inLbl = '<span class="bl" style="color:' + textColorFor(col) + '">' + iconHTML(ev.base) + esc(ev.name) + (ev.fl ? ' - FL' : '') + '</span>';
+              inLbl = '<span class="bl" style="color:' + textColorFor(col) + '">' + iconHTML(ev.base) + esc(ev.name) + '</span>';
             } else {
               var next = row.evs[i + 1];
               var limit = next ? xOf(next.start) + half + (next.seamL ? sgap / 2 : 0) : chartW;
               var room = limit - right - 8;
               if (room >= 34) {
-                outLbl = '<span class="blo' + (flOn && !isFl ? ' dim' : '') + '" style="left:' + (right + 5) + 'px;top:' + top + 'px;height:' + barH + 'px;max-width:' + Math.min(room, 170) + 'px">' + iconHTML(ev.base) + esc(ev.name) + (ev.fl ? ' · FL' : '') + '</span>';
+                outLbl = '<span class="blo' + (flOn && !isFl ? ' dim' : '') + '" style="left:' + (right + 5) + 'px;top:' + top + 'px;height:' + barH + 'px;max-width:' + Math.min(room, 170) + 'px">' + iconHTML(ev.base) + esc(ev.name) + '</span>';
               }
             }
           }
@@ -2437,7 +2437,7 @@
   fetchEventLinks();
 })();
 </script>
- <script data-goatcounter="https://bigfarmexplorer.goatcounter.com/count"
+<script data-goatcounter="https://bigfarmexplorer.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
