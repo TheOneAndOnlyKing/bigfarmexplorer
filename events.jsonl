@@ -27,7 +27,7 @@
 {"start":"2026-10-22","end":"2026-10-31","event":"Fortune Teller","section":"Minor events"}
 {"start":"2026-10-22","end":"2026-11-03","event":"Halloween Search Event","section":"Search events"}
 {"start":"2026-10-24","end":"2026-10-26","event":"Landscape Architect","section":"Minor events"}
-{"start":"2026-10-24","end":"2026-10-28","event":"Cruise Ship","section":"Monthly events"}
+{"start":"2026-10-24","end":"2026-10-28","event":"Cruise Ship","section":"Monthly events","fl":true}
 {"start":"2026-10-26","end":"2026-11-02","event":"Not of this World","section":"Themed events"}
 {"start":"2026-10-27","end":"2026-10-31","event":"My bees are gone!","section":"Minor events"}
 {"start":"2026-10-28","end":"2026-10-31","event":"Village Fair","section":"Weekly events","fl":true}
