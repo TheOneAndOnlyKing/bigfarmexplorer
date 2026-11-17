@@ -1,0 +1,2443 @@
+<!DOCTYPE html>
+<!-- bigfarm calendar — v14 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bigfarm Calendar — Bigfarm Explorer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%233E6B35'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23F7F4EA' text-anchor='middle'>BE</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --f-sans: 'Instrument Sans', system-ui, sans-serif;
+    --f-serif: 'Fraunces', Georgia, serif;
+    --f-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+  body[data-font="sans"]  { --ui: var(--f-sans); }
+  body[data-font="serif"] { --ui: var(--f-serif); }
+  body[data-font="mono"]  { --ui: var(--f-mono); }
+  body[data-theme="light"] {
+    --bg:#F2F0E8; --card:#FBFAF5; --ink:#22251E; --muted:#6C6F63;
+    --line:#E3E0D4; --line2:#D2CEBF; --dayline:rgba(34,37,30,.08);
+    --accent:#3E6B35; --on-accent:#F6F4EB; --accent-soft:rgba(62,107,53,.09);
+    --wknd:rgba(62,80,50,.065); --warn:#A66A21;
+    --shadow:0 1px 2px rgba(30,30,20,.05), 0 10px 30px rgba(30,30,20,.06);
+    --tipbg:#22251E; --tipink:#F2F0E8;
+    --bar-0:#C25B3C; --bar-1:#6D8A56; --bar-2:#D19E3A; --bar-3:#5B7BA6;
+    --bar-4:#9A6E9C; --bar-5:#42968B; --bar-6:#B06675; --bar-7:#7A7233;
+  }
+  body[data-theme="grey"] {
+    --bg:#C8C8C1; --card:#D4D4CC; --ink:#26261F; --muted:#5E5E55;
+    --line:#B8B8AE; --line2:#A6A69A; --dayline:rgba(38,38,31,.09);
+    --accent:#37552E; --on-accent:#EDEBE0; --accent-soft:rgba(55,85,46,.12);
+    --wknd:rgba(30,35,25,.07); --warn:#8A5A1C;
+    --shadow:0 1px 2px rgba(30,30,20,.08), 0 10px 30px rgba(30,30,20,.1);
+    --tipbg:#26261F; --tipink:#D4D4CC;
+    --bar-0:#A34A2E; --bar-1:#546F3F; --bar-2:#A87E2A; --bar-3:#425F8A;
+    --bar-4:#7B5680; --bar-5:#2B7A6E; --bar-6:#8C4A59; --bar-7:#5F5A28;
+  }
+  body[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:#141711; --card:#1B1E17; --ink:#EAE9DF; --muted:#9AA092;
+    --line:#2A2D22; --line2:#3A3E2C; --dayline:rgba(234,233,223,.06);
+    --accent:#9CCB7E; --on-accent:#141B0C; --accent-soft:rgba(156,203,126,.12);
+    --wknd:rgba(255,255,255,.035); --warn:#D9A253;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.35);
+    --tipbg:#EAE9DF; --tipink:#1B1E17;
+    --bar-0:#E07850; --bar-1:#93BE74; --bar-2:#E5BC58; --bar-3:#8FA9DA;
+    --bar-4:#C293C6; --bar-5:#5FC2B0; --bar-6:#DE8E9C; --bar-7:#B2B45E;
+  }
+  html { background: var(--bg); }
+  body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-size: 14px; -webkit-font-smoothing: antialiased; transition: background-color .25s, color .25s; }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  ::selection { background: var(--accent); color: var(--on-accent); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 6px; border: 2px solid var(--card); }
+  ::-webkit-scrollbar-track { background: transparent; }
+  * { scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 11px 22px; border-bottom: 1px solid var(--line); }
+  .home-wrap { display: flex; align-items: center; gap: 12px; min-height: 34px; }
+  .home { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; min-height: 34px; }
+  .homelogo { display: block; height: 32px; width: auto; max-width: 260px; object-fit: contain; }
+  .homefall { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
+  .bt { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
+  .themebtn { display: flex; align-items: center; gap: 8px; padding: 7px 13px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .themebtn:hover { color: var(--ink); border-color: var(--line2); }
+
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 20px 22px 44px; }
+  .tabs { display: flex; gap: 6px; padding: 0 18px; margin-bottom: -1px; position: relative; z-index: 2; overflow-x: auto; }
+  .tab { display: flex; align-items: center; gap: 7px; white-space: nowrap; border: 1px solid transparent; border-bottom: none; padding: 8px 16px 9px; border-radius: 11px 11px 0 0; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .tab:hover { color: var(--ink); }
+  .tab.active { background: var(--card); border-color: var(--line); padding-bottom: 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+
+  .toolbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+  .card.on-themes .toolbar { display: none; }
+  .tb-side { display: flex; align-items: center; gap: 8px; }
+  .tb-side.r { justify-content: flex-end; }
+  .tb-center { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tb-mid { display: flex; align-items: center; gap: 8px; }
+  /* fixed-width center block: the arrows sit outside it, so no matter how the
+     month/year labels change ("September" vs "Sep – Feb", 1Y hiding the month
+     button, …) the arrows never shift — the contents just recenter */
+  #calCenter { width: 220px; justify-content: center; }
+  .ghostbtn { padding: 6px 12px; border: 1px solid var(--line); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .ghostbtn:hover { color: var(--ink); border-color: var(--line2); }
+  .ghostbtn.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .nav-arrow { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); }
+  .nav-arrow:hover { color: var(--ink); border-color: var(--line2); }
+  .nav-label { height: 30px; padding: 0 12px; display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 9px; font-size: 13px; font-weight: 600; }
+  .nav-label:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-label svg { opacity: .5; }
+  .rangelbl { font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .dateinput { font: inherit; font-size: 12.5px; font-family: var(--ui); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 5px 8px; }
+  .dateinput:focus { outline: none; border-color: var(--accent); }
+  .view-count { font-size: 12px; color: var(--muted); }
+
+  .pane { display: none; }
+  .pane.active { display: block; }
+  .tl-wrap { position: relative; }
+  .tl { position: relative; overflow: auto; height: clamp(340px, calc(100vh - 280px), 1000px); }
+  .tl-inner { position: relative; }
+  .tl-head { position: sticky; top: 0; z-index: 6; display: flex; background: var(--card); border-bottom: 1px solid var(--line); }
+  .tl-corner { position: sticky; left: 0; z-index: 7; flex: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; background: var(--card); border-right: 1px solid var(--line); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .sectri { display: grid; place-items: center; width: 20px; height: 14px; border-radius: 5px; color: var(--muted); }
+  .sectri:hover { color: var(--ink); background: var(--accent-soft); }
+  .sectri svg { transition: transform .15s; }
+  .sectri.open svg { transform: rotate(180deg); }
+  .tl-headcol { position: relative; flex: none; overflow: hidden; }
+  .hm-row { position: relative; height: 32px; }
+  .hd-row { position: relative; height: 34px; }
+  .hmonth { position: absolute; top: 0; height: 100%; display: flex; align-items: center; padding-left: 8px; border-left: 1px solid var(--line); font-size: 11.5px; font-weight: 600; letter-spacing: .04em; overflow: hidden; white-space: nowrap; }
+  .hday { position: absolute; top: 0; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+  .hday i { font-style: normal; font-size: 8.5px; color: var(--muted); }
+  /* the month name that replaces the weekday letter on the 1st */
+  .hday i.mo { color: var(--ink); font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
+  .hday b { font-size: 11px; font-weight: 500; }
+  .hday.we b, .hday.we i { color: var(--muted); }
+  .hday.we { background: var(--wknd); }
+  .hflag { position: absolute; top: 4px; transform: translateX(-50%); z-index: 2; background: var(--accent); color: var(--on-accent); font-family: var(--f-mono); font-size: 8.5px; letter-spacing: .1em; padding: 1px 6px; border-radius: 99px; }
+  .tl-lanewrap { position: relative; }
+  .tl-grid { position: absolute; top: 0; bottom: 0; pointer-events: none; z-index: 0; }
+  .gmonth { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
+  .gwkd { position: absolute; top: 0; bottom: 0; background: var(--wknd); }
+  .gtoday { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); }
+  .lane { display: flex; position: relative; z-index: 1; border-bottom: 1px solid var(--dayline); }
+  .lane:last-child { border-bottom: none; }
+  .lane-label { position: sticky; left: 0; z-index: 3; flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; background: var(--card); border-right: 1px solid var(--line); }
+  .lane-label .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+  .capdot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+  .ltxt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .ltxt b { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* the bare event count, hugging the divider, vertically centred */
+  .lcount { margin-left: auto; flex: none; font-family: var(--f-mono); font-size: 10px; color: var(--muted); }
+  .lane-chart { position: relative; flex: none; overflow: hidden; }
+  .bar { position: absolute; border-radius: 6px; overflow: hidden; display: flex; align-items: center; padding: 0 8px; cursor: pointer; font-size: 10.5px; font-weight: 500; letter-spacing: .01em; transition: box-shadow .15s, filter .15s, opacity .2s; }
+  .bar:hover { filter: brightness(1.06) saturate(1.05); box-shadow: 0 0 0 1.5px var(--card), 0 0 0 3px var(--accent); }
+  .bl { pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .blo { position: absolute; display: flex; align-items: center; font-size: 10px; font-weight: 500; color: var(--ink); opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; z-index: 2; }
+  .blo.dim { opacity: .3; }
+  .tl.fl-on .bar:not(.is-fl) { opacity: .28; }
+  .flb { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-style: normal; font-family: var(--f-mono); font-size: 8px; font-weight: 700; letter-spacing: .08em; background: var(--accent); color: var(--on-accent); border-radius: 3px; padding: 1px 3px; pointer-events: none; }
+  @keyframes flash { 0%, 100% { box-shadow: none; } 15%, 45%, 75% { box-shadow: 0 0 0 3px var(--accent); } 30%, 60% { box-shadow: 0 0 0 3px transparent; } }
+  .bar.flash { animation: flash 1.4s ease; }
+  /* the "nothing here" overlay: fully transparent, and offset past the section
+     labels, so lanes, labels and dividing lines all stay fully visible */
+  .tl-empty { position: absolute; top: 0; right: 0; bottom: 0; left: 172px; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; pointer-events: none; }
+  .tl-empty[hidden] { display: none; }
+  .tl-empty p { text-align: center; padding: 8px 16px; margin: 0 20px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+  .tl-empty-btns { display: flex; gap: 8px; }
+  .tl-empty .mini { pointer-events: auto; font-style: normal; background: var(--card); }
+  .mini { padding: 6px 13px; border: 1px solid var(--line); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .mini:hover { color: var(--accent); border-color: var(--accent); }
+  .mini:disabled { opacity: .45; cursor: default; }
+
+  .vresize { display: flex; align-items: center; justify-content: center; height: 18px; cursor: row-resize; border-top: 1px solid var(--line); touch-action: none; user-select: none; -webkit-user-select: none; }
+  .vresize span { width: 48px; height: 5px; border-radius: 3px; background: #3E7FC1; transition: background .15s, width .15s; }
+  .vresize:hover span, .vresize.drag span { background: #2A5E97; width: 62px; }
+  .card.on-themes .vresize { display: none; }
+  /* on the List tab the footer keeps only the Filters button — the zoom/range
+     controls are Calendar-only, so they're hidden there */
+  .card.on-list .zoomstep, .card.on-list .zoom { display: none; }
+
+  .list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 18px; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  .lh-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .sortseg, .seg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+  .sortseg button, .seg button { padding: 4px 12px; font-size: 11.5px; font-weight: 600; color: var(--muted); }
+  .sortseg button + button, .seg button + button { border-left: 1px solid var(--line); }
+  .sortseg button.on, .seg button.on { background: var(--accent); color: var(--on-accent); }
+  .sortseg button:disabled { opacity: .35; cursor: default; }
+  .sortseg button:disabled:hover { color: var(--muted); }
+  .list-body { height: clamp(300px, calc(100vh - 324px), 956px); overflow: auto; padding: 4px 0 12px; }
+  .lg-head { display: flex; align-items: baseline; gap: 10px; padding: 14px 18px 6px; font-family: var(--f-serif); font-weight: 600; font-size: 14px; }
+  .lg-head span { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
+  .lrow { width: 100%; display: grid; grid-template-columns: 14px 1fr auto auto 44px; align-items: center; gap: 12px; text-align: left; padding: 8px 18px; border-radius: 10px; }
+  .lrow:hover { background: var(--accent-soft); }
+  .ldot { width: 10px; height: 10px; border-radius: 50%; }
+  .ln { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ls { font-size: 11.5px; color: var(--muted); }
+  .ld { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+  .llu { font-family: var(--f-mono); font-size: 11px; color: var(--muted); text-align: right; }
+  .list-empty { padding: 60px 20px; text-align: center; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; }
+  .flbadge { display: inline-flex; font-family: var(--f-mono); font-size: 8.5px; font-weight: 700; letter-spacing: .08em; background: var(--accent); color: var(--on-accent); border-radius: 3px; padding: 1px 4px; margin-left: 8px; vertical-align: 1px; }
+  #pane-list.fl-on .lrow:not(.has-fl), #pane-list.fl-on .atable tbody tr:not(.has-fl) { opacity: .45; }
+  .evico { width: 13px; height: 13px; object-fit: contain; flex: none; pointer-events: none; }
+  .bl .evico, .blo .evico { margin-right: 4px; vertical-align: -2px; }
+  .lrow .evico { width: 14px; height: 14px; }
+  .atable .evico { margin-right: 9px; vertical-align: -0.5px; }
+  .atable { width: 100%; min-width: 560px; border-collapse: collapse; }
+  .atable th { position: sticky; top: 0; z-index: 2; background: var(--card); font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line2); cursor: pointer; user-select: none; white-space: nowrap; }
+  .atable th.r { text-align: right; }
+  .atable th:hover { color: var(--ink); }
+  .atable th.on { color: var(--ink); }
+  .tri { display: inline-flex; flex-direction: column; gap: 2px; margin-left: 7px; vertical-align: -1px; }
+  .tri i { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; }
+  .tri .tu { border-bottom: 5px solid var(--line2); }
+  .tri .td { border-top: 5px solid var(--line2); }
+  .tri .tu.act { border-bottom-color: var(--accent); }
+  .tri .td.act { border-top-color: var(--accent); }
+  .atable td { padding: 7px 14px; border-bottom: 1px solid var(--line); font-size: 13px; white-space: nowrap; }
+  .atable tbody tr { cursor: pointer; }
+  .atable tbody tr:hover { background: var(--accent-soft); }
+  .atable .ldot { display: inline-block; margin-right: 9px; vertical-align: -0.5px; }
+  .atable td.c-sec { font-size: 12px; color: var(--muted); }
+  .atable .c-dt, .atable .c-dy { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+  .atable .c-dy { text-align: right; }
+
+  .settings { padding: 8px 22px 26px; max-width: 880px; }
+  .set-group { padding: 20px 0; border-bottom: 1px solid var(--line); }
+  .set-group:last-child { border-bottom: none; }
+  .set-group h3 { font-family: var(--f-serif); font-size: 15px; font-weight: 600; display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .set-group h3 .h-note { font-family: var(--ui); font-size: 11.5px; font-weight: 400; color: var(--muted); }
+  .fontopts { display: flex; gap: 10px; flex-wrap: wrap; }
+  .fontopt { flex: 1; min-width: 200px; text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .fontopt:hover { border-color: var(--line2); }
+  .fontopt.on { border-color: var(--accent); background: var(--accent-soft); }
+  .fontopt .fprev { font-size: 19px; font-weight: 600; }
+  .fontopt .fname { font-family: var(--f-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .setrow { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 0; }
+  .setrow .lab { font-size: 13px; }
+  .setrow .lab small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+  .sw { position: relative; width: 40px; height: 22px; flex: none; }
+  .sw input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .sw i { display: block; width: 100%; height: 100%; border-radius: 99px; background: var(--line2); position: relative; transition: background .2s; }
+  .sw i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--card); transition: left .2s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .sw input:checked + i { background: var(--accent); }
+  .sw input:checked + i::after { left: 21px; }
+
+  .csub { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 16px 0 6px; }
+  .csub b { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .csub-acts { display: flex; align-items: center; gap: 4px; }
+  .csub-lab { font-family: var(--f-mono); font-size: 9.5px; color: var(--muted); margin-right: 2px; }
+  .cgroup { margin-bottom: 2px; }
+  .crow { display: flex; align-items: center; gap: 10px; padding: 6px 2px; border-radius: 8px; }
+  .crow.cevt .cn { padding-left: 18px; }
+  .csw { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid transparent; position: relative; }
+  .csw:hover { border-color: var(--ink); }
+  .csw.auto { border-style: dashed; border-color: var(--muted); opacity: .75; }
+  .cn { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .crow .ov { margin-left: auto; font-family: var(--f-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .ovbtn { margin-left: auto; font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 3px 11px; }
+  .ovbtn:hover { color: var(--ink); border-color: var(--line2); }
+  .ovbtn.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .mini2 { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 2px 6px; border-radius: 6px; }
+  .mini2:hover { color: var(--accent); background: var(--accent-soft); }
+  .lorow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .lorow[hidden] { display: none; }
+  .loselect { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 6px 10px; max-width: 200px; }
+  .loinput input { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 6px 10px; width: 220px; }
+  #loStatus { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+  #loStatus.warn { color: var(--warn); }
+  .dhint { font-size: 12.5px; line-height: 1.7; color: var(--muted); }
+  .dhint b { color: var(--ink); }
+  .dstat { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+  .dstat.warn { color: var(--warn); }
+  .dbtns { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .danger { padding: 7px 14px; border: 1px solid var(--line2); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .danger:hover { border-color: var(--warn); color: var(--warn); }
+
+  .cardfoot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-top: 1px solid var(--line); }
+  .filterbtn { display: flex; align-items: center; gap: 8px; padding: 6px 13px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .filterbtn:hover { color: var(--ink); border-color: var(--line2); }
+  .badge { background: var(--accent); color: var(--on-accent); min-width: 16px; height: 16px; border-radius: 99px; padding: 0 4px; display: inline-grid; place-items: center; font-size: 10px; font-weight: 700; }
+  .zoomstep { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-left: auto; }
+  .zoomstep button { width: 30px; height: 29px; display: grid; place-items: center; color: var(--muted); }
+  .zoomstep button:hover { color: var(--ink); background: var(--accent-soft); }
+  .zoomstep span { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); display: flex; align-items: center; justify-content: center; min-width: 38px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+  .zoom { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .zoom button { padding: 6px 12px; font-size: 12px; font-weight: 700; letter-spacing: .03em; color: var(--muted); }
+  .zoom button + button { border-left: 1px solid var(--line); }
+  .zoom button.on { background: var(--accent); color: var(--on-accent); }
+
+  .notice { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 9px 18px; background: var(--accent-soft); border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  .notice b { color: var(--ink); }
+  .notice .mini { border: none; padding: 2px 8px; color: var(--accent); text-decoration: underline; }
+  .notice .nx { margin-left: auto; color: var(--muted); font-size: 15px; line-height: 1; }
+
+  .scrim { position: fixed; inset: 0; z-index: 39; background: rgba(20,22,16,.28); opacity: 0; pointer-events: none; transition: opacity .25s; }
+  body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
+  body.drawer-open { overflow: hidden; }
+  .drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; width: min(470px, 92vw); background: var(--card); border-right: 1px solid var(--line); transform: translateX(-102%); transition: transform .25s ease; display: flex; flex-direction: column; }
+  body.drawer-open .drawer { transform: none; }
+  .d-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+  .d-head b { font-family: var(--f-serif); font-size: 17px; font-weight: 600; }
+  .dclose { color: var(--muted); padding: 4px; }
+  .dclose:hover { color: var(--ink); }
+  .d-scroll { flex: 1; overflow: auto; padding: 14px 18px; }
+  .dselbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .dselbar b { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .dsearch { width: 100%; padding: 7px 10px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px; }
+  .dsearch:focus { outline: none; border-color: var(--accent); }
+  .dgroup { margin-bottom: 18px; }
+  .dg-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .dg-head b { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .dg-acts { display: flex; gap: 4px; }
+  .drow { display: flex; align-items: center; gap: 10px; padding: 5px 6px; border-radius: 8px; cursor: pointer; }
+  .drow:hover { background: var(--accent-soft); }
+  .drow .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+  .drow .dv { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .drow.dsec .dv { font-weight: 600; }
+  .drow.devt .dv { padding-left: 16px; font-size: 12.5px; }
+  .drow .cnt { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
+  .drow input { appearance: none; width: 16px; height: 16px; flex: none; margin-left: auto; border: 1.5px solid var(--muted); border-radius: 5px; display: grid; place-items: center; cursor: pointer; }
+  .drow input:checked { background: var(--accent); border-color: var(--accent); }
+  .drow input:checked::after { content: ""; width: 8px; height: 4px; border-left: 2px solid var(--on-accent); border-bottom: 2px solid var(--on-accent); transform: rotate(-45deg) translate(0, -1px); }
+  .dgrid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6px; }
+  .d-foot { padding: 12px 18px; border-top: 1px solid var(--line); font-family: var(--f-mono); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .d-resize { position: absolute; top: 0; right: 0; bottom: 0; width: 10px; cursor: col-resize; touch-action: none; z-index: 5; }
+  .d-resize::after { content: ""; position: absolute; top: 50%; right: 3px; width: 3px; height: 40px; transform: translateY(-50%); border-radius: 2px; background: #3E7FC1; transition: background .15s; }
+  .d-resize:hover::after, .d-resize.drag::after { background: #2A5E97; }
+
+  .pop { position: fixed; z-index: 60; display: none; background: var(--card); border: 1px solid var(--line2); border-radius: 12px; box-shadow: 0 8px 30px rgba(20,22,14,.22); padding: 10px; }
+  .pgrid { display: grid; grid-template-columns: repeat(3, 62px); gap: 4px; }
+  .pgrid.y { grid-template-columns: repeat(4, 56px); }
+  .pm { padding: 7px 4px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--muted); text-align: center; }
+  .pm:hover { background: var(--accent-soft); color: var(--ink); }
+  .pm.on { background: var(--accent); color: var(--on-accent); }
+  .poptitle { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 2px 2px 8px; }
+  .pseclist { display: flex; flex-direction: column; min-width: 210px; max-height: 62vh; overflow: auto; }
+  .prow { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 7px; cursor: pointer; }
+  .prow:hover { background: var(--accent-soft); }
+  .prow .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+  .prow .psec { flex: 1; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .prow input { appearance: none; width: 15px; height: 15px; flex: none; border: 1.5px solid var(--muted); border-radius: 4px; display: grid; place-items: center; cursor: pointer; }
+  .prow input:checked { background: var(--accent); border-color: var(--accent); }
+  .prow input:checked::after { content: ""; width: 8px; height: 4px; border-left: 2px solid var(--on-accent); border-bottom: 2px solid var(--on-accent); transform: rotate(-45deg) translate(0, -1px); }
+  .swrow { display: flex; flex-wrap: wrap; gap: 6px; max-width: 240px; }
+  .swb { width: 26px; height: 26px; border-radius: 8px; border: 1.5px solid transparent; }
+  .swb:hover { border-color: var(--ink); }
+  .swb.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--accent); }
+  .pop .custom-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .pop input[type="color"] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 7px; background: none; cursor: pointer; }
+  .pop .lbl { font-size: 12px; color: var(--muted); }
+  .pop .pacts { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .pop #cState { font-family: var(--f-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+  /* the event pane — interactive, auto-sized */
+  .tip { position: fixed; z-index: 90; display: none; }
+  .tt { background: var(--tipbg); color: var(--tipink); border-left: 3px solid; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; max-width: 340px; max-height: min(64vh, 520px); overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,.25); font-size: 12px; }
+  .tt b { font-weight: 600; }
+  .tt .sec { opacity: .65; font-size: 11.5px; }
+  .tt .td { font-family: var(--f-mono); font-size: 10.5px; opacity: .8; margin-top: 2px; }
+  .tt .fl { font-family: var(--f-mono); font-size: 9px; font-weight: 700; letter-spacing: .1em; background: rgba(140,140,140,.3); border-radius: 3px; padding: 1px 4px; align-self: flex-start; margin-top: 4px; }
+  .tlinks { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(140,140,140,.4); }
+  .tlink { display: flex; align-items: flex-start; gap: 8px; text-decoration: none; padding: 3px 6px; margin: 0 -6px; border-radius: 6px; font-size: 12px; line-height: 1.4; color: inherit; }
+  .tlink:hover { background: rgba(140,140,140,.22); }
+  .tlink i { flex: none; width: 10px; height: 10px; border-radius: 3px; margin-top: 2px; background: currentColor; }
+  .tlink span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; min-width: 0; overflow-wrap: anywhere; }
+  .tlink svg { flex: none; margin-left: 6px; margin-top: 2px; opacity: .6; }
+
+  .drop { position: fixed; inset: 14px; z-index: 100; display: none; align-items: center; justify-content: center; border: 2px dashed var(--accent); border-radius: 18px; background: var(--accent-soft); }
+  .drop.on { display: flex; }
+  .drop-in { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--accent); }
+  .drop-in b { font-family: var(--f-serif); font-size: 22px; color: var(--ink); }
+  .drop-in span { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+
+  @media (max-width: 760px) {
+    .view-count { display: none; }
+    .bt { display: none; }
+    .homelogo { max-width: 56vw; height: 28px; }
+    #filterBtn { margin-right: auto; }
+    .wrap { padding: 14px 12px 30px; }
+    .toolbar { grid-template-columns: auto 1fr; row-gap: 8px; }
+    .tb-side.r { display: none; }
+    #calCenter { width: auto; }   /* narrow screens: let the selector shrink again */
+    .tl-empty { left: 120px; }    /* narrower label column on small screens */
+    .lrow { grid-template-columns: 14px 1fr 44px; }
+    .ls, .ld { display: none; }
+    .dgrid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body data-theme="dark" data-font="sans">
+
+<header class="topbar">
+  <div class="home-wrap">
+    <a class="home" href="../" title="Bigfarm Explorer — home">
+      <img class="homelogo" id="homeLogo" src="../logo.png" alt="Bigfarm Explorer">
+      <span class="homefall" id="homeFall" hidden>Bigfarm Explorer</span>
+    </a>
+    <span class="bt">Bigfarm Calendar</span>
+  </div>
+  <button class="themebtn" id="themeBtn"><span id="themeIc"></span><span id="themeLb">Light</span></button>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist" id="tabs">
+    <button class="tab active" data-tab="calendar" role="tab" aria-selected="true">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
+      Calendar
+    </button>
+    <button class="tab" data-tab="list" role="tab" aria-selected="false">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      List View
+    </button>
+    <button class="tab" data-tab="themes" role="tab" aria-selected="false">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="14.5" cy="8" r="2.4"/><circle cx="8.5" cy="16" r="2.4"/></svg>
+      Themes
+    </button>
+  </div>
+
+  <div class="card" id="card">
+    <div class="toolbar">
+      <div class="tb-side">
+        <button class="ghostbtn" id="todayBtn">Today</button>
+        <button class="ghostbtn" id="flBtn" title="Highlight the events counting for the Farmer's League" aria-pressed="false">FL</button>
+      </div>
+      <div class="tb-center">
+        <button class="nav-arrow" id="prevBtn" aria-label="Previous period"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l-8 8 8 8"/></svg></button>
+        <span class="tb-mid" id="calCenter">
+          <button class="nav-label" id="rangeBtn"><span id="rangeVal"></span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+          <button class="nav-label" id="yearBtn"><span id="yearVal"></span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        </span>
+        <span class="tb-mid" id="listCenter" style="display:none">
+          <span class="rangelbl">from</span><input type="date" class="dateinput" id="fromDate">
+          <span class="rangelbl">to</span><input type="date" class="dateinput" id="toDate">
+        </span>
+        <button class="nav-arrow" id="nextBtn" aria-label="Next period"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4l8 8-8 8"/></svg></button>
+      </div>
+      <div class="tb-side r"><span class="view-count" id="viewCount"></span></div>
+    </div>
+
+    <div id="noticeSlot"></div>
+
+    <section class="pane active" id="pane-calendar">
+      <div class="tl-wrap">
+        <div class="tl" id="tl"></div>
+        <div class="tl-empty" id="tlEmpty"><p>loading events…</p></div>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-list"></section>
+    <section class="pane" id="pane-themes"></section>
+
+    <div class="cardfoot">
+      <button class="filterbtn" id="filterBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6.5 7.5V19l-3-1.5v-5z"/></svg>
+        Filters <span class="badge" id="filterBadge" hidden></span>
+      </button>
+      <div class="zoomstep">
+        <button id="zOut" title="Zoom out slightly"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4"/></svg></button>
+        <span id="zPct" title="Zoom level">100%</span>
+        <button id="zIn" title="Zoom in slightly"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4M10.5 7.8v5.4"/></svg></button>
+      </div>
+      <div class="zoom" id="zoomSeg">
+        <button data-z="7">1W</button><button data-z="1">1M</button><button data-z="3">3M</button><button data-z="6">6M</button><button data-z="12">1Y</button>
+      </div>
+    </div>
+
+    <div class="vresize" id="vResize" title="Drag to resize the window height — double-click to reset"><span></span></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Filters">
+  <div class="d-head"><b>Filters</b><button class="dclose" id="drawerClose" aria-label="Close filters"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="d-scroll" id="drawerBody"></div>
+  <div class="d-foot"><span id="drawerFoot"></span><button class="mini2" id="drawerReset">reset</button></div>
+  <div class="d-resize" id="drawerResize" title="Drag to resize the pane — double-click to reset"></div>
+</aside>
+
+<div class="pop" id="pop"></div>
+<div class="tip" id="tip"></div>
+<div class="drop" id="drop">
+  <div class="drop-in">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"/></svg>
+    <b>Drop your events file</b><span>events .jsonl / .txt</span>
+  </div>
+</div>
+<input type="file" id="fileInput" accept=".jsonl,.json,.txt" hidden>
+<input type="file" id="colImport" accept=".json" hidden>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ══════════════ CONFIG ══════════════ */
+  var LS_KEY = 'bigfarm-calendar-v1';
+  var MS = 86400000;
+  var DATA_FILES = ['../events.jsonl', '../Events Machine.txt', '../Events Machine.jsonl'];
+  var TEMPLATE_FILE = '../defaultcolourtemplate.json';
+  var EVENTLINKS_FILE = '../eventlinks.json';
+
+  var SECTION_ORDER = [
+    { name: 'Weekly events', cap: 0, events: ['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship'] },
+    { name: 'Monthly events', cap: 0, events: ['Cruise Ship', 'Goldfish Rescue', 'Pleasure Park', 'Urgent Delivery', 'Urgent Delivery (Gourmet Farm)', 'Shinkei-Suijaku', 'Pair Finder'] },
+    { name: 'Dream worlds', cap: 1, events: ["Greta's Dream World", "Tessa's Dream World", "Tessa's Dream World (Missions)"] },
+    { name: 'Background events', cap: 0, events: ['Horse Season', "Farmer's League", 'Worldwide Championship'] },
+    { name: 'Seasons', cap: 1, events: ['Spring Season', 'Summer Season', 'Autumn Season', 'Winter Season', 'Christmas Season'] },
+    { name: 'Temporary farms', cap: 1, events: ['Festive Farm', 'Northern Lights Farm', 'Viking Farm', 'Tropical Farm', 'Candy Farm'] },
+    { name: 'Search events', cap: 2, events: ['Candy Search', 'Mushroom Search Event', "Valentine's Search Event", 'Easter Egg Hunt', 'Summer Time Search Event', 'Halloween Search Event', 'Winter Search Event'] },
+    { name: 'Yearly events', cap: 2, events: ['Global Point Event', 'Chinese New Year', "Saint Patrick's Day", 'Golden Week Event', 'Tailgate Party', 'Oktoberfest', "Santa's Workshop", 'Advent Calendar', 'Big Farm Anniversary Event', 'Football Fever'] },
+    { name: 'Themed events', cap: 3, events: ['A Hint of Hawaii', "Here's to Nature", 'Not of this World', 'Mysterious Asia', 'Fairytale Time', 'Culinary Campaign', 'Three Weddings and a Rigmarole'] },
+    { name: 'Minor events', cap: 0, events: ['A Hero for Piggles', 'My bees are gone!', 'Fortune Teller', 'Landscape Architect'] }
+  ];
+  var WEEKLY_SET = new Set(['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship']);
+  var FL_NAME = "Farmer's League";
+
+  var SAMPLE_JSONL = [
+    '{"start":"2025-08-26","end":"2025-10-07","event":"Farmer\'s League","section":"Background events"}',
+    '{"start":"2025-09-03","end":"2025-10-28","event":"Horse Season: Movie Heroes","section":"Background events"}',
+    '{"start":"2025-08-23","end":"2025-09-20","event":"Worldwide Championship","section":"Background events"}',
+    '{"start":"2025-08-25","end":"2025-08-31","event":"Summer Season","section":"Seasons"}',
+    '{"start":"2025-09-24","end":"2025-10-22","event":"Autumn Season","section":"Seasons"}',
+    '{"start":"2025-08-31","end":"2025-09-27","event":"Candy Farm","section":"Temporary farms"}',
+    '{"start":"2025-09-30","end":"2025-10-28","event":"Tropical Farm","section":"Temporary farms"}',
+    '{"start":"2025-10-22","end":"2025-11-03","event":"Halloween Search Event","section":"Search events"}',
+    '{"start":"2025-09-18","end":"2025-10-09","event":"Oktoberfest","section":"Yearly events"}',
+    '{"start":"2025-09-02","end":"2025-09-05","event":"Village Fair","section":"Weekly events","fl":true}',
+    '{"start":"2025-09-02","end":"2025-09-05","event":"Fishing Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-05","end":"2025-09-09","event":"Cooperative Championship","section":"Weekly events"}',
+    '{"start":"2025-09-09","end":"2025-09-12","event":"Cooperative Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-15","end":"2025-09-18","event":"Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-17","end":"2025-09-20","event":"Village Fair","section":"Weekly events","fl":true}',
+    '{"start":"2025-09-17","end":"2025-09-20","event":"Fishing Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-20","end":"2025-09-24","event":"Cooperative Championship","section":"Weekly events"}',
+    '{"start":"2025-09-24","end":"2025-09-27","event":"Cooperative Hard Worker Event","section":"Weekly events"}',
+    '{"start":"2025-09-03","end":"2025-09-10","event":"Greta\'s Dream World","section":"Dream worlds"}',
+    '{"start":"2025-09-10","end":"2025-09-17","event":"Tessa\'s Dream World (Missions)","section":"Dream worlds"}',
+    '{"start":"2025-09-18","end":"2025-09-25","event":"Tessa\'s Dream World","section":"Dream worlds"}',
+    '{"start":"2025-08-22","end":"2025-08-26","event":"Cruise Ship","section":"Monthly events","fl":true}',
+    '{"start":"2025-09-05","end":"2025-09-09","event":"Pair Finder","section":"Monthly events"}',
+    '{"start":"2025-09-06","end":"2025-09-10","event":"Urgent Delivery (Gourmet Farm)","section":"Monthly events"}',
+    '{"start":"2025-09-09","end":"2025-09-13","event":"Pleasure Park","section":"Monthly events"}',
+    '{"start":"2025-09-20","end":"2025-09-24","event":"Shinkei-Suijaku","section":"Monthly events"}',
+    '{"start":"2025-09-21","end":"2025-09-30","event":"Goldfish Rescue","section":"Monthly events"}',
+    '{"start":"2025-09-08","end":"2025-09-15","event":"Culinary Campaign","section":"Themed events"}',
+    '{"start":"2025-09-13","end":"2025-09-20","event":"Fairytale Time","section":"Themed events"}',
+    '{"start":"2025-09-21","end":"2025-09-28","event":"Mysterious Asia","section":"Themed events"}',
+    '{"start":"2025-09-23","end":"2025-09-30","event":"A Hint of Hawaii","section":"Themed events"}',
+    '{"start":"2025-09-29","end":"2025-10-06","event":"Not of this World","section":"Themed events"}',
+    '{"start":"2025-09-05","end":"2025-09-07","event":"Fortune Teller","section":"Minor events"}',
+    '{"start":"2025-09-11","end":"2025-09-13","event":"Fortune Teller","section":"Minor events"}',
+    '{"start":"2025-09-21","end":"2025-09-30","event":"Fortune Teller","section":"Minor events"}',
+    '{"start":"2025-09-04","end":"2025-09-06","event":"Landscape Architect","section":"Minor events"}',
+    '{"start":"2025-09-09","end":"2025-09-11","event":"Landscape Architect","section":"Minor events"}',
+    '{"start":"2025-09-14","end":"2025-09-16","event":"Landscape Architect","section":"Minor events"}',
+    '{"start":"2025-09-23","end":"2025-09-25","event":"Landscape Architect","section":"Minor events"}',
+    '{"start":"2025-09-20","end":"2025-09-28","event":"My bees are gone!","section":"Minor events"}'
+  ].join('\n');
+
+  var SAMPLE_LINKS = {
+    'Village Fair': [
+      { text: 'Example link — replace in eventlinks.json', url: 'https://www.example.com/village-fair', color: '#3E7FC1' }
+    ],
+    'Landscape Architect': [
+      { text: 'Example link — replace in eventlinks.json', url: 'https://www.example.com/landscape', color: '#C25B3C' },
+      { text: 'Second line example', url: 'https://www.example.com/more-info', color: '#42968B' }
+    ]
+  };
+
+  /* ── helpers ── */
+  var M_L = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var M_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var WD  = ['S','M','T','W','T','F','S'];
+  function $(s) { return document.querySelector(s); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function normMonth(y, m) { var d = new Date(Date.UTC(y, m, 1)); return { y: d.getUTCFullYear(), m: d.getUTCMonth() }; }
+  function monthAddT(t, n) { var d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1); }
+  function todayUTC() { var n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function fmtD(ts) { var d = new Date(ts); return d.getUTCDate() + ' ' + M_S[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
+  function isoOf(ts) { var d = new Date(ts); return d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate()); }
+  function dmy(ts) { var d = new Date(ts); return pad2(d.getUTCDate()) + '/' + pad2(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear(); }
+  function fmtRange(ev) {
+    if (ev.start === ev.end) return fmtD(ev.start);
+    var a = new Date(ev.start), b = new Date(ev.end);
+    if (a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth())
+      return a.getUTCDate() + ' – ' + b.getUTCDate() + ' ' + M_S[a.getUTCMonth()] + ' ' + a.getUTCFullYear();
+    if (a.getUTCFullYear() === b.getUTCFullYear())
+      return a.getUTCDate() + ' ' + M_S[a.getUTCMonth()] + ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()] + ' ' + a.getUTCFullYear();
+    return fmtD(ev.start) + ' – ' + fmtD(ev.end);
+  }
+  function textColorFor(hex) {
+    var h = hex.replace('#', '');
+    function ch(c) { c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); }
+    var L = .2126 * ch(parseInt(h.substr(0, 2), 16)) + .7152 * ch(parseInt(h.substr(2, 2), 16)) + .0722 * ch(parseInt(h.substr(4, 2), 16));
+    return L > .45 ? '#20241A' : '#FDFCF7';
+  }
+  function baseName(n) {
+    var ln = n.toLowerCase();
+    if (ln === 'horse season' || ln.indexOf('horse season:') === 0) return 'Horse Season';
+    if (ln.indexOf('big farm anniversary event:') === 0) return 'Big Farm Anniversary Event';
+    return n;
+  }
+
+  /* ── section maps ── */
+  var EV_SEC = new Map();
+  var SEC_INDEX = new Map();
+  SECTION_ORDER.forEach(function (s, si) {
+    SEC_INDEX.set(s.name, si);
+    s.events.forEach(function (n, i) { EV_SEC.set(n, { sec: s.name, idx: i }); });
+  });
+  var SEC_CAP = new Map(SECTION_ORDER.map(function (s) { return [s.name, s.cap]; }));
+
+  /* ── state ── */
+  var now0 = new Date();
+  var state = {
+    theme: 'dark', font: 'sans', zoom: 1,
+    anchor: { y: now0.getFullYear(), m: now0.getMonth() },
+    tab: 'calendar', density: 'comfortable', weekends: true, labels: true,
+    sort: 'date', scale: 1, showFL: false,
+    listFormat: 'informal', tsort: { col: 'start', dir: 'asc' },
+    listFrom: null, listTo: null,
+    drawerW: null, vHeight: null,
+    colors: { sections: {}, events: {}, secOverride: {} },
+    loadouts: {}, lastLoadout: '',
+    filters: { sections: [], items: [], years: [] },
+    hiddenSecs: []   /* calendar-only lane visibility; NOT a filter — list & drawer unaffected */
+  };
+  var events = [], sections = [], items = [], years = [];
+  var filtered = [], source = 'sample', fileName = '', dataLoaded = false;
+  var filtersLive = { sec: new Set(), it: new Set(), yr: new Set() };
+  var noticeDismissed = false, pinned = false, resetArmed = false;
+  var DEFAULT_LAYOUT = null, defaultFound = false;
+  var eventLinks = {}, linksFromFile = false;
+  var pendingZoomRebuild = false;
+
+  var tl = $('#tl');
+  var drawerEl = $('#drawer');
+  var bufStartT = 0, bufEndT = 0, dayW = 20, savedScroll = 0, lastW = 0;
+  var laneRows = new Map(), secCounts = new Map(), capWarns = new Set();
+  var scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0, loStatusTimer = 0;
+
+  function save() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({
+      theme: state.theme, font: state.font, zoom: state.zoom, tab: state.tab,
+      anchor: state.anchor, density: state.density, weekends: state.weekends,
+      labels: state.labels, sort: state.sort, scale: state.scale, showFL: state.showFL,
+      listFormat: state.listFormat, tsort: state.tsort,
+      listFrom: state.listFrom, listTo: state.listTo,
+      drawerW: state.drawerW, vHeight: state.vHeight,
+      colors: state.colors, loadouts: state.loadouts, lastLoadout: state.lastLoadout,
+      filters: state.filters, hiddenSecs: state.hiddenSecs
+    })); } catch (e) {}
+  }
+  function normVal(v) {
+    if (!v || typeof v !== 'object') return null;
+    if (v.t === 'h' && /^#[0-9a-fA-F]{6}$/.test(v.v || '')) return { t: 'h', v: v.v };
+    if (v.t === 'p' && Number.isInteger(v.i) && v.i >= 0 && v.i <= 7) return { t: 'p', i: v.i };
+    return null;
+  }
+  function normalizeLayout(raw) {
+    var out = { sections: {}, events: {}, secOverride: {} };
+    if (!raw || typeof raw !== 'object') return out;
+    if (raw.sections || raw.events || raw.secOverride) {
+      ['sections', 'events'].forEach(function (k) {
+        if (raw[k] && typeof raw[k] === 'object')
+          for (var key in raw[k]) { var r = normVal(raw[k][key]); if (r) out[k][key] = r; }
+      });
+      if (raw.secOverride && typeof raw.secOverride === 'object')
+        for (var k2 in raw.secOverride) if (raw.secOverride[k2]) out.secOverride[k2] = true;
+    } else {
+      for (var key2 in raw) { var r2 = normVal(raw[key2]); if (r2) out.events[key2] = r2; }
+    }
+    return out;
+  }
+  function hasOverrides(c) {
+    return Object.keys(c.sections).length > 0 || Object.keys(c.events).length > 0 || Object.keys(c.secOverride).length > 0;
+  }
+  function loadSettings() {
+    try {
+      var s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      if (s.theme === 'light' || s.theme === 'grey' || s.theme === 'dark') state.theme = s.theme;
+      if (['sans','serif','mono'].includes(s.font)) state.font = s.font;
+      if ([7,1,3,6,12].includes(s.zoom)) state.zoom = s.zoom;
+      if (['calendar','list','themes'].includes(s.tab)) state.tab = s.tab;
+      if (['comfortable','compact'].includes(s.density)) state.density = s.density;
+      if (typeof s.weekends === 'boolean') state.weekends = s.weekends;
+      if (typeof s.labels === 'boolean') state.labels = s.labels;
+      if (['date','name','section'].includes(s.sort)) state.sort = s.sort;
+      if (typeof s.scale === 'number') state.scale = Math.min(3, Math.max(0.4, s.scale));
+      if (typeof s.showFL === 'boolean') state.showFL = s.showFL;
+      if (s.listFormat === 'informal' || s.listFormat === 'analytical') state.listFormat = s.listFormat;
+      if (s.tsort && ['event','section','start','end','days'].includes(s.tsort.col))
+        state.tsort = { col: s.tsort.col, dir: s.tsort.dir === 'desc' ? 'desc' : 'asc' };
+      if (s.anchor && isFinite(s.anchor.y)) state.anchor = { y: s.anchor.y, m: s.anchor.m || 0 };
+      if (isFinite(s.listFrom)) state.listFrom = s.listFrom;
+      if (isFinite(s.listTo)) state.listTo = s.listTo;
+      if (isFinite(s.drawerW) && s.drawerW > 0) state.drawerW = s.drawerW;
+      if (isFinite(s.vHeight) && s.vHeight > 0) state.vHeight = s.vHeight;
+      if (s.colors) state.colors = normalizeLayout(s.colors);
+      if (s.loadouts && typeof s.loadouts === 'object') {
+        var lo = {};
+        for (var n in s.loadouts) if (n && s.loadouts[n] && typeof s.loadouts[n] === 'object') lo[n] = normalizeLayout(s.loadouts[n]);
+        state.loadouts = lo;
+      }
+      if (typeof s.lastLoadout === 'string' && state.loadouts[s.lastLoadout]) state.lastLoadout = s.lastLoadout;
+      if (s.filters) state.filters = s.filters;
+      if (Array.isArray(s.hiddenSecs)) state.hiddenSecs = s.hiddenSecs.filter(function (x) { return typeof x === 'string'; });
+    } catch (e) {}
+  }
+
+  /* ── event links (eventlinks.json) ── */
+  function normLinkColour(c) {
+    if (typeof c !== 'string') return null;
+    var s = c.trim().replace(/^#+/, '#');
+    if (s.charAt(0) !== '#') s = '#' + s;
+    if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
+    if (/^#[0-9a-fA-F]{3}$/.test(s)) return '#' + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2) + s.charAt(3) + s.charAt(3);
+    return null;
+  }
+  function normLink(o) {
+    if (typeof o === 'string') o = { url: o };
+    if (!o || typeof o !== 'object') return null;
+    var url = o.url || o.link || o.href;
+    if (!url) {
+      for (var k in o) {
+        if (/^https?:\/\//i.test(k) && typeof o[k] !== 'object') { url = k; break; }
+      }
+    }
+    if (typeof url !== 'string' || !/^https?:\/\//i.test(url.trim())) {
+      console.warn('eventlinks: a line for "' + (o.text || '?') + '" has no usable url — skipped');
+      return null;
+    }
+    var text = (o.text || o.label || o.title || url).trim();
+    if (!text) return null;
+    return { text: text, url: url.trim(), color: normLinkColour(o.color || o.colour) };
+  }
+  function normalizeLinks(obj) {
+    var out = {};
+    if (!obj || typeof obj !== 'object') return out;
+    Object.keys(obj).forEach(function (k) {
+      if (k.charAt(0) === '_') return;
+      var v = obj[k];
+      if (!Array.isArray(v)) {
+        if (v && typeof v === 'object') v = [v];
+        else if (typeof v === 'string') v = [v];
+        else { console.warn('eventlinks: "' + k + '" is not a list — skipped'); return; }
+      }
+      var list = v.map(normLink).filter(Boolean);
+      var dropped = v.length - list.length;
+      if (dropped) console.warn('eventlinks: ' + dropped + ' bad entr' + (dropped === 1 ? 'y' : 'ies') + ' under "' + k + '" — skipped');
+      if (list.length) out[k] = list;
+    });
+    return out;
+  }
+  function parseLinkFile(text) {
+    try { return JSON.parse(text); } catch (e) {}
+    var fixed = text
+      .replace(/\}\s*\{/g, '},{')
+      .replace(/,\s*"(https?:\/\/[^"]*)"\s*,\s*"(url|text|color|colour)"/g, ', "url": "$1", "$2"');
+    try { return JSON.parse(fixed); }
+    catch (e2) { return null; }
+  }
+  var linkLC = { src: null, map: null };
+  function lookupLinks(ev) {
+    if (eventLinks[ev.name]) return eventLinks[ev.name];
+    if (eventLinks[ev.base]) return eventLinks[ev.base];
+    if (eventLinks[ev.section]) return eventLinks[ev.section];
+    if (linkLC.src !== eventLinks) {
+      linkLC = { src: eventLinks, map: {} };
+      Object.keys(eventLinks).forEach(function (k) { linkLC.map[k.toLowerCase()] = eventLinks[k]; });
+    }
+    return linkLC.map[ev.name.toLowerCase()] || linkLC.map[ev.base.toLowerCase()] || linkLC.map[ev.section.toLowerCase()] || [];
+  }
+  function warnUnknownLinkKeys() {
+    var known = new Set(items.concat(sections));
+    Object.keys(eventLinks).forEach(function (k) {
+      if (!known.has(k)) console.warn('eventlinks: no event or section named "' + k + '" — check the spelling');
+    });
+  }
+  function fetchEventLinks() {
+    fetch(EVENTLINKS_FILE)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(function (t) {
+        var o = parseLinkFile(t.replace(/^\uFEFF/, ''));
+        if (o == null) {
+          console.warn('eventlinks.json is not valid JSON and could not be auto-repaired — its links were skipped. Check the file at jsonlint.com');
+          return;
+        }
+        eventLinks = normalizeLinks(o);
+        linksFromFile = true;
+        if (items.length) warnUnknownLinkKeys();
+      })
+      .catch(function (err) {
+        console.warn('eventlinks.json could not be loaded (' + err.message + '). ' +
+          'Make sure the file sits next to calendar.html and is named exactly "eventlinks.json" (all lowercase — the host is case-sensitive).');
+      });
+  }
+
+  /* ── event icons (icons/<event name>.png, optional per event) ── */
+  var iconCache = new Map();
+  var iconRerenderTimer = 0;
+  function iconURL(base) { return '../icons/' + encodeURIComponent(base) + '.png'; }
+  function hasIcon(base) { return iconCache.get(base) === true; }
+  function iconHTML(base) {
+    return hasIcon(base) ? '<img class="evico" src="' + iconURL(base) + '" alt="" draggable="false">' : '';
+  }
+  function probeIcons() {
+    items.forEach(function (nm) {
+      if (iconCache.has(nm)) return;
+      iconCache.set(nm, false);
+      var im = new Image();
+      im.onload = function () { iconCache.set(nm, true); scheduleIconRerender(); };
+      im.onerror = function () { iconCache.set(nm, false); };
+      im.src = iconURL(nm);
+    });
+  }
+  function scheduleIconRerender() {
+    clearTimeout(iconRerenderTimer);
+    iconRerenderTimer = setTimeout(function () {
+      if (state.tab === 'calendar' || state.tab === 'list') renderPane(state.tab);
+    }, 80);
+  }
+
+  /* ── data loading ── */
+  function parseISO(v) {
+    if (typeof v !== 'string') return null;
+    var m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (!m) return null;
+    var y = +m[1], mo = +m[2], d = +m[3];
+    var dt = new Date(Date.UTC(y, mo - 1, d));
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
+    return Date.UTC(y, mo - 1, d);
+  }
+  function parseJSONL(text) {
+    var list = [], bad = 0, id = 0;
+    text.split(/\r?\n/).forEach(function (ln, i) {
+      var s = ln.trim();
+      if (!s) return;
+      try {
+        var o = JSON.parse(s);
+        var st = parseISO(o.start), en = parseISO(o.end);
+        if (st == null || en == null) { bad++; console.warn('line ' + (i + 1) + ': dates must be YYYY-MM-DD'); return; }
+        if (en < st) { bad++; console.warn('line ' + (i + 1) + ': ends before it starts — skipped'); return; }
+        var name = typeof o.event === 'string' ? o.event.trim() : '';
+        if (!name) { bad++; return; }
+        var fl = !!o.fl;
+        var flm = name.match(/\s*[-–—]\s*fl$/i);
+        if (flm) { fl = true; name = name.slice(0, flm.index).trim(); }
+        var base = baseName(name);
+        var rec = EV_SEC.get(base);
+        var section = rec ? rec.sec : ((typeof o.section === 'string' && o.section.trim()) ? o.section.trim() : 'Unsorted');
+        list.push({
+          id: id++, name: name, base: base, section: section, fl: fl,
+          start: st, end: en,
+          days: Math.max(1, Math.round((en - st) / MS)),
+          row: 0, seamL: false, seamR: false, flInferred: false
+        });
+      } catch (e) { bad++; console.warn('line ' + (i + 1) + ': not valid JSON'); }
+    });
+    return { list: list, bad: bad };
+  }
+  function deriveAll() {
+    var known = SECTION_ORDER.map(function (s) { return s.name; });
+    var extra = [...new Set(events.map(function (e) { return e.section; }))].filter(function (s) { return known.indexOf(s) < 0; }).sort();
+    sections = known.filter(function (n) { return events.some(function (e) { return e.section === n; }); }).concat(extra);
+    if (!sections.length) sections = known.slice(0, 1);
+    items = [...new Set(events.map(function (e) { return e.base; }))].sort(function (a, b) { return a.localeCompare(b); });
+    years = [...new Set(events.map(function (e) { return new Date(e.start).getUTCFullYear(); }))].sort();
+    probeIcons();
+    buildFilterSets();
+    computeFiltered();
+    computeFLInference();
+    recomputeLanes();
+  }
+  function orderedItems(sec) {
+    var set = new Set(events.filter(function (e) { return e.section === sec; }).map(function (e) { return e.base; }));
+    var out = [];
+    var rec = SECTION_ORDER.find(function (s) { return s.name === sec; });
+    if (rec) rec.events.forEach(function (n) { if (set.has(n)) { out.push(n); set.delete(n); } });
+    return out.concat([...set].sort(function (a, b) { return a.localeCompare(b); }));
+  }
+  function applyText(text, label, kind) {
+    var r = parseJSONL(text);
+    events = r.list;
+    source = kind || 'session';
+    fileName = label;
+    dataLoaded = true;
+    if (!linksFromFile) eventLinks = (kind === 'sample') ? SAMPLE_LINKS : {};
+    if (linksFromFile) warnUnknownLinkKeys();
+    deriveAll();
+    buildDrawer();
+    updateNotice();
+    refresh();
+  }
+  async function loadData() {
+    for (var i = 0; i < DATA_FILES.length; i++) {
+      try {
+        var res = await fetch(DATA_FILES[i]);
+        if (res.ok) { applyText(await res.text(), DATA_FILES[i], 'file'); return; }
+      } catch (e) {}
+    }
+    applyText(SAMPLE_JSONL, 'sample', 'sample');
+  }
+
+  /* ── filtering ── */
+  function buildFilterSets() {
+    var off = state.filters;
+    filtersLive.sec = new Set(sections.filter(function (s) { return off.sections.indexOf(s) < 0; }));
+    filtersLive.it  = new Set(items.filter(function (i) { return off.items.indexOf(i) < 0; }));
+    filtersLive.yr  = new Set(years.map(String).filter(function (y) { return off.years.indexOf(y) < 0; }));
+  }
+  function computeFiltered() {
+    filtered = events.filter(function (e) {
+      return filtersLive.sec.has(e.section) && filtersLive.it.has(e.base) &&
+        filtersLive.yr.has(String(new Date(e.start).getUTCFullYear()));
+    });
+  }
+  function offCount() {
+    return state.filters.sections.length + state.filters.items.length + state.filters.years.length;
+  }
+  function rebuildAfterFilter() {
+    buildFilterSets();
+    computeFiltered();
+    recomputeLanes();
+    buildDrawer();
+    updateBadge();
+    refresh();
+    save();
+  }
+
+  /* ── FL inference (always from the full loaded data) ── */
+  function computeFLInference() {
+    events.forEach(function (e) { e.flInferred = false; });
+    var flDays = new Set();
+    events.filter(function (e) { return e.base === FL_NAME; }).forEach(function (e) {
+      for (var d = e.start; d <= e.end; d += MS) flDays.add(d);
+    });
+    if (!flDays.size) return;
+    var weeklies = events.filter(function (e) { return WEEKLY_SET.has(e.base); });
+    weeklies.forEach(function (e) {
+      var blockers = weeklies.filter(function (w) { return w !== e && w.start <= e.end && e.start <= w.end; });
+      var n = 0;
+      for (var d = e.start; d <= e.end; d += MS) {
+        if (!flDays.has(d)) continue;
+        if (blockers.some(function (w) { return w.start <= d && d <= w.end; })) continue;
+        n++;
+      }
+      e.flInferred = n >= 2;
+    });
+  }
+  function isFL(e) { return e.fl || e.flInferred; }
+
+  /* ── packing ──
+     Lanes follow the Themes-tab order of a section's events. Event types are
+     placed highest-listed first; an event always lands BELOW every overlapping
+     event listed above it (no matter which starts first), and an event that
+     overlaps nothing takes the top lane. Touching runs (end == start) share a
+     lane, as before. */
+  function recomputeLanes() {
+    laneRows = new Map(); secCounts = new Map(); capWarns = new Set();
+    var bySec = new Map();
+    filtered.forEach(function (e) {
+      if (!bySec.has(e.section)) bySec.set(e.section, []);
+      bySec.get(e.section).push(e);
+    });
+    var known = SECTION_ORDER.map(function (s) { return s.name; });
+    var order = known.filter(function (n) { return bySec.has(n); })
+      .concat([...bySec.keys()].filter(function (n) { return known.indexOf(n) < 0; }).sort());
+    order.forEach(function (sec) {
+      var evs = bySec.get(sec).slice();
+      secCounts.set(sec, evs.length);
+      var ord = orderedItems(sec);
+      var prio = new Map();
+      ord.forEach(function (nm, i) { prio.set(nm, i); });
+      evs.sort(function (a, b) {
+        var pa = prio.has(a.base) ? prio.get(a.base) : ord.length;
+        var pb = prio.has(b.base) ? prio.get(b.base) : ord.length;
+        return pa - pb || a.start - b.start || a.id - b.id;
+      });
+      var rows = [];
+      evs.forEach(function (ev) {
+        ev.row = 0; ev.seamL = false; ev.seamR = false;
+        /* lowest row forced by overlapping runs already placed (they are all
+           listed at or above this event, so it must sit below them) */
+        var minRow = 0;
+        for (var i = 0; i < rows.length; i++) {
+          for (var j = 0; j < rows[i].evs.length; j++) {
+            var o = rows[i].evs[j];
+            if (o.start < ev.end && ev.start < o.end) { if (i + 1 > minRow) minRow = i + 1; break; }
+          }
+        }
+        /* first free row at or below that floor */
+        var r = -1;
+        for (var i2 = minRow; i2 < rows.length; i2++) {
+          var free = true;
+          for (var j2 = 0; j2 < rows[i2].evs.length; j2++) {
+            var o2 = rows[i2].evs[j2];
+            if (o2.start < ev.end && ev.start < o2.end) { free = false; break; }
+          }
+          if (free) { r = i2; break; }
+        }
+        if (r < 0) { r = rows.length; rows.push({ evs: [] }); }
+        rows[r].evs.push(ev);
+        ev.row = r;
+      });
+      rows.forEach(function (row) {
+        row.evs.sort(function (a, b) { return a.start - b.start || a.id - b.id; });
+        for (var i = 0; i + 1 < row.evs.length; i++) {
+          var A = row.evs[i], B = row.evs[i + 1];
+          if (A.end === B.start) { A.seamR = true; B.seamL = true; }
+        }
+      });
+      laneRows.set(sec, rows);
+      var cap = SEC_CAP.get(sec);
+      if (cap && rows.length > cap) {
+        capWarns.add(sec);
+        console.warn('“' + sec + '” uses ' + rows.length + ' lines but its cap is ' + cap + ' — overlapping events may need checking.');
+      }
+    });
+  }
+
+  /* ── colours ── */
+  var palCache = { theme: null, vals: [] };
+  function palette() {
+    if (palCache.theme === state.theme) return palCache.vals;
+    var cs = getComputedStyle(document.body);
+    palCache = { theme: state.theme, vals: [0,1,2,3,4,5,6,7].map(function (i) { return cs.getPropertyValue('--bar-' + i).trim(); }) };
+    return palCache.vals;
+  }
+  function resolveColour(o) { return o.t === 'h' ? o.v : palette()[o.i]; }
+  function eventColorIdx(base) {
+    var rec = EV_SEC.get(base);
+    return rec ? rec.idx % 8 : 5;
+  }
+  /* a section's colour: your saved choice first, otherwise the automatic palette colour */
+  function sectionColor(sec) {
+    var ov = state.colors.sections[sec];
+    if (ov) return resolveColour(ov);
+    var i = SEC_INDEX.get(sec);
+    return palette()[(i == null ? 0 : i) % 8];
+  }
+  function barColor(ev) {
+    var c = state.colors;
+    if (c.secOverride[ev.section]) return sectionColor(ev.section);
+    var eo = c.events[ev.base];
+    if (eo) return resolveColour(eo);
+    return palette()[eventColorIdx(ev.base)];
+  }
+
+  /* ── zoom / range ── */
+  function zoomDays(z) { return z === 7 ? 7 : z * 30.4375; }
+  /* spare data kept loaded around the view: 1 month on each side in 1W mode, 6 months otherwise */
+  function bufMonths() { return state.zoom === 7 ? 1 : 6; }
+  function laneW() { return innerWidth < 760 ? 120 : 172; }
+  var MINW = { 7: 30, 1: 8, 3: 5, 6: 1.6, 12: 1.2 };
+  function refitDayW() {
+    var avail = Math.max(tl.clientWidth - laneW(), 120);
+    dayW = Math.max(avail / zoomDays(state.zoom) * state.scale, MINW[state.zoom]);
+  }
+  /* the scroll position is day-snapped: browsers report scrollLeft in whole
+     pixels, so without this rounding the derived date could sit a fraction of
+     a day before a month boundary — which made some months need two presses
+     of the arrow (the "shiver") before the label caught up */
+  function dateAtLeft() { return bufStartT + Math.round(savedScroll / dayW) * MS; }
+  function chartViewMs() { return (Math.max(tl.clientWidth - laneW(), 0) / dayW) * MS; }
+  function visibleRange() { var a = dateAtLeft(); return [a, a + chartViewMs()]; }
+  function deriveAnchor() {
+    var t = Math.min(Math.max(dateAtLeft(), bufStartT), bufEndT - 1);
+    var d = new Date(t);
+    return { y: d.getUTCFullYear(), m: d.getUTCMonth() };
+  }
+  function computeInView() {
+    var a, b;
+    if (state.listFrom != null && state.listTo != null) {
+      a = state.listFrom; b = state.listTo + MS;
+    } else {
+      a = Date.UTC(state.anchor.y, state.anchor.m, 1);
+      b = a + zoomDays(state.zoom) * MS;
+    }
+    return filtered.filter(function (ev) { return ev.end >= a && ev.start < b; });
+  }
+  function fmtListRange() {
+    if (state.listFrom == null || state.listTo == null) return '';
+    var a = new Date(state.listFrom), b = new Date(state.listTo);
+    if (a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth())
+      return a.getUTCDate() + ' – ' + b.getUTCDate() + ' ' + M_L[b.getUTCMonth()] + ' ' + b.getUTCFullYear();
+    return a.getUTCDate() + ' ' + M_S[a.getUTCMonth()] + (a.getUTCFullYear() !== b.getUTCFullYear() ? ' ' + a.getUTCFullYear() : '') +
+      ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()] + ' ' + b.getUTCFullYear();
+  }
+  function rangeLabel() {
+    var y = state.anchor.y, m = state.anchor.m, z = state.zoom;
+    if (z === 7) {
+      var a = new Date(Date.UTC(y, m, 1)), b = new Date(Date.UTC(y, m, 1) + 6 * MS);
+      return a.getUTCDate() + ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()] + ' ' + b.getUTCFullYear();
+    }
+    if (z === 12) return String(y);
+    var e = normMonth(y, m + z - 1);
+    if (z === 1) return M_L[m] + ' ' + y;
+    if (e.y === y) return M_S[m] + ' – ' + M_S[e.m] + ' ' + y;
+    return M_S[m] + ' ' + y + ' – ' + M_S[e.m] + ' ' + e.y;
+  }
+
+  /* ── toolbar ── */
+  function renderToolbar() {
+    var onList = state.tab === 'list';
+    $('#calCenter').style.display = onList ? 'none' : '';
+    $('#listCenter').style.display = onList ? '' : 'none';
+    var n;
+    if (onList) {
+      var fd = $('#fromDate'), td = $('#toDate');
+      if (document.activeElement !== fd) fd.value = state.listFrom != null ? isoOf(state.listFrom) : '';
+      if (document.activeElement !== td) td.value = state.listTo != null ? isoOf(state.listTo) : '';
+      n = computeInView().length;
+      $('#viewCount').textContent = n + ' event' + (n !== 1 ? 's' : '') + ' in range';
+    } else {
+      var y = state.anchor.y, m = state.anchor.m, z = state.zoom;
+      $('#rangeBtn').style.display = z === 12 ? 'none' : '';
+      if (z === 7) {
+        var t0 = Math.floor(dateAtLeft() / MS) * MS;
+        var a = new Date(t0), b = new Date(t0 + 6 * MS);
+        $('#rangeVal').textContent = a.getUTCMonth() === b.getUTCMonth()
+          ? a.getUTCDate() + ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()]
+          : a.getUTCDate() + ' ' + M_S[a.getUTCMonth()] + ' – ' + b.getUTCDate() + ' ' + M_S[b.getUTCMonth()];
+        $('#yearVal').textContent = String(b.getUTCFullYear());
+      } else {
+        var e = normMonth(y, m + z - 1);
+        $('#rangeVal').textContent = z === 1 ? M_L[m] : M_S[m] + ' – ' + M_S[e.m];
+        $('#yearVal').textContent = e.y === y ? String(y) : y + ' – ' + e.y;
+      }
+      var vr = visibleRange();
+      n = filtered.filter(function (ev) { return ev.end >= vr[0] && ev.start < vr[1]; }).length;
+      $('#viewCount').textContent = n + ' event' + (n !== 1 ? 's' : '') + ' in view';
+    }
+  }
+  function updateBadge() {
+    var n = offCount(), b = $('#filterBadge');
+    b.hidden = n === 0;
+    b.textContent = n;
+  }
+  function updateNotice() {
+    var slot = $('#noticeSlot');
+    /* only mention the sample data once loading has actually finished —
+       never as a flash while the real file is still being fetched */
+    if (!dataLoaded || source !== 'sample' || noticeDismissed) { slot.innerHTML = ''; return; }
+    slot.innerHTML = '<div class="notice">' +
+      '<span>Showing <b>sample data</b>. Save your events as <b>Events Machine.txt</b> (or events.jsonl) in this folder — or ' +
+      '<button class="mini" id="noticeLoad">load a file now</button>.</span>' +
+      '<button class="nx" id="noticeClose" aria-label="Dismiss">×</button></div>';
+  }
+
+  /* ── timeline ── */
+  function renderTimeline() {
+    var LANE_W = laneW();
+    var rowH = state.density === 'compact' ? 24 : 34;
+    var barH = rowH - 12;
+    var totalDays = Math.round((bufEndT - bufStartT) / MS);
+    var chartW = Math.round(totalDays * dayW);
+    function xOf(t) { return (t - bufStartT) / MS * dayW; }
+
+    var months = [];
+    for (var t = bufStartT; t < bufEndT; t = monthAddT(t, 1)) {
+      var d = new Date(t);
+      months.push({ t: t, mi: d.getUTCMonth(), yr: d.getUTCFullYear(), days: Math.round((monthAddT(t, 1) - t) / MS) });
+    }
+    var showDays = dayW >= 16, showWD = dayW >= 24;
+    var todayT = todayUTC();
+    /* the Today marker is centred on the day: half a day-cell right of its
+       left edge (minus half the 2px line width) */
+    var todayX = Math.round(xOf(todayT) + dayW / 2 - 1);
+    var todayFlagX = Math.round(xOf(todayT) + dayW / 2);
+
+    /* When days are shown the header is a single row of day cells — the weekday
+       letter sits above the number, and on the 1st of a month the month name
+       takes the letter's place. The year is only included when the cell is wide
+       enough to hold it without spilling. On very wide zooms (no day cells) a
+       separate months-only row appears, like before. */
+    var monthsHTML = '';
+    if (!showDays) {
+      months.forEach(function (mo, i) {
+        var x = Math.round(xOf(mo.t)), w = Math.round(mo.days * dayW);
+        var lb = w > 78 ? M_L[mo.mi] : M_S[mo.mi];
+        if (i === 0 || mo.mi === 0) lb += ' ' + mo.yr;
+        monthsHTML += '<div class="hmonth" style="left:' + x + 'px;width:' + w + 'px">' + lb + '</div>';
+      });
+      if (todayT >= bufStartT && todayT < bufEndT)
+        monthsHTML += '<div class="hflag" style="left:' + todayFlagX + 'px">Today</div>';
+    }
+
+    var daysHTML = '';
+    if (showDays) {
+      var wd0 = new Date(bufStartT).getUTCDay();
+      var firstCell = true;
+      for (var di = 0; di < totalDays; di++) {
+        var ts = bufStartT + di * MS, dd = new Date(ts);
+        var wd = (wd0 + di) % 7, dn = dd.getUTCDate(), we = (wd === 0 || wd === 6) ? ' we' : '';
+        var top;
+        if (dn === 1) {
+          var mi = dd.getUTCMonth(), yr = dd.getUTCFullYear();
+          var wantYr = (mi === 0 || firstCell);
+          var ml = wantYr && dayW >= 78 ? M_L[mi] + ' ' + yr
+                 : wantYr && dayW >= 52 ? M_S[mi] + ' ' + yr
+                 : (dayW >= 32 ? M_L[mi] : M_S[mi]);
+          top = '<i class="mo">' + ml + '</i>';
+        } else {
+          top = showWD ? '<i>' + WD[wd] + '</i>' : '';
+        }
+        daysHTML += '<div class="hday' + we + '" style="left:' + Math.round(di * dayW) + 'px;width:' + Math.ceil(dayW) + 'px">' +
+          top + '<b>' + dn + '</b></div>';
+        firstCell = false;
+      }
+      if (todayT >= bufStartT && todayT < bufEndT)
+        daysHTML += '<div class="hflag" style="left:' + todayFlagX + 'px">Today</div>';
+    }
+    var gridBg = dayW >= 7
+      ? 'background-image:repeating-linear-gradient(90deg,var(--dayline) 0 1px,transparent 1px ' + dayW + 'px);' : '';
+
+    var grid = '';
+    months.forEach(function (mo) { grid += '<div class="gmonth" style="left:' + Math.round(xOf(mo.t)) + 'px"></div>'; });
+    if (state.weekends && dayW >= 7) {
+      var wd0b = new Date(bufStartT).getUTCDay();
+      if (wd0b === 0) grid += '<div class="gwkd" style="left:0;width:' + dayW + 'px"></div>';
+      var di2 = (6 - wd0b + 7) % 7;
+      for (; di2 < totalDays; di2 += 7) grid += '<div class="gwkd" style="left:' + Math.round(di2 * dayW) + 'px;width:' + dayW * 2 + 'px"></div>';
+    }
+    if (todayT >= bufStartT && todayT < bufEndT)
+      grid += '<div class="gtoday" style="left:' + todayX + 'px"></div>';
+
+    var flOn = state.showFL;
+    var half = dayW / 2;
+    var sgap = Math.min(dayW / 2, 3);
+    var minBar = Math.max(2, Math.min(dayW * 0.4, 10));
+    var lanesHTML = '';
+    sections.forEach(function (sec) {
+      /* hidden via the corner triangle: the whole lane is skipped on the calendar.
+         This is display-only — filters, the drawer and the list view are untouched. */
+      if (state.hiddenSecs.indexOf(sec) >= 0) return;
+      var rows = laneRows.get(sec) || [];
+      var nRows = Math.max(rows.length, 1);
+      var total = secCounts.get(sec) || 0;
+      var capFlag = capWarns.has(sec)
+        ? '<span class="capdot" title="More concurrent events than this section\'s cap — check for overlapping or stray lines"></span>' : '';
+      var barsHTML = '';
+      rows.forEach(function (row) {
+        row.evs.forEach(function (ev, i) {
+          if (ev.end < bufStartT || ev.start >= bufEndT) return;
+          var x1 = xOf(ev.start) + half + (ev.seamL ? sgap / 2 : 0);
+          var x2 = xOf(ev.end) + half - (ev.seamR ? sgap / 2 : 0);
+          if (x2 - x1 < minBar && !ev.seamL) x1 = x2 - minBar;
+          var w = Math.max(x2 - x1, 1.5);
+          var right = x1 + w;
+          var top = ev.row * rowH + (rowH - barH) / 2;
+          var col = barColor(ev);
+          var isFl = flOn && isFL(ev);
+
+          var inLbl = '', outLbl = '';
+          if (state.labels) {
+            if (w >= 40) {
+              inLbl = '<span class="bl" style="color:' + textColorFor(col) + '">' + iconHTML(ev.base) + esc(ev.name) + '</span>';
+            } else {
+              var next = row.evs[i + 1];
+              var limit = next ? xOf(next.start) + half + (next.seamL ? sgap / 2 : 0) : chartW;
+              var room = limit - right - 8;
+              if (room >= 34) {
+                outLbl = '<span class="blo' + (flOn && !isFl ? ' dim' : '') + '" style="left:' + (right + 5) + 'px;top:' + top + 'px;height:' + barH + 'px;max-width:' + Math.min(room, 170) + 'px">' + iconHTML(ev.base) + esc(ev.name) + '</span>';
+              }
+            }
+          }
+          var badge = isFl && w >= 26 ? '<i class="flb">FL</i>' : '';
+          barsHTML += '<div class="bar' + (isFl ? ' is-fl' : '') + '" data-id="' + ev.id + '" style="left:' + x1 + 'px;width:' + w + 'px;top:' + top + 'px;height:' + barH + 'px;background:' + col + '">' + inLbl + badge + '</div>' + outLbl;
+        });
+      });
+      lanesHTML += '<div class="lane">' +
+        '<div class="lane-label" style="width:' + LANE_W + 'px">' +
+          '<span class="dot" style="background:' + sectionColor(sec) + '"></span>' + capFlag +
+          '<span class="ltxt"><b>' + esc(sec) + '</b></span>' +
+          '<span class="lcount">' + total + '</span>' +
+        '</div>' +
+        '<div class="lane-chart" style="width:' + chartW + 'px;height:' + nRows * rowH + 'px">' + barsHTML + '</div>' +
+      '</div>';
+    });
+
+    tl.innerHTML = '<div class="tl-inner" style="width:' + (LANE_W + chartW) + 'px">' +
+      '<div class="tl-head">' +
+        '<div class="tl-corner" style="width:' + LANE_W + 'px">' +
+          '<span>sections</span>' +
+          '<button id="secTri" class="sectri" title="Show or hide section lanes on the calendar (display only)" aria-label="Show or hide section lanes on the calendar">' +
+            '<svg width="9" height="7" viewBox="0 0 10 8"><path d="M0 .5h10L5 7.5z" fill="currentColor"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="tl-headcol" style="width:' + chartW + 'px;' + gridBg + '">' +
+          (showDays
+            ? '<div class="hd-row">' + daysHTML + '</div>'
+            : '<div class="hm-row">' + monthsHTML + '</div>') +
+        '</div>' +
+      '</div>' +
+      '<div class="tl-lanewrap">' +
+        '<div class="tl-grid" style="left:' + LANE_W + 'px;width:' + chartW + 'px;' + gridBg + '">' + grid + '</div>' +
+        lanesHTML +
+      '</div>' +
+    '</div>';
+    tl.classList.toggle('fl-on', flOn);
+    tl.scrollLeft = savedScroll;
+  }
+
+  function updateEmptyOverlay() {
+    var el = $('#tlEmpty');
+    if (!dataLoaded) { el.hidden = false; el.innerHTML = '<p>loading events…</p>'; return; }
+    if (!events.length) { el.hidden = false; el.innerHTML = '<p>No events loaded.</p>'; return; }
+    var vr = visibleRange();
+    var any = filtered.some(function (ev) { return ev.end >= vr[0] && ev.start < vr[1] && state.hiddenSecs.indexOf(ev.section) < 0; });
+    el.hidden = any;
+    if (!any) {
+      el.innerHTML = '<p>Nothing on the calendar here — keep scrolling, or…</p><div class="tl-empty-btns">' +
+        (filtered.length ? '<button class="mini" id="jumpNear">Jump to nearest event</button>' : '') +
+        (offCount() ? '<button class="mini" id="clearF">Clear filters</button>' : '') + '</div>';
+    }
+  }
+
+  /* ── buffer management ── */
+  function handleScrollFrame() {
+    savedScroll = tl.scrollLeft;
+    var rightGap = tl.scrollWidth - tl.clientWidth - savedScroll;
+    var trigger = (state.zoom === 7 ? 1 : 2) * 30.4375 * dayW;
+    if (rightGap < trigger) extendRight();
+    else if (savedScroll < trigger) extendLeft();
+    maybeTrim();
+    postScrollUpdate();
+  }
+  function extendRight() {
+    bufEndT = monthAddT(bufEndT, bufMonths());
+    renderTimeline();
+  }
+  function extendLeft() {
+    var old = bufStartT;
+    bufStartT = monthAddT(bufStartT, -bufMonths());
+    savedScroll += (old - bufStartT) / MS * dayW;
+    renderTimeline();
+  }
+  function maybeTrim() {
+    var viewL = dateAtLeft(), viewR = viewL + chartViewMs();
+    var BM = bufMonths();
+    var KEEP = 3 * BM * 30.4375 * MS, STEP = BM * 30.4375 * MS;
+    var ns = bufStartT, ne = bufEndT;
+    while (viewL - ns > KEEP + STEP) ns = monthAddT(ns, BM);
+    while (ne - viewR > KEEP + STEP) ne = monthAddT(ne, -BM);
+    if (ns !== bufStartT || ne !== bufEndT) {
+      savedScroll -= (ns - bufStartT) / MS * dayW;
+      bufStartT = ns; bufEndT = ne;
+      renderTimeline();
+    }
+  }
+  function postScrollUpdate() {
+    var a = deriveAnchor();
+    if (a.y !== state.anchor.y || a.m !== state.anchor.m) state.anchor = a;
+    renderToolbar();
+    updateEmptyOverlay();
+    clearTimeout(anchorSaveTimer);
+    anchorSaveTimer = setTimeout(save, 500);
+  }
+  /* goToDate(t, center): places t at the left edge by default; with center=true
+     the day t lands in the middle of the chart instead (used by the Today button) */
+  function goToDate(t, center) {
+    var viewMs = Math.max(chartViewMs(), zoomDays(7) * dayW * MS);
+    var marginMs = (state.zoom === 7 ? 1 : 2.5) * 30.4375 * MS;
+    var lo = center ? t - viewMs / 2 : t;
+    var hi = center ? t + viewMs / 2 : t + viewMs;
+    var delta = 0, changed = false;
+    while (bufStartT > lo - marginMs) { var old = bufStartT; bufStartT = monthAddT(bufStartT, -bufMonths()); delta += (old - bufStartT) / MS * dayW; changed = true; }
+    while (bufEndT < hi + marginMs) { bufEndT = monthAddT(bufEndT, bufMonths()); changed = true; }
+    if (changed) { savedScroll += delta; renderTimeline(); }
+    var halfPx = center ? Math.max(tl.clientWidth - laneW(), 0) / 2 : 0;
+    var x = Math.max(0, (t - bufStartT) / MS * dayW - halfPx);
+    savedScroll = x;
+    tl.scrollLeft = x;
+    maybeTrim();
+    postScrollUpdate();
+  }
+  function step(dir) {
+    if (state.tab === 'list' && state.listFrom != null && state.listTo != null) {
+      var dur = Math.max(state.listTo - state.listFrom, MS);
+      state.listFrom += dir * dur;
+      state.listTo += dir * dur;
+      save(); renderToolbar(); renderList();
+      return;
+    }
+    if (state.zoom === 7) {
+      var t = Math.floor(dateAtLeft() / MS) * MS + dir * 7 * MS;
+      goToDate(t);
+    } else {
+      goToDate(Date.UTC(state.anchor.y, state.anchor.m + dir * state.zoom, 1));
+    }
+  }
+
+  /* ── list view ── */
+  function rowHTML(ev) {
+    var badge = isFL(ev) ? '<span class="flbadge">FL</span>' : '';
+    return '<button class="lrow' + (isFL(ev) ? ' has-fl' : '') + '" data-id="' + ev.id + '">' +
+      (hasIcon(ev.base)
+        ? iconHTML(ev.base)
+        : '<span class="ldot" style="background:' + barColor(ev) + '"></span>') +
+      '<span class="ln">' + esc(ev.name) + badge + '</span>' +
+      '<span class="ls">' + esc(ev.section) + '</span>' +
+      '<span class="ld">' + esc(fmtRange(ev)) + '</span>' +
+      '<span class="llu">' + ev.days + 'd</span></button>';
+  }
+  function informalHTML(inV) {
+    var s = state.sort;
+    var list = inV.slice().sort(
+      s === 'name' ? function (a, b) { return a.name.localeCompare(b.name); } :
+      s === 'section' ? function (a, b) { return a.section === b.section ? a.start - b.start : a.section.localeCompare(b.section); } :
+      function (a, b) { return a.start - b.start || a.name.localeCompare(b.name); });
+    if (s !== 'date') return list.map(rowHTML).join('');
+    var curKey = '', curLabel = '', buf = [];
+    var groups = [];
+    list.forEach(function (ev) {
+      var d = new Date(ev.start), key = d.getUTCFullYear() + '-' + d.getUTCMonth();
+      if (key !== curKey) {
+        if (buf.length) groups.push({ label: curLabel, evs: buf });
+        buf = []; curKey = key;
+        curLabel = M_L[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+      }
+      buf.push(ev);
+    });
+    if (buf.length) groups.push({ label: curLabel, evs: buf });
+    return groups.map(function (g) {
+      return '<div class="lg"><div class="lg-head">' + esc(g.label) + '<span>' + g.evs.length + '</span></div>' +
+        g.evs.map(rowHTML).join('') + '</div>';
+    }).join('');
+  }
+  function analyticalHTML(inV) {
+    var cols = [['event','Event'],['section','Section'],['start','Start'],['end','End'],['days','Days']];
+    var col = state.tsort.col, dir = state.tsort.dir;
+    var mul = dir === 'asc' ? 1 : -1;
+    var list = inV.slice().sort(function (a, b) {
+      var r = 0;
+      if (col === 'event') r = a.name.localeCompare(b.name);
+      else if (col === 'section') r = a.section.localeCompare(b.section) || a.name.localeCompare(b.name);
+      else if (col === 'start') r = a.start - b.start || a.name.localeCompare(b.name);
+      else if (col === 'end') r = a.end - b.end || a.name.localeCompare(b.name);
+      else r = a.days - b.days || a.start - b.start;
+      return r * mul;
+    });
+    var head = cols.map(function (c) {
+      var on = col === c[0];
+      return '<th data-col="' + c[0] + '" class="' + (on ? 'on' : '') + (c[0] === 'days' ? ' r' : '') + '" title="Sort by ' + c[1] + '"><span>' + c[1] + '</span>' +
+        '<span class="tri"><i class="tu' + (on && dir === 'asc' ? ' act' : '') + '"></i><i class="td' + (on && dir === 'desc' ? ' act' : '') + '"></i></span></th>';
+    }).join('');
+    var rows = list.map(function (ev) {
+      return '<tr data-id="' + ev.id + '" class="' + (isFL(ev) ? 'has-fl' : '') + '">' +
+        '<td>' + (hasIcon(ev.base)
+          ? iconHTML(ev.base)
+          : '<span class="ldot" style="background:' + barColor(ev) + '"></span>') + esc(ev.name) + (isFL(ev) ? '<span class="flbadge">FL</span>' : '') + '</td>' +
+        '<td class="c-sec">' + esc(ev.section) + '</td>' +
+        '<td class="c-dt">' + fmtD(ev.start) + '</td>' +
+        '<td class="c-dt">' + fmtD(ev.end) + '</td>' +
+        '<td class="c-dy">' + ev.days + '</td></tr>';
+    }).join('');
+    return '<table class="atable"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+  function renderList() {
+    var inV = computeInView();
+    var fmt = state.listFormat;
+    var ana = fmt === 'analytical';
+    var rng = state.listFrom != null ? esc(fmtListRange()) : esc(rangeLabel());
+    var head = '<div class="list-head">' +
+      '<span>' + inV.length + ' event' + (inV.length !== 1 ? 's' : '') + (rng ? ' · ' + rng : '') + '</span>' +
+      '<span class="lh-controls">' +
+        '<div class="sortseg">' + [['date','Date'],['name','Name'],['section','Section']].map(function (v) {
+          return '<button data-sort="' + v[0] + '"' + (state.sort === v[0] ? ' class="on"' : '') + (ana ? ' disabled' : '') + '>' + v[1] + '</button>';
+        }).join('') + '</div>' +
+        '<div class="seg">' +
+          '<button data-fmt="informal"' + (fmt === 'informal' ? ' class="on"' : '') + '>Informal</button>' +
+          '<button data-fmt="analytical"' + (ana ? ' class="on"' : '') + '>Analytical</button>' +
+        '</div>' +
+      '</span></div>';
+    var body;
+    if (!inV.length) body = '<div class="list-empty">Nothing in this range — try different dates or loosen the filters.</div>';
+    else body = ana ? analyticalHTML(inV) : informalHTML(inV);
+    var pane = $('#pane-list');
+    pane.innerHTML = head + '<div class="list-body">' + body + '</div>';
+    pane.classList.toggle('fl-on', state.showFL);
+    if (state.vHeight) { var lb = pane.querySelector('.list-body'); if (lb) lb.style.height = state.vHeight + 'px'; }
+  }
+
+  /* ── themes pane ── */
+  function renderThemes() {
+    var fonts = [
+      ['sans', 'Instrument Sans', 'clean sans — the default'],
+      ['serif', 'Fraunces', 'bookish serif'],
+      ['mono', 'IBM Plex Mono', 'technical mono']
+    ];
+    var c = state.colors;
+    var loNames = Object.keys(state.loadouts).sort(function (a, b) { return a.localeCompare(b); });
+    var loSel = loNames.includes(state.lastLoadout) ? state.lastLoadout : '';
+
+    var groupsHTML = sections.map(function (sec) {
+      var ov = c.sections[sec];
+      var on = !!c.secOverride[sec];
+      var evs = orderedItems(sec);
+      var evRows = evs.map(function (nm) {
+        var own = c.events[nm];
+        var col = own ? resolveColour(own) : palette()[eventColorIdx(nm)];
+        return '<div class="crow cevt">' +
+          '<button class="csw' + (own ? '' : ' auto') + '" data-cname="' + esc(nm) + '" style="background:' + col + '" title="Set colour"></button>' +
+          '<span class="cn">' + esc(nm) + '</span>' + (own ? '<span class="ov">custom</span>' : '') + '</div>';
+      }).join('');
+      return '<div class="cgroup">' +
+        '<div class="crow">' +
+          '<button class="csw' + (ov ? '' : ' auto') + '" data-secname="' + esc(sec) + '" style="background:' + sectionColor(sec) + '" title="Set section colour"></button>' +
+          '<span class="cn"><b>' + esc(sec) + '</b></span>' +
+          '<button class="ovbtn' + (on ? ' on' : '') + '" data-ovsec="' + esc(sec) + '" title="' +
+            (on ? 'Events in this section are using the section colour — click to release them' : 'Make every event in this section use the section colour') + '">' +
+            (on ? 'overriding' : 'override events') + '</button>' +
+        '</div>' + evRows + '</div>';
+    }).join('');
+
+    $('#pane-themes').innerHTML = '<div class="settings">' +
+      '<div class="set-group"><h3>Font</h3>' +
+        '<div class="fontopts">' + fonts.map(function (f) {
+          return '<button class="fontopt' + (state.font === f[0] ? ' on' : '') + '" data-font="' + f[0] + '">' +
+            '<span class="fprev" style="font-family:var(--f-' + f[0] + ')">' + f[1] + '</span>' +
+            '<span class="fname">' + f[2] + '</span></button>';
+        }).join('') + '</div>' +
+      '</div>' +
+      '<div class="set-group"><h3>Display</h3>' +
+        '<div class="setrow"><span class="lab">Row density<small>how tall each event line is</small></span>' +
+          '<div class="seg"><button data-density="comfortable" class="' + (state.density === 'comfortable' ? 'on' : '') + '">Comfortable</button><button data-density="compact" class="' + (state.density === 'compact' ? 'on' : '') + '">Compact</button></div></div>' +
+        '<div class="setrow"><span class="lab">Weekend shading<small>faint tint on Sat/Sun when zoomed in</small></span>' +
+          '<label class="sw"><input type="checkbox" id="wkndSw"' + (state.weekends ? ' checked' : '') + '><i></i></label></div>' +
+        '<div class="setrow"><span class="lab">Event labels<small>on the bars when they fit, beside them when they don\'t</small></span>' +
+          '<label class="sw"><input type="checkbox" id="lblSw"' + (state.labels ? ' checked' : '') + '><i></i></label></div>' +
+        '<div class="setrow"><span class="lab">FL highlighting<small>the FL button on the Calendar &amp; List tabs</small></span>' +
+          '<label class="sw"><input type="checkbox" id="flSw"' + (state.showFL ? ' checked' : '') + '><i></i></label></div>' +
+      '</div>' +
+      '<div class="set-group">' +
+        '<h3>Colours <button class="mini2" id="resetColours" style="margin-left:auto" title="Return to the Default layout">Reset colours</button></h3>' +
+        '<div class="lorow">' +
+          '<select class="loselect" id="loSelect"' + (loNames.length ? '' : ' disabled') + '>' +
+            (loNames.length
+              ? loNames.map(function (n) { return '<option value="' + esc(n) + '"' + (n === loSel ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('')
+              : '<option value="">no load-outs saved yet</option>') +
+          '</select>' +
+          '<button class="mini" id="loSave">save as…</button>' +
+          '<button class="mini" id="loUpdate"' + (loSel ? '' : ' disabled') + '>update</button>' +
+          '<button class="mini" id="loDelete"' + (loSel ? '' : ' disabled') + '>delete</button>' +
+        '</div>' +
+        '<div class="lorow">' +
+          '<button class="mini" id="loExport" title="Download your current colours + every saved load-out as a file">export file</button>' +
+          '<button class="mini" id="loImport" title="Load colour layouts from an exported file">import file…</button>' +
+          '<span id="loStatus"></span>' +
+        '</div>' +
+        '<div class="lorow loinput" id="loInputRow" hidden>' +
+          '<input id="loName" type="text" placeholder="load-out name — e.g. Default" maxlength="24">' +
+          '<button class="mini" id="loConfirm">save</button>' +
+          '<button class="mini" id="loCancel">cancel</button>' +
+        '</div>' +
+        '<div class="csub"><b>sections &amp; events</b>' +
+          '<span class="csub-acts"><span class="csub-lab">event override:</span>' +
+            '<button class="mini2" data-ovall="1" title="Every section\'s colour overrides its events">all</button>' +
+            '<button class="mini2" data-ovnone="1" title="No section overrides its events">none</button></span></div>' +
+        (groupsHTML || '<p class="dhint">No data loaded yet.</p>') +
+      '</div>' +
+      '<div class="set-group"><h3>Data <span class="h-note">Download event data</span></h3>' +
+        '<div class="dbtns">' +
+          '<button class="mini" id="expReadable">Event data - Readable form</button>' +
+          '<button class="mini" id="expMachine">Event data - Machine form</button>' +
+        '</div>' +
+        '<p class="dstat" id="expStatus"></p>' +
+      '</div>' +
+      '<div class="set-group"><h3>Reset</h3>' +
+        '<button class="danger" id="resetBtn">' + (resetArmed ? 'Click again to confirm' : 'Reset all settings') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderPane(t) {
+    if (t === 'calendar') { renderTimeline(); updateEmptyOverlay(); }
+    else if (t === 'list') renderList();
+    else renderThemes();
+  }
+  function refresh() { renderToolbar(); updateBadge(); renderPane(state.tab); }
+  function setTab(t) {
+    state.tab = t;
+    save();
+    document.querySelectorAll('.tab').forEach(function (b) {
+      var on = b.dataset.tab === t;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on);
+    });
+    $('#card').classList.toggle('on-themes', t === 'themes');
+    $('#card').classList.toggle('on-list', t === 'list');
+    ['calendar', 'list', 'themes'].forEach(function (p) {
+      $('#pane-' + p).classList.toggle('active', p === t);
+    });
+    if (t === 'list' && state.listFrom == null) {
+      state.listFrom = Date.UTC(state.anchor.y, state.anchor.m, 1);
+      state.listTo = state.listFrom + (Math.round(zoomDays(state.zoom)) - 1) * MS;
+    }
+    if (t === 'calendar') {
+      if (pendingZoomRebuild) { pendingZoomRebuild = false; rebuildAroundAnchor(); }
+      else { var old = dayW; refitDayW(); savedScroll = savedScroll / old * dayW; }
+    }
+    renderPane(t);
+    renderToolbar();
+  }
+
+  /* ── colour load-outs / default template ── */
+  function loStatus(msg, warn) {
+    var el = $('#loStatus');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.toggle('warn', !!warn);
+    clearTimeout(loStatusTimer);
+    loStatusTimer = setTimeout(function () { if (el.isConnected) el.textContent = ''; }, 3200);
+  }
+  function resetColours() {
+    if (DEFAULT_LAYOUT) {
+      state.colors = clone(DEFAULT_LAYOUT);
+      state.lastLoadout = '';
+      loStatus('reset to the default template');
+    } else if (state.loadouts['Default']) {
+      state.colors = clone(state.loadouts['Default']);
+      state.lastLoadout = 'Default';
+      loStatus('reset to the Default load-out');
+    } else {
+      state.colors = { sections: {}, events: {}, secOverride: {} };
+      state.lastLoadout = '';
+      loStatus('colours reset to automatic');
+    }
+    save();
+    buildDrawer();
+    renderPane('themes');
+    if (state.tab === 'calendar') renderTimeline();
+  }
+  function exportColours() {
+    var data = { format: 'bigfarm-colours', version: 1, exported: new Date().toISOString(), current: state.colors, loadouts: state.loadouts };
+    downloadText(JSON.stringify(data, null, 2), 'bigfarm-colours.json');
+    loStatus('exported colours + load-outs');
+  }
+  function importColoursText(text) {
+    var obj;
+    try { obj = JSON.parse(text); } catch (e) { loStatus("couldn't read that as JSON", true); return; }
+    var applied = false, imported = 0;
+    if (obj && typeof obj === 'object') {
+      if (obj.loadouts && typeof obj.loadouts === 'object') {
+        for (var n in obj.loadouts) {
+          if (n && obj.loadouts[n] && typeof obj.loadouts[n] === 'object') { state.loadouts[n] = normalizeLayout(obj.loadouts[n]); imported++; }
+        }
+      }
+      var cur = obj.current || ((obj.sections || obj.events || obj.secOverride) ? obj : null);
+      if (cur) { state.colors = normalizeLayout(cur); applied = true; }
+    }
+    if (!applied && !imported) { loStatus('no colour layouts found in that file', true); return; }
+    if (!state.loadouts[state.lastLoadout]) state.lastLoadout = '';
+    save();
+    buildDrawer();
+    setTab('themes');
+    loStatus('imported' + (imported ? ' ' + imported + ' load-out' + (imported > 1 ? 's' : '') : '') + (applied ? ' + current colours' : ''));
+  }
+  function fetchDefaultTemplate() {
+    fetch(TEMPLATE_FILE)
+      .then(function (r) { if (!r.ok) throw new Error('missing'); return r.json(); })
+      .then(function (o) {
+        var cur = (o && typeof o === 'object' && o.current) ? o.current : o;
+        DEFAULT_LAYOUT = normalizeLayout(cur);
+        defaultFound = true;
+        if (!hasOverrides(state.colors)) {
+          state.colors = clone(DEFAULT_LAYOUT);
+          buildDrawer();
+          refresh();
+        } else if (state.tab === 'themes') {
+          renderPane('themes');
+        }
+      })
+      .catch(function () {});
+  }
+
+  /* ── exports ── */
+  function downloadText(text, name) {
+    var blob = new Blob([text], { type: 'text/plain' });
+    var a = document.createElement('a');
+    var url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+  function exportEvents(machine) {
+    var el = $('#expStatus');
+    if (!events.length) { el.textContent = 'nothing loaded to export'; return; }
+    var text;
+    if (machine) {
+      text = events.map(function (e) {
+        var o = { start: isoOf(e.start), end: isoOf(e.end), event: e.name, section: e.section };
+        if (e.fl) o.fl = true;
+        return JSON.stringify(o);
+      }).join('\n');
+    } else {
+      text = events.slice().sort(function (a, b) { return a.start - b.start; }).map(function (e) {
+        var s = dmy(e.start);
+        return (e.start === e.end ? s : s + ' → ' + dmy(e.end)) + ' · ' + e.name + (e.fl ? ' - FL' : '');
+      }).join('\n');
+    }
+    downloadText(text + '\n', machine ? 'Events Machine.txt' : 'Events Readable.txt');
+    el.textContent = 'exported ' + events.length + ' events';
+    setTimeout(function () { if (el.isConnected) el.textContent = ''; }, 2500);
+  }
+
+  /* ── the event pane (info + links) — interactive, auto-sized ── */
+  var tip = $('#tip');
+  function showTip(anchorEl) {
+    var ev = events.find(function (x) { return x.id === +anchorEl.dataset.id; });
+    if (!ev) return;
+    var col = barColor(ev);
+    var ls = lookupLinks(ev);
+    var html = '<div class="tt" style="border-color:' + col + '"><b>' + esc(ev.name) + '</b>' +
+      '<span class="sec">' + esc(ev.section) + '</span>' +
+      '<span class="td">' + esc(fmtRange(ev)) + ' · ' + ev.days + (ev.days > 1 ? ' days' : ' day') + '</span>' +
+      (isFL(ev) ? '<span class="fl">COUNTS FOR FL</span>' : '');
+    if (ls.length) {
+      html += '<div class="tlinks">';
+      ls.forEach(function (l) {
+        var st = l.color ? ' style="color:' + l.color + '"' : '';
+        var chip = l.color ? ' style="background:' + l.color + '"' : '';
+        html += '<a class="tlink" href="' + esc(l.url) + '" target="_blank" rel="noopener noreferrer"' + st + '>' +
+          '<i' + chip + '></i><span>' + esc(l.text) + '</span>' +
+          '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></a>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+    tip.innerHTML = html;
+    tip.style.display = 'block';
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var r = anchorEl.getBoundingClientRect();
+    var x = r.left + Math.min(r.width / 2, 140) - w / 2;
+    x = Math.min(Math.max(8, x), innerWidth - w - 8);
+    var y = r.top - h - 8;
+    if (y < 8) y = r.bottom + 8;
+    if (y + h > innerHeight - 8) y = Math.max(8, innerHeight - h - 8);
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hideTip() { tip.style.display = 'none'; }
+
+  /* ── popovers ── */
+  var pop = $('#pop');
+  var popAnchor = null, popHandler = null;
+  function openPop(anchor, title, html, handler) {
+    pop.innerHTML = '<div class="poptitle">' + title + '</div>' + html;
+    popHandler = handler;
+    popAnchor = anchor;
+    pop.style.display = 'block';
+    var r = anchor.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
+    var x = Math.min(Math.max(8, r.left), innerWidth - pw - 8);
+    var y = r.bottom + 6;
+    if (y + ph > innerHeight - 8) y = Math.max(8, r.top - ph - 6);
+    pop.style.left = x + 'px';
+    pop.style.top = y + 'px';
+  }
+  function closePop() {
+    pop.style.display = 'none';
+    if (popAnchor && popAnchor.classList) popAnchor.classList.remove('open');
+    popAnchor = null; popHandler = null;
+  }
+  pop.addEventListener('click', function (e) { if (popHandler) popHandler(e); });
+  document.addEventListener('mousedown', function (e) {
+    if (pop.style.display === 'block' && !pop.contains(e.target) && !(popAnchor && popAnchor.contains(e.target))) closePop();
+  });
+
+  /* the little triangle in the calendar's corner: lane visibility only.
+     Hidden lanes simply don't render — filters, the drawer, and the list view
+     are completely unaffected. */
+  function openCornerPop() {
+    var btn = $('#secTri');
+    if (pop.style.display === 'block' && popAnchor === btn) { closePop(); return; }
+    var list = sections.map(function (sec) {
+      var shown = state.hiddenSecs.indexOf(sec) < 0;
+      return '<label class="prow"><span class="dot" style="background:' + sectionColor(sec) + '"></span>' +
+        '<span class="psec">' + esc(sec) + '</span>' +
+        '<input type="checkbox" data-hsec="' + esc(sec) + '"' + (shown ? ' checked' : '') + '></label>';
+    }).join('');
+    openPop(btn, 'calendar lanes', '<div class="pseclist">' + list + '</div>', function () {});
+    btn.classList.add('open');
+    pop.querySelectorAll('input[data-hsec]').forEach(function (cb) {
+      cb.addEventListener('change', function () {
+        var sec = cb.dataset.hsec;
+        var i = state.hiddenSecs.indexOf(sec);
+        if (cb.checked && i >= 0) state.hiddenSecs.splice(i, 1);
+        if (!cb.checked && i < 0) state.hiddenSecs.push(sec);
+        /* re-render only the calendar; the pop stays open on the new corner button */
+        renderTimeline();
+        updateEmptyOverlay();
+        save();
+        if (popAnchor && popAnchor.id === 'secTri') {
+          popAnchor = $('#secTri');
+          if (popAnchor) popAnchor.classList.add('open');
+        }
+      });
+    });
+  }
+
+  function openMonthPop() {
+    openPop($('#rangeBtn'), 'jump to month',
+      '<div class="pgrid">' + M_S.map(function (m, i) {
+        return '<button class="pm' + (i === state.anchor.m ? ' on' : '') + '" data-m="' + i + '">' + m + '</button>';
+      }).join('') + '</div>',
+      function (e) {
+        var b = e.target.closest('[data-m]');
+        if (!b) return;
+        goToDate(Date.UTC(state.anchor.y, +b.dataset.m, 1));
+        closePop();
+      });
+  }
+  function openYearPop() {
+    var ys = years.length ? years : [state.anchor.y];
+    var min = Math.min.apply(null, ys.concat([now0.getFullYear()])) - 1;
+    var max = Math.max.apply(null, ys.concat([now0.getFullYear()])) + 1;
+    var list = [];
+    for (var y = min; y <= max; y++) list.push(y);
+    openPop($('#yearBtn'), 'jump to year',
+      '<div class="pgrid y">' + list.map(function (y2) {
+        return '<button class="pm' + (y2 === state.anchor.y ? ' on' : '') + '" data-y="' + y2 + '">' + y2 + '</button>';
+      }).join('') + '</div>',
+      function (e) {
+        var b = e.target.closest('[data-y]');
+        if (!b) return;
+        goToDate(Date.UTC(+b.dataset.y, 0, 1));
+        closePop();
+      });
+  }
+  /* colour picker — custom colours commit on both `input` (live drag) and `change` (confirm),
+     the active palette swatch is marked, and the pop shows its current state with an explicit
+     done button. Events: "reset to automatic". Sections: "reset to default". */
+  function openColorPop(kind, key, anchor) {
+    var store = state.colors[kind === 'event' ? 'events' : 'sections'];
+    var cur = store[key];
+    var swHTML = palette().map(function (c, i) {
+      var on = cur && cur.t === 'p' && cur.i === i;
+      return '<button class="swb' + (on ? ' on' : '') + '" data-p="' + i + '" style="background:' + c + '" title="palette colour ' + (i + 1) + '"></button>';
+    }).join('');
+    openPop(anchor, 'colour · ' + key,
+      '<div class="swrow">' + swHTML + '</div>' +
+      '<div class="custom-row">' +
+        '<input type="color" id="cPick" value="' + (cur && cur.t === 'h' ? cur.v : '#C25B3C') + '" title="Choose any custom colour">' +
+        '<span class="lbl">custom — pick a colour, it applies at once</span>' +
+      '</div>' +
+      '<div class="pacts">' +
+        '<span id="cState"></span>' +
+        '<span style="margin-left:auto;display:flex;gap:6px">' +
+          '<button class="mini2" id="cReset">' + (kind === 'event' ? 'reset to automatic' : 'reset to default') + '</button>' +
+          '<button class="mini2" id="cDone">done</button>' +
+        '</span>' +
+      '</div>',
+      function (e) {
+        var swb = e.target.closest('[data-p]');
+        if (swb) { store[key] = { t: 'p', i: +swb.dataset.p }; after(); return; }
+        if (e.target.closest('#cReset')) { delete store[key]; after(); return; }
+        if (e.target.closest('#cDone')) { closePop(); return; }
+      });
+    function pick() {
+      store[key] = { t: 'h', v: pop.querySelector('#cPick').value };
+      after(true);
+    }
+    pop.querySelector('#cPick').addEventListener('input', pick);
+    pop.querySelector('#cPick').addEventListener('change', pick);
+    function after(keepOpen) {
+      save();
+      buildDrawer();
+      renderPane('themes');
+      if (state.tab === 'calendar') renderTimeline();
+      /* refresh the pop's own indicators without rebuilding its colour input */
+      var cur2 = store[key];
+      var pal2 = !!(cur2 && cur2.t === 'p');
+      pop.querySelectorAll('.swb').forEach(function (b) {
+        b.classList.toggle('on', pal2 && cur2.i === +b.dataset.p);
+      });
+      var st = pop.querySelector('#cState');
+      if (st) st.textContent = (cur2 && cur2.t === 'h') ? 'custom colour in use'
+        : pal2 ? 'palette colour in use' : 'automatic colour';
+      if (!keepOpen) closePop();
+    }
+    (function () {
+      var st = pop.querySelector('#cState');
+      if (st) st.textContent = (cur && cur.t === 'h') ? 'custom colour in use'
+        : (cur && cur.t === 'p') ? 'palette colour in use' : 'automatic colour';
+    })();
+  }
+
+  /* ── filter drawer ── */
+  function buildDrawer() {
+    var body = $('#drawerBody');
+    if (!sections.length) { body.innerHTML = '<p class="d-empty">No data loaded yet.</p>'; $('#drawerFoot').textContent = ''; return; }
+    var html = '<div class="dselbar"><b>Select</b><span class="dg-acts">' +
+        '<button class="mini2" data-topall="1" title="Check everything">All</button>' +
+        '<button class="mini2" data-topnone="1" title="Uncheck all sections &amp; events">None</button></span></div>' +
+      '<input class="dsearch" type="search" placeholder="find an event…">';
+    sections.forEach(function (sec) {
+      var cnt = events.filter(function (e) { return e.section === sec; }).length;
+      var evs = orderedItems(sec);
+      html += '<div class="dgroup" data-sec="' + esc(sec) + '">' +
+        '<label class="drow dsec">' +
+          '<span class="dot" style="background:' + sectionColor(sec) + '"></span>' +
+          '<span class="dv">' + esc(sec) + '</span><span class="cnt">' + cnt + '</span>' +
+          '<input type="checkbox" data-g="sections" value="' + esc(sec) + '"' + (filtersLive.sec.has(sec) ? ' checked' : '') + ' title="Toggle the whole section"></label>' +
+        '<div class="dgrid">' +
+          evs.map(function (nm) {
+            return '<label class="drow devt"><span class="dv">' + esc(nm) + '</span>' +
+              '<input type="checkbox" data-g="items" value="' + esc(nm) + '"' + (filtersLive.it.has(nm) ? ' checked' : '') + '></label>';
+          }).join('') +
+        '</div></div>';
+    });
+    html += '<div class="dgroup" data-sec="__years">' +
+      '<div class="dg-head"><b>Years</b><span class="dg-acts">' +
+        '<button class="mini2" data-allyr="1">all</button>' +
+        '<button class="mini2" data-noneyr="1">none</button></span></div>' +
+      '<div class="dgrid">' + years.map(function (y) {
+        return '<label class="drow devt"><span class="dv">' + y + '</span>' +
+          '<input type="checkbox" data-g="years" value="' + y + '"' + (filtersLive.yr.has(String(y)) ? ' checked' : '') + '></label>';
+      }).join('') + '</div></div>';
+    body.innerHTML = html;
+    updateDrawerFoot();
+  }
+  function updateDrawerFoot() {
+    $('#drawerFoot').textContent = 'showing ' + filtered.length + ' of ' + events.length + ' events';
+  }
+  function toggleFilter(g, v, on) {
+    var list = state.filters[g], i = list.indexOf(v);
+    if (!on && i < 0) list.push(v);
+    if (on && i >= 0) list.splice(i, 1);
+  }
+  /* the top All/None governs sections & events only — years are a separate
+     refinement with their own all/none buttons and are left untouched here */
+  function setTopAll(on) {
+    state.filters = on
+      ? { sections: [], items: [], years: [] }
+      : { sections: sections.slice(), items: items.slice(), years: state.filters.years.slice() };
+    rebuildAfterFilter();
+  }
+  function setYears(on) {
+    state.filters.years = on ? [] : years.map(String);
+    rebuildAfterFilter();
+  }
+
+  /* ── logo ── */
+  var homeLogo = $('#homeLogo'), homeFall = $('#homeFall');
+  var darkLogoOK = false;
+  var logoProbe = new Image();
+  logoProbe.onload = function () { darkLogoOK = true; syncLogo(); };
+  logoProbe.src = '../logo-dark.png';
+  function syncLogo() {
+    if (!homeLogo || homeLogo.hidden) return;
+    var want = (state.theme !== 'light' && darkLogoOK) ? '../logo-dark.png' : '../logo.png';
+    if (homeLogo.getAttribute('src') !== want) homeLogo.src = want;
+  }
+  homeLogo.addEventListener('error', function () {
+    if (homeLogo.getAttribute('src') === '../logo-dark.png') { homeLogo.src = '../logo.png'; return; }
+    homeLogo.hidden = true;
+    homeFall.hidden = false;
+  });
+
+  /* ── resizable panes ── */
+  function applyVHeight() {
+    var h = state.vHeight;
+    tl.style.height = h ? h + 'px' : '';
+    var lb = document.querySelector('#pane-list .list-body');
+    if (lb) lb.style.height = h ? h + 'px' : '';
+  }
+  var vResize = $('#vResize');
+  var vhDrag = null;
+  function activePaneEl() {
+    return state.tab === 'list' ? (document.querySelector('#pane-list .list-body') || $('#pane-list')) : tl;
+  }
+  /* while dragging: holding the cursor near the top/bottom of the screen scrolls the page for
+     you — gently where the zone starts, quicker at the very edge — and the window keeps
+     growing/shrinking to follow, so you never run out of room at the screen border */
+  var EDGE_ZONE = 70, EDGE_SPEED = 16, vEdgeRaf = 0;
+  function dragHeight() {
+    return Math.max(240, Math.min(2200, vhDrag.h + (vhDrag.lastY - vhDrag.y) + vhDrag.sc));
+  }
+  function applyDragHeight() {
+    state.vHeight = dragHeight();
+    applyVHeight();
+  }
+  function vEdgeScroll() {
+    if (!vhDrag) { vEdgeRaf = 0; return; }
+    var y = vhDrag.lastY, v = 0;
+    if (y > innerHeight - EDGE_ZONE) v = 2 + (EDGE_SPEED - 2) * Math.min(1, (y - (innerHeight - EDGE_ZONE)) / EDGE_ZONE);
+    else if (y < EDGE_ZONE) v = -(2 + (EDGE_SPEED - 2) * Math.min(1, (EDGE_ZONE - y) / EDGE_ZONE));
+    if (v) { window.scrollBy(0, v); vhDrag.sc += v; applyDragHeight(); }
+    vEdgeRaf = requestAnimationFrame(vEdgeScroll);
+  }
+  vResize.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    try { window.getSelection().removeAllRanges(); } catch (err) {}
+    vResize.setPointerCapture(e.pointerId);
+    vResize.classList.add('drag');
+    var c = activePaneEl();
+    vhDrag = { y: e.clientY, h: c ? c.offsetHeight : 420, lastY: e.clientY, sc: 0 };
+    if (!vEdgeRaf) vEdgeRaf = requestAnimationFrame(vEdgeScroll);
+  });
+  vResize.addEventListener('pointermove', function (e) {
+    if (!vhDrag) return;
+    vhDrag.lastY = e.clientY;
+    /* handle sits below the window: drag DOWN grows it, drag UP shrinks it */
+    applyDragHeight();
+  });
+  function vResizeEnd() {
+    if (!vhDrag) return;
+    vhDrag = null;
+    if (vEdgeRaf) { cancelAnimationFrame(vEdgeRaf); vEdgeRaf = 0; }
+    vResize.classList.remove('drag');
+    save();
+  }
+  vResize.addEventListener('pointerup', vResizeEnd);
+  vResize.addEventListener('pointercancel', vResizeEnd);
+  vResize.addEventListener('dblclick', function () {
+    state.vHeight = null;
+    applyVHeight();
+    save();
+  });
+
+  var drawerResize = $('#drawerResize');
+  var dwDrag = null;
+  drawerResize.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    try { window.getSelection().removeAllRanges(); } catch (err) {}
+    drawerResize.setPointerCapture(e.pointerId);
+    drawerResize.classList.add('drag');
+    drawerEl.style.transition = 'none';
+    dwDrag = { x: e.clientX, w: drawerEl.offsetWidth };
+  });
+  drawerResize.addEventListener('pointermove', function (e) {
+    if (!dwDrag) return;
+    var max = Math.max(300, Math.min(innerWidth - 24, 1100));
+    var w = Math.max(300, Math.min(max, dwDrag.w + (e.clientX - dwDrag.x)));
+    drawerEl.style.width = w + 'px';
+  });
+  drawerResize.addEventListener('pointerup', function () {
+    if (!dwDrag) return;
+    dwDrag = null;
+    drawerResize.classList.remove('drag');
+    drawerEl.style.transition = '';
+    state.drawerW = drawerEl.offsetWidth;
+    save();
+  });
+  drawerResize.addEventListener('dblclick', function () {
+    state.drawerW = null;
+    drawerEl.style.width = '';
+    save();
+  });
+
+  /* ── interactions ── */
+  $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('.tab'); if (b) setTab(b.dataset.tab); });
+  $('#themeBtn').addEventListener('click', function () {
+    state.theme = { light: 'grey', grey: 'dark', dark: 'light' }[state.theme];
+    applyTheme();
+    palCache.theme = null;
+    syncLogo();
+    save();
+    buildDrawer();
+    refresh();
+  });
+  function applyTheme() {
+    document.body.dataset.theme = state.theme;
+    var icons = {
+      light: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>',
+      grey: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>',
+      dark: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>'
+    };
+    $('#themeIc').innerHTML = icons[state.theme];
+    $('#themeLb').textContent = state.theme.charAt(0).toUpperCase() + state.theme.slice(1);
+    syncLogo();
+  }
+  function applyFont() { document.body.dataset.font = state.font; }
+
+  $('#prevBtn').addEventListener('click', function () { step(-1); });
+  $('#nextBtn').addEventListener('click', function () { step(1); });
+  $('#todayBtn').addEventListener('click', function () {
+    if (state.tab === 'list') {
+      var n = new Date();
+      state.listFrom = Date.UTC(n.getFullYear(), n.getMonth(), 1);
+      state.listTo = monthAddT(state.listFrom, 1) - MS;
+      save(); renderToolbar(); renderList();
+      return;
+    }
+    goToDate(todayUTC(), true);   /* center the current day in the view */
+  });
+  $('#rangeBtn').addEventListener('click', openMonthPop);
+  $('#yearBtn').addEventListener('click', openYearPop);
+  $('#flBtn').addEventListener('click', function () {
+    state.showFL = !state.showFL;
+    $('#flBtn').classList.toggle('on', state.showFL);
+    $('#flBtn').setAttribute('aria-pressed', state.showFL);
+    refresh();
+    save();
+  });
+  $('#fromDate').addEventListener('change', function () {
+    var t = parseISO(this.value);
+    if (t == null) return;
+    state.listFrom = t;
+    if (state.listTo == null || state.listTo < state.listFrom) state.listTo = state.listFrom;
+    save(); renderToolbar(); renderList();
+  });
+  $('#toDate').addEventListener('change', function () {
+    var t = parseISO(this.value);
+    if (t == null) return;
+    state.listTo = t;
+    if (state.listFrom == null || state.listFrom > state.listTo) state.listFrom = state.listTo;
+    save(); renderToolbar(); renderList();
+  });
+
+  $('#zoomSeg').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-z]');
+    if (!b) return;
+    var z = +b.dataset.z;
+    if (z === state.zoom) return;
+    state.zoom = z;
+    state.scale = 1;
+    updateScaleUI();
+    document.querySelectorAll('#zoomSeg button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    if (state.tab === 'list') {
+      if (state.listFrom != null) state.listTo = state.listFrom + (Math.round(zoomDays(z)) - 1) * MS;
+      pendingZoomRebuild = true;
+      renderToolbar(); renderList();
+    } else {
+      rebuildAroundAnchor();
+    }
+    save();
+  });
+  function rebuildAroundAnchor() {
+    refitDayW();
+    var aT = Date.UTC(state.anchor.y, state.anchor.m, 1);
+    var ahead = bufMonths() + Math.ceil(zoomDays(state.zoom) / 30.4375);
+    bufStartT = monthAddT(aT, -bufMonths());
+    bufEndT = monthAddT(aT, ahead);
+    savedScroll = (aT - bufStartT) / MS * dayW;
+    renderTimeline();
+    renderToolbar();
+    updateEmptyOverlay();
+  }
+  function setScale(f) {
+    var center = dateAtLeft() + chartViewMs() / 2;
+    state.scale = Math.min(3, Math.max(0.4, +(state.scale * f).toFixed(3)));
+    refitDayW();
+    savedScroll = Math.max(0, (center - bufStartT) / MS * dayW - Math.max(tl.clientWidth - laneW(), 0) / 2);
+    renderTimeline(); renderToolbar(); updateEmptyOverlay(); updateScaleUI(); save();
+  }
+  function updateScaleUI() { $('#zPct').textContent = Math.round(state.scale * 100) + '%'; }
+  $('#zIn').addEventListener('click', function () { setScale(1.2); });
+  $('#zOut').addEventListener('click', function () { setScale(1 / 1.2); });
+
+  $('#filterBtn').addEventListener('click', function () { document.body.classList.add('drawer-open'); });
+  $('#scrim').addEventListener('click', function () { document.body.classList.remove('drawer-open'); });
+  $('#drawerClose').addEventListener('click', function () { document.body.classList.remove('drawer-open'); });
+  $('#drawerReset').addEventListener('click', function () {
+    state.filters = { sections: [], items: [], years: [] };
+    rebuildAfterFilter();
+  });
+  $('#drawerBody').addEventListener('change', function (e) {
+    var c = e.target.closest('input[data-g]');
+    if (!c) return;
+    var g = c.dataset.g, on = c.checked;
+    toggleFilter(g, c.value, on);
+    if (g === 'items' && on) {
+      /* switching an event on while its section is off implies the section on,
+         otherwise the event could never show (a disabled section hides everything under it) */
+      var evx = events.find(function (x) { return x.base === c.value; });
+      if (evx) {
+        var si = state.filters.sections.indexOf(evx.section);
+        if (si >= 0) {
+          state.filters.sections.splice(si, 1);
+          var grp = c.closest('.dgroup');
+          if (grp) { var scb = grp.querySelector('input[data-g="sections"]'); if (scb) scb.checked = true; }
+        }
+      }
+    }
+    if (g === 'sections') {
+      var evs = orderedItems(c.value);
+      evs.forEach(function (nm) { toggleFilter('items', nm, on); });
+      var grp2 = c.closest('.dgroup');
+      if (grp2) grp2.querySelectorAll('input[data-g="items"]').forEach(function (cb) { cb.checked = on; });
+    }
+    buildFilterSets(); computeFiltered(); recomputeLanes();
+    updateBadge(); refresh(); updateDrawerFoot(); save();
+  });
+  $('#drawerBody').addEventListener('click', function (e) {
+    if (e.target.closest('[data-topall]')) { setTopAll(true); return; }
+    if (e.target.closest('[data-topnone]')) { setTopAll(false); return; }
+    var g = e.target.closest('.dgroup');
+    if (!g) return;
+    if (g.getAttribute('data-sec') === '__years') {
+      if (e.target.closest('[data-allyr]')) setYears(true);
+      if (e.target.closest('[data-noneyr]')) setYears(false);
+    }
+  });
+  $('#drawerBody').addEventListener('input', function (e) {
+    if (!e.target.classList.contains('dsearch')) return;
+    var q = e.target.value.toLowerCase();
+    document.querySelectorAll('#drawerBody .dgroup').forEach(function (g) {
+      if (g.getAttribute('data-sec') === '__years') { g.style.display = q ? 'none' : ''; return; }
+      var secRow = g.querySelector('.dsec');
+      var secName = secRow.querySelector('.dv').textContent.toLowerCase();
+      var secMatch = secName.indexOf(q) >= 0;
+      secRow.style.display = secMatch ? '' : 'none';
+      var any = secMatch;
+      g.querySelectorAll('.devt').forEach(function (r) {
+        var m = secMatch || r.textContent.toLowerCase().indexOf(q) >= 0;
+        r.style.display = m ? '' : 'none';
+        if (m) any = true;
+      });
+      g.style.display = any ? '' : 'none';
+    });
+  });
+
+  tl.addEventListener('scroll', function () {
+    hideTip();
+    pinned = false;
+    if (scrollRaf) return;
+    scrollRaf = requestAnimationFrame(function () { scrollRaf = 0; handleScrollFrame(); });
+  }, { passive: true });
+
+  tl.addEventListener('click', function (e) {
+    if (e.target.closest('#secTri')) { openCornerPop(); return; }
+    var b = e.target.closest('.bar');
+    if (b) { pinned = true; showTip(b); }
+    else { pinned = false; hideTip(); }
+  });
+
+  /* the "nothing here" overlay sits BESIDE #tl in the DOM, so clicks on its
+     buttons never bubble through #tl — they must be handled here */
+  function nearestEvent() {
+    var vr = visibleRange();
+    var best = null, bestD = Infinity;
+    filtered.forEach(function (ev) {
+      if (state.hiddenSecs.indexOf(ev.section) >= 0) return;
+      var d = ev.end < vr[0] ? vr[0] - ev.end : (ev.start >= vr[1] ? ev.start - vr[1] : 0);
+      if (d < bestD) { bestD = d; best = ev; }
+    });
+    return best;
+  }
+  $('#tlEmpty').addEventListener('click', function (e) {
+    if (e.target.closest('#jumpNear')) {
+      var ev = nearestEvent();
+      if (ev) goToDate(ev.start);
+      return;
+    }
+    if (e.target.closest('#clearF')) {
+      state.filters = { sections: [], items: [], years: [] };
+      rebuildAfterFilter();
+    }
+  });
+
+  /* the pane never closes from its own clicks — only outside clicks, Esc, or scrolling */
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.bar') && !e.target.closest('#tip') && !e.target.closest('#pane-list [data-id]')) { pinned = false; hideTip(); }
+  });
+
+  $('#pane-list').addEventListener('click', function (e) {
+    var th = e.target.closest('.atable th[data-col]');
+    if (th) {
+      var c = th.dataset.col;
+      if (state.tsort.col === c) state.tsort.dir = state.tsort.dir === 'asc' ? 'desc' : 'asc';
+      else state.tsort = { col: c, dir: 'asc' };
+      renderList(); save();
+      return;
+    }
+    var f = e.target.closest('[data-fmt]');
+    if (f) { state.listFormat = f.dataset.fmt; renderList(); save(); return; }
+    var s = e.target.closest('[data-sort]');
+    if (s && !s.disabled) { state.sort = s.dataset.sort; renderList(); save(); return; }
+    var r = e.target.closest('[data-id]');
+    if (r) { pinned = true; showTip(r); }
+  });
+  $('#pane-list').addEventListener('scroll', function () { pinned = false; hideTip(); }, true);
+
+  /* themes pane */
+  $('#pane-themes').addEventListener('click', function (e) {
+    if (e.target.closest('#loSave')) { $('#loInputRow').hidden = false; $('#loName').focus(); return; }
+    if (e.target.closest('#loCancel')) { $('#loInputRow').hidden = true; return; }
+    if (e.target.closest('#loConfirm')) {
+      var name = ($('#loName').value || '').trim();
+      if (!name) { $('#loName').focus(); return; }
+      state.loadouts[name] = clone(state.colors);
+      state.lastLoadout = name;
+      save(); renderPane('themes');
+      return;
+    }
+    if (e.target.closest('#loUpdate')) {
+      if (!state.lastLoadout || !state.loadouts[state.lastLoadout]) return;
+      state.loadouts[state.lastLoadout] = clone(state.colors);
+      save();
+      var b = e.target.closest('#loUpdate');
+      b.textContent = 'updated';
+      setTimeout(function () { if (b.isConnected) b.textContent = 'update'; }, 1200);
+      return;
+    }
+    if (e.target.closest('#loDelete')) {
+      if (state.lastLoadout) { delete state.loadouts[state.lastLoadout]; state.lastLoadout = ''; save(); renderPane('themes'); }
+      return;
+    }
+    if (e.target.closest('#loExport')) { exportColours(); return; }
+    if (e.target.closest('#loImport')) { $('#colImport').click(); return; }
+    if (e.target.closest('#resetColours')) { resetColours(); return; }
+    if (e.target.closest('#expReadable')) { exportEvents(false); return; }
+    if (e.target.closest('#expMachine')) { exportEvents(true); return; }
+    var ovT = e.target.closest('[data-ovsec]');
+    if (ovT) {
+      var sec = ovT.dataset.ovsec;
+      if (state.colors.secOverride[sec]) delete state.colors.secOverride[sec];
+      else state.colors.secOverride[sec] = true;
+      save(); buildDrawer(); renderPane('themes');
+      if (state.tab === 'calendar') renderTimeline();
+      return;
+    }
+    if (e.target.closest('[data-ovall]')) {
+      sections.forEach(function (s) { state.colors.secOverride[s] = true; });
+      save(); buildDrawer(); renderPane('themes');
+      if (state.tab === 'calendar') renderTimeline();
+      return;
+    }
+    if (e.target.closest('[data-ovnone]')) {
+      state.colors.secOverride = {};
+      save(); buildDrawer(); renderPane('themes');
+      if (state.tab === 'calendar') renderTimeline();
+      return;
+    }
+    var ssw = e.target.closest('[data-secname]');
+    if (ssw) { openColorPop('section', ssw.dataset.secname, ssw); return; }
+    var f = e.target.closest('.fontopt');
+    if (f) { state.font = f.dataset.font; applyFont(); renderPane('themes'); refresh(); save(); return; }
+    var d = e.target.closest('[data-density]');
+    if (d) { state.density = d.dataset.density; renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
+    var sw = e.target.closest('[data-cname]');
+    if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
+    if (e.target.closest('#resetBtn')) {
+      if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(function () { resetArmed = false; }, 3000); }
+      else { try { localStorage.removeItem(LS_KEY); } catch (e2) {} location.reload(); }
+    }
+  });
+  $('#pane-themes').addEventListener('change', function (e) {
+    if (e.target.id === 'loSelect') {
+      var n = e.target.value;
+      if (n && state.loadouts[n]) {
+        state.colors = clone(state.loadouts[n]);
+        state.lastLoadout = n;
+        save(); renderPane('themes');
+        if (state.tab === 'calendar') renderTimeline();
+      }
+      return;
+    }
+    if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; save(); if (state.tab === 'calendar') renderTimeline(); }
+    if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); if (state.tab === 'calendar') renderTimeline(); }
+    if (e.target.id === 'flSw') { state.showFL = e.target.checked; $('#flBtn').classList.toggle('on', state.showFL); refresh(); save(); }
+  });
+  $('#pane-themes').addEventListener('keydown', function (e) {
+    if (e.target.id === 'loName' && e.key === 'Enter') { e.preventDefault(); $('#loConfirm').click(); }
+  });
+  $('#colImport').addEventListener('change', function (e) {
+    var f = e.target.files[0];
+    if (!f) return;
+    var fi = f;
+    fi.text().then(function (t) { importColoursText(t); });
+    e.target.value = '';
+  });
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#noticeLoad')) $('#fileInput').click();
+    if (e.target.closest('#noticeClose')) { noticeDismissed = true; updateNotice(); }
+  });
+
+  $('#fileInput').addEventListener('change', function (e) {
+    var f = e.target.files[0];
+    if (!f) return;
+    var ff = f;
+    ff.text().then(function (t) { applyText(t, ff.name, 'session'); });
+    e.target.value = '';
+  });
+
+  var dragDepth = 0;
+  function draggingFiles(e) {
+    return !!(e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files'));
+  }
+  addEventListener('dragenter', function (e) {
+    e.preventDefault();
+    if (!draggingFiles(e)) return;
+    if (++dragDepth === 1) $('#drop').classList.add('on');
+  });
+  addEventListener('dragover', function (e) { e.preventDefault(); });
+  addEventListener('dragleave', function (e) {
+    e.preventDefault();
+    if (--dragDepth <= 0) { dragDepth = 0; $('#drop').classList.remove('on'); }
+  });
+  addEventListener('drop', function (e) {
+    e.preventDefault();
+    dragDepth = 0;
+    $('#drop').classList.remove('on');
+    if (!draggingFiles(e)) return;
+    var f = e.dataTransfer.files[0];
+    if (f) f.text().then(function (t) { applyText(t, f.name, 'session'); });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { pinned = false; hideTip(); closePop(); document.body.classList.remove('drawer-open'); }
+  });
+
+  new ResizeObserver(function () {
+    if (state.tab !== 'calendar') return;
+    cancelAnimationFrame(roTimer);
+    roTimer = requestAnimationFrame(function () {
+      var w = tl.clientWidth;
+      if (Math.abs(w - lastW) <= 8) return;
+      lastW = w;
+      var center = dateAtLeft() + chartViewMs() / 2;
+      refitDayW();
+      savedScroll = Math.max(0, (center - bufStartT) / MS * dayW - Math.max(tl.clientWidth - laneW(), 0) / 2);
+      renderTimeline(); renderToolbar(); updateEmptyOverlay();
+    });
+  }).observe(tl);
+
+  /* ── init ── */
+  loadSettings();
+  applyTheme();
+  applyFont();
+  $('#flBtn').classList.toggle('on', state.showFL);
+  $('#flBtn').setAttribute('aria-pressed', state.showFL);
+  document.querySelectorAll('#zoomSeg button').forEach(function (b) { b.classList.toggle('on', +b.dataset.z === state.zoom); });
+  updateScaleUI();
+  refitDayW();
+  var initAT = Date.UTC(state.anchor.y, state.anchor.m, 1);
+  bufStartT = monthAddT(initAT, -bufMonths());
+  bufEndT = monthAddT(initAT, bufMonths() + Math.ceil(zoomDays(state.zoom) / 30.4375));
+  savedScroll = (initAT - bufStartT) / MS * dayW;
+  lastW = tl.clientWidth;
+  applyVHeight();
+  if (state.drawerW) drawerEl.style.width = Math.min(state.drawerW, Math.max(300, innerWidth - 24)) + 'px';
+  setTab(state.tab);
+  updateNotice();
+  updateBadge();
+  loadData();
+  fetchDefaultTemplate();
+  fetchEventLinks();
+})();
+</script>
+<script data-goatcounter="https://bigfarmexplorer.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
