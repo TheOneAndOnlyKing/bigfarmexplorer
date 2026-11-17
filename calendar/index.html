@@ -382,8 +382,8 @@
 
 <header class="topbar">
   <div class="home-wrap">
-    <a class="home" href="index.html" title="Bigfarm Explorer — home">
-      <img class="homelogo" id="homeLogo" src="logo.png" alt="Bigfarm Explorer">
+    <a class="home" href="../" title="Bigfarm Explorer — home">
+      <img class="homelogo" id="homeLogo" src="../logo.png" alt="Bigfarm Explorer">
       <span class="homefall" id="homeFall" hidden>Bigfarm Explorer</span>
     </a>
     <span class="bt">Bigfarm Calendar</span>
@@ -1965,14 +1965,14 @@
   var darkLogoOK = false;
   var logoProbe = new Image();
   logoProbe.onload = function () { darkLogoOK = true; syncLogo(); };
-  logoProbe.src = 'logo-dark.png';
+  logoProbe.src = '../logo-dark.png';
   function syncLogo() {
     if (!homeLogo || homeLogo.hidden) return;
-    var want = (state.theme !== 'light' && darkLogoOK) ? 'logo-dark.png' : 'logo.png';
+    var want = (state.theme !== 'light' && darkLogoOK) ? '../logo-dark.png' : '../logo.png';
     if (homeLogo.getAttribute('src') !== want) homeLogo.src = want;
   }
   homeLogo.addEventListener('error', function () {
-    if (homeLogo.getAttribute('src') === 'logo-dark.png') { homeLogo.src = 'logo.png'; return; }
+    if (homeLogo.getAttribute('src') === '../logo-dark.png') { homeLogo.src = '../logo.png'; return; }
     homeLogo.hidden = true;
     homeFall.hidden = false;
   });
