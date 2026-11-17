@@ -98,6 +98,7 @@
   .dateinput { font: inherit; font-size: 12.5px; font-family: var(--ui); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 5px 8px; }
   .dateinput:focus { outline: none; border-color: var(--accent); }
   .view-count { font-size: 12px; color: var(--muted); }
+  #copyUrlBtn.copied { color: var(--accent); border-color: var(--accent); }
 
   .pane { display: none; }
   .pane.active { display: block; }
@@ -146,6 +147,8 @@
   .flb { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-style: normal; font-family: var(--f-mono); font-size: 8px; font-weight: 700; letter-spacing: .08em; background: var(--accent); color: var(--on-accent); border-radius: 3px; padding: 1px 3px; pointer-events: none; }
   @keyframes flash { 0%, 100% { box-shadow: none; } 15%, 45%, 75% { box-shadow: 0 0 0 3px var(--accent); } 30%, 60% { box-shadow: 0 0 0 3px transparent; } }
   .bar.flash { animation: flash 1.4s ease; }
+  @keyframes todayGlow { 0% { opacity: 1; box-shadow: 0 0 0 0 var(--accent); } 40% { opacity: 1; box-shadow: 0 0 0 6px transparent; } 100% { opacity: 1; box-shadow: none; } }
+  .gtoday.pulse { animation: todayGlow 1.2s ease-out; }
   /* the "nothing here" overlay: fully transparent, and offset past the section
      labels, so lanes, labels and dividing lines all stay fully visible */
   .tl-empty { position: absolute; top: 0; right: 0; bottom: 0; left: 172px; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--muted); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; pointer-events: none; }
@@ -419,14 +422,21 @@
         <span class="tb-mid" id="listCenter" style="display:none">
           <span class="rangelbl">from</span>
           <button class="nav-label" id="fromDateBtn"><span id="fromDateVal">—</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-          <input type="date" class="dateinput" id="fromDate" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
           <span class="rangelbl">to</span>
           <button class="nav-label" id="toDateBtn"><span id="toDateVal">—</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-          <input type="date" class="dateinput" id="toDate" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
         </span>
         <button class="nav-arrow" id="nextBtn" aria-label="Next period"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4l8 8-8 8"/></svg></button>
       </div>
-      <div class="tb-side r"><span class="view-count" id="viewCount"></span></div>
+      <div class="tb-side r">
+        <button class="ghostbtn" id="copyUrlBtn" title="Copy link to current date">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span id="copyUrlLbl">Share</span>
+        </button>
+        <button class="ghostbtn" id="exportTableBtn" title="Export visible events as CSV">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Table
+        </button>
+      </div>
     </div>
 
     <div id="noticeSlot"></div>
@@ -446,6 +456,7 @@
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6.5 7.5V19l-3-1.5v-5z"/></svg>
         Filters <span class="badge" id="filterBadge" hidden></span>
       </button>
+      <span class="view-count" id="viewCount"></span>
       <div class="zoomstep">
         <button id="zOut" title="Zoom out slightly"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.7"/><path d="M15.6 15.6L20.5 20.5"/><path d="M7.8 10.5h5.4"/></svg></button>
         <span id="zPct" title="Zoom level">100%</span>
@@ -889,6 +900,7 @@
     buildDrawer();
     updateNotice();
     refresh();
+    if (state.tab === 'calendar') pulseToday();
   }
   async function loadData() {
     for (var i = 0; i < DATA_FILES.length; i++) {
@@ -1105,9 +1117,6 @@
     $('#listCenter').style.display = onList ? '' : 'none';
     var n;
     if (onList) {
-      var fd = $('#fromDate'), td = $('#toDate');
-      if (document.activeElement !== fd) fd.value = state.listFrom != null ? isoOf(state.listFrom) : '';
-      if (document.activeElement !== td) td.value = state.listTo != null ? isoOf(state.listTo) : '';
       /* update the visible nav-label button text */
       var fv = $('#fromDateVal'), tv = $('#toDateVal');
       if (fv) fv.textContent = state.listFrom != null ? fmtD(state.listFrom) : '—';
@@ -1360,6 +1369,7 @@
     if (a.y !== state.anchor.y || a.m !== state.anchor.m) state.anchor = a;
     renderToolbar();
     updateEmptyOverlay();
+    pushHash();
     clearTimeout(anchorSaveTimer);
     anchorSaveTimer = setTimeout(save, 500);
   }
@@ -1393,9 +1403,7 @@
       var t = Math.floor(dateAtLeft() / MS) * MS + dir * 7 * MS;
       goToDate(t);
     } else {
-      /* center=true keeps the new month's start near the middle of the viewport
-         so the scrollbar stays roughly centred rather than jumping to the left edge */
-      goToDate(Date.UTC(state.anchor.y, state.anchor.m + dir * state.zoom, 1), true);
+      goToDate(Date.UTC(state.anchor.y, state.anchor.m + dir * state.zoom, 1));
     }
   }
 
@@ -2086,6 +2094,47 @@
 
   $('#prevBtn').addEventListener('click', function () { step(-1); });
   $('#nextBtn').addEventListener('click', function () { step(1); });
+
+  /* ── URL hash navigation ── */
+  function hashFromAnchor(a) { return '#' + a.y + '-' + pad2(a.m + 1); }
+  function anchorFromHash(h) {
+    var m = (h || '').match(/^#(\d{4})-(\d{2})$/);
+    if (!m) return null;
+    var y = +m[1], mo = +m[2] - 1;
+    if (mo < 0 || mo > 11) return null;
+    return { y: y, m: mo };
+  }
+  function pushHash() {
+    var h = hashFromAnchor(state.anchor);
+    if (location.hash !== h) history.replaceState(null, '', h);
+  }
+
+  /* ── Copy URL button ── */
+  $('#copyUrlBtn').addEventListener('click', function () {
+    pushHash();
+    var url = location.href.split('#')[0] + hashFromAnchor(state.anchor);
+    navigator.clipboard.writeText(url).then(function () {
+      var btn = $('#copyUrlBtn'), lbl = $('#copyUrlLbl');
+      btn.classList.add('copied');
+      lbl.textContent = 'Copied!';
+      setTimeout(function () { btn.classList.remove('copied'); lbl.textContent = 'Share'; }, 2000);
+    }).catch(function () {
+      prompt('Copy this link:', url);
+    });
+  });
+
+  /* ── Export visible events as CSV ── */
+  $('#exportTableBtn').addEventListener('click', function () {
+    var inV = computeInView();
+    if (!inV.length) { return; }
+    var rows = [['Event','Section','Start','End','Days']].concat(
+      inV.map(function(ev) { return [ev.name, ev.section, isoOf(ev.start), isoOf(ev.end), ev.days]; })
+    );
+    var csv = rows.map(function(r) {
+      return r.map(function(c) { return '"' + String(c).replace(/"/g,'""') + '"'; }).join(',');
+    }).join('\n');
+    downloadText(csv, 'bigfarm-events.csv');
+  });
   $('#todayBtn').addEventListener('click', function () {
     if (state.tab === 'list') {
       var n = new Date();
@@ -2094,8 +2143,19 @@
       save(); renderToolbar(); renderList();
       return;
     }
-    goToDate(todayUTC(), true);   /* center the current day in the view */
+    goToDate(todayUTC(), true);
+    pulseToday();
   });
+  function pulseToday() {
+    /* find the today marker and add the pulse class; re-trigger by cloning */
+    setTimeout(function () {
+      var el = tl.querySelector('.gtoday');
+      if (!el) return;
+      el.classList.remove('pulse');
+      void el.offsetWidth; /* force reflow to restart animation */
+      el.classList.add('pulse');
+    }, 80);
+  }
   $('#rangeBtn').addEventListener('click', openMonthPop);
   $('#yearBtn').addEventListener('click', openYearPop);
   $('#flBtn').addEventListener('click', function () {
@@ -2105,50 +2165,79 @@
     refresh();
     save();
   });
-  /* clicking the styled nav-label buttons opens the hidden date picker */
-  $('#fromDateBtn').addEventListener('click', function () {
-    var fd = $('#fromDate');
-    fd.style.position = 'fixed';
-    fd.style.left = this.getBoundingClientRect().left + 'px';
-    fd.style.top = (this.getBoundingClientRect().bottom + 4) + 'px';
-    fd.style.opacity = '0';
-    fd.style.pointerEvents = 'auto';
-    fd.style.width = '0';
-    fd.style.height = '0';
-    fd.showPicker ? fd.showPicker() : fd.focus();
-    setTimeout(function () {
-      fd.style.pointerEvents = 'none';
-      fd.style.position = 'absolute';
-    }, 500);
+  /* ── custom date-picker popover for List View from/to buttons ── */
+  function openDatePop(anchor, getVal, setVal) {
+    if (pop.style.display === 'block' && popAnchor === anchor) { closePop(); return; }
+    var cur = getVal();
+    var d = cur != null ? new Date(cur) : new Date();
+    var pickY = d.getUTCFullYear(), pickM = d.getUTCMonth();
+    function html() {
+      var title = M_L[pickM] + ' ' + pickY;
+      var prev = '<button class="nav-arrow" data-dpnav="-1" style="width:24px;height:24px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l-8 8 8 8"/></svg></button>';
+      var next = '<button class="nav-arrow" data-dpnav="1" style="width:24px;height:24px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4l8 8-8 8"/></svg></button>';
+      var nav = '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px">' + prev +
+        '<span style="font-size:12.5px;font-weight:600;flex:1;text-align:center">' + title + '</span>' + next + '</div>';
+      /* day-of-week headers */
+      var hdr = '<div style="display:grid;grid-template-columns:repeat(7,28px);gap:2px;margin-bottom:2px">' +
+        ['S','M','T','W','T','F','S'].map(function(w){ return '<div style="text-align:center;font-family:var(--f-mono);font-size:9px;color:var(--muted);padding:2px 0">' + w + '</div>'; }).join('') + '</div>';
+      var first = new Date(Date.UTC(pickY, pickM, 1)).getUTCDay();
+      var daysInMonth = new Date(Date.UTC(pickY, pickM + 1, 0)).getUTCDate();
+      var cells = '';
+      var curTs = cur != null ? new Date(cur) : null;
+      var curD = curTs ? curTs.getUTCDate() : -1;
+      var curMMatch = curTs && curTs.getUTCFullYear() === pickY && curTs.getUTCMonth() === pickM;
+      for (var i = 0; i < first; i++) cells += '<div></div>';
+      for (var day = 1; day <= daysInMonth; day++) {
+        var on = curMMatch && day === curD;
+        cells += '<button class="pm' + (on ? ' on' : '') + '" data-dpday="' + day + '" style="width:28px;height:28px;border-radius:7px;font-size:12px">' + day + '</button>';
+      }
+      var grid = '<div style="display:grid;grid-template-columns:repeat(7,28px);gap:2px">' + cells + '</div>';
+      return nav + hdr + grid;
+    }
+    openPop(anchor, '', html(), function(e) {
+      var nav = e.target.closest('[data-dpnav]');
+      if (nav) {
+        var nm = normMonth(pickY, pickM + +nav.dataset.dpnav);
+        pickY = nm.y; pickM = nm.m;
+        pop.querySelector('.poptitle').textContent = '';
+        /* rebuild just the content area (after poptitle) */
+        var tmp = document.createElement('div');
+        tmp.innerHTML = '<div class="poptitle"></div>' + html();
+        while (pop.firstChild) pop.removeChild(pop.firstChild);
+        while (tmp.firstChild) pop.appendChild(tmp.firstChild);
+        /* re-position */
+        var r = anchor.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
+        var x = Math.min(Math.max(8, r.left), innerWidth - pw - 8);
+        var y = r.bottom + 6; if (y + ph > innerHeight - 8) y = Math.max(8, r.top - ph - 6);
+        pop.style.left = x + 'px'; pop.style.top = y + 'px';
+        return;
+      }
+      var dayBtn = e.target.closest('[data-dpday]');
+      if (dayBtn) {
+        setVal(Date.UTC(pickY, pickM, +dayBtn.dataset.dpday));
+        closePop();
+      }
+    });
+    anchor.classList.add('open');
+  }
+
+  $('#fromDateBtn').addEventListener('click', function() {
+    openDatePop(this,
+      function() { return state.listFrom; },
+      function(t) {
+        state.listFrom = t;
+        if (state.listTo == null || state.listTo < state.listFrom) state.listTo = state.listFrom;
+        save(); renderToolbar(); renderList();
+      });
   });
-  $('#toDateBtn').addEventListener('click', function () {
-    var td = $('#toDate');
-    td.style.position = 'fixed';
-    td.style.left = this.getBoundingClientRect().left + 'px';
-    td.style.top = (this.getBoundingClientRect().bottom + 4) + 'px';
-    td.style.opacity = '0';
-    td.style.pointerEvents = 'auto';
-    td.style.width = '0';
-    td.style.height = '0';
-    td.showPicker ? td.showPicker() : td.focus();
-    setTimeout(function () {
-      td.style.pointerEvents = 'none';
-      td.style.position = 'absolute';
-    }, 500);
-  });
-  $('#fromDate').addEventListener('change', function () {
-    var t = parseISO(this.value);
-    if (t == null) return;
-    state.listFrom = t;
-    if (state.listTo == null || state.listTo < state.listFrom) state.listTo = state.listFrom;
-    save(); renderToolbar(); renderList();
-  });
-  $('#toDate').addEventListener('change', function () {
-    var t = parseISO(this.value);
-    if (t == null) return;
-    state.listTo = t;
-    if (state.listFrom == null || state.listFrom > state.listTo) state.listFrom = state.listTo;
-    save(); renderToolbar(); renderList();
+  $('#toDateBtn').addEventListener('click', function() {
+    openDatePop(this,
+      function() { return state.listTo; },
+      function(t) {
+        state.listTo = t;
+        if (state.listFrom == null || state.listFrom > state.listTo) state.listFrom = state.listTo;
+        save(); renderToolbar(); renderList();
+      });
   });
 
   $('#zoomSeg').addEventListener('click', function (e) {
@@ -2448,6 +2537,26 @@
     if (e.key === 'Escape') { pinned = false; hideTip(); closePop(); document.body.classList.remove('drawer-open'); }
   });
 
+  /* ── touch swipe on timeline to step month ── */
+  var swipeStart = null;
+  tl.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1) { swipeStart = null; return; }
+    swipeStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, scrollLeft: tl.scrollLeft };
+  }, { passive: true });
+  tl.addEventListener('touchend', function (e) {
+    if (!swipeStart || state.zoom === 7) { swipeStart = null; return; }
+    var dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : swipeStart.x) - swipeStart.x;
+    var dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : swipeStart.y) - swipeStart.y;
+    /* only count as a nav swipe if horizontal movement > 60px and dominantly horizontal */
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      /* if user scrolled significantly, don't treat as a step swipe */
+      if (Math.abs(tl.scrollLeft - swipeStart.scrollLeft) < 30) {
+        step(dx < 0 ? 1 : -1);
+      }
+    }
+    swipeStart = null;
+  }, { passive: true });
+
   new ResizeObserver(function () {
     if (state.tab !== 'calendar') return;
     cancelAnimationFrame(roTimer);
@@ -2464,6 +2573,11 @@
 
   /* ── init ── */
   loadSettings();
+  /* override saved anchor with URL hash if present */
+  (function () {
+    var ha = anchorFromHash(location.hash);
+    if (ha) state.anchor = ha;
+  })();
   applyTheme();
   applyFont();
   $('#flBtn').classList.toggle('on', state.showFL);
