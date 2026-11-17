@@ -417,8 +417,12 @@
           <button class="nav-label" id="yearBtn"><span id="yearVal"></span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
         </span>
         <span class="tb-mid" id="listCenter" style="display:none">
-          <span class="rangelbl">from</span><input type="date" class="dateinput" id="fromDate">
-          <span class="rangelbl">to</span><input type="date" class="dateinput" id="toDate">
+          <span class="rangelbl">from</span>
+          <button class="nav-label" id="fromDateBtn"><span id="fromDateVal">—</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+          <input type="date" class="dateinput" id="fromDate" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
+          <span class="rangelbl">to</span>
+          <button class="nav-label" id="toDateBtn"><span id="toDateVal">—</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+          <input type="date" class="dateinput" id="toDate" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
         </span>
         <button class="nav-arrow" id="nextBtn" aria-label="Next period"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4l8 8-8 8"/></svg></button>
       </div>
@@ -629,6 +633,7 @@
   var tl = $('#tl');
   var drawerEl = $('#drawer');
   var bufStartT = 0, bufEndT = 0, dayW = 20, savedScroll = 0, lastW = 0;
+  var renderingTimeline = false;  /* guard: ignore scroll events fired during renderTimeline() */
   var laneRows = new Map(), secCounts = new Map(), capWarns = new Set();
   var scrollRaf = 0, roTimer = 0, anchorSaveTimer = 0, loStatusTimer = 0;
 
@@ -1103,6 +1108,10 @@
       var fd = $('#fromDate'), td = $('#toDate');
       if (document.activeElement !== fd) fd.value = state.listFrom != null ? isoOf(state.listFrom) : '';
       if (document.activeElement !== td) td.value = state.listTo != null ? isoOf(state.listTo) : '';
+      /* update the visible nav-label button text */
+      var fv = $('#fromDateVal'), tv = $('#toDateVal');
+      if (fv) fv.textContent = state.listFrom != null ? fmtD(state.listFrom) : '—';
+      if (tv) tv.textContent = state.listTo != null ? fmtD(state.listTo) : '—';
       n = computeInView().length;
       $('#viewCount').textContent = n + ' event' + (n !== 1 ? 's' : '') + ' in range';
     } else {
@@ -1292,7 +1301,11 @@
       '</div>' +
     '</div>';
     tl.classList.toggle('fl-on', flOn);
+    renderingTimeline = true;
     tl.scrollLeft = savedScroll;
+    /* use rAF so the flag is cleared after the browser has processed the
+       synchronous scroll that the assignment above may fire */
+    requestAnimationFrame(function () { renderingTimeline = false; });
   }
 
   function updateEmptyOverlay() {
@@ -1380,7 +1393,9 @@
       var t = Math.floor(dateAtLeft() / MS) * MS + dir * 7 * MS;
       goToDate(t);
     } else {
-      goToDate(Date.UTC(state.anchor.y, state.anchor.m + dir * state.zoom, 1));
+      /* center=true keeps the new month's start near the middle of the viewport
+         so the scrollbar stays roughly centred rather than jumping to the left edge */
+      goToDate(Date.UTC(state.anchor.y, state.anchor.m + dir * state.zoom, 1), true);
     }
   }
 
@@ -1820,7 +1835,7 @@
       function (e) {
         var b = e.target.closest('[data-y]');
         if (!b) return;
-        goToDate(Date.UTC(+b.dataset.y, 0, 1));
+        goToDate(Date.UTC(+b.dataset.y, state.anchor.m, 1));
         closePop();
       });
   }
@@ -2090,6 +2105,37 @@
     refresh();
     save();
   });
+  /* clicking the styled nav-label buttons opens the hidden date picker */
+  $('#fromDateBtn').addEventListener('click', function () {
+    var fd = $('#fromDate');
+    fd.style.position = 'fixed';
+    fd.style.left = this.getBoundingClientRect().left + 'px';
+    fd.style.top = (this.getBoundingClientRect().bottom + 4) + 'px';
+    fd.style.opacity = '0';
+    fd.style.pointerEvents = 'auto';
+    fd.style.width = '0';
+    fd.style.height = '0';
+    fd.showPicker ? fd.showPicker() : fd.focus();
+    setTimeout(function () {
+      fd.style.pointerEvents = 'none';
+      fd.style.position = 'absolute';
+    }, 500);
+  });
+  $('#toDateBtn').addEventListener('click', function () {
+    var td = $('#toDate');
+    td.style.position = 'fixed';
+    td.style.left = this.getBoundingClientRect().left + 'px';
+    td.style.top = (this.getBoundingClientRect().bottom + 4) + 'px';
+    td.style.opacity = '0';
+    td.style.pointerEvents = 'auto';
+    td.style.width = '0';
+    td.style.height = '0';
+    td.showPicker ? td.showPicker() : td.focus();
+    setTimeout(function () {
+      td.style.pointerEvents = 'none';
+      td.style.position = 'absolute';
+    }, 500);
+  });
   $('#fromDate').addEventListener('change', function () {
     var t = parseISO(this.value);
     if (t == null) return;
@@ -2211,6 +2257,9 @@
   tl.addEventListener('scroll', function () {
     hideTip();
     pinned = false;
+    /* ignore scroll events that fire because renderTimeline() just set scrollLeft —
+       those are not user-initiated and processing them would corrupt savedScroll */
+    if (renderingTimeline) return;
     if (scrollRaf) return;
     scrollRaf = requestAnimationFrame(function () { scrollRaf = 0; handleScrollFrame(); });
   }, { passive: true });
