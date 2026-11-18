@@ -2164,9 +2164,9 @@
 
   function exportTimelineScreenshot() {
     if (state.tab === 'list') { exportListScreenshot(); return; }
-    /* read live CSS variables — invalidate palette cache first so colors are fresh */
+    /* read live CSS variables from body (vars are set on body[data-theme]) */
     palCache = {};
-    var cs = getComputedStyle(document.documentElement);
+    var cs = getComputedStyle(document.body);
     function cv(n) { return cs.getPropertyValue(n).trim(); }
     var C = {
       bg:      cv('--bg'),    /* lane / body background — matches the actual page */
@@ -2447,7 +2447,7 @@
 
   function exportListScreenshot() {
     palCache = {};
-    var cs = getComputedStyle(document.documentElement);
+    var cs = getComputedStyle(document.body);
     function cv(n) { return cs.getPropertyValue(n).trim(); }
     var C = {
       bg:    cv('--bg'),
