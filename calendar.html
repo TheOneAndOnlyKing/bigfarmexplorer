@@ -1116,6 +1116,7 @@
     var onList = state.tab === 'list';
     $('#calCenter').style.display = onList ? 'none' : '';
     $('#listCenter').style.display = onList ? '' : 'none';
+    $('#copyUrlBtn').style.display = onList ? 'none' : '';
     var n;
     if (onList) {
       /* update the visible nav-label button text */
@@ -2125,18 +2126,17 @@
   });
 
   /* ── Export visible events as CSV ── */
-  $('#exportBtn').addEventListener('click', function (e) {
+  $('#exportBtn').addEventListener('click', function () {
     var btn = this;
-    openPop(btn, 'Export', [
-      '<button class="pm" id="expCsv" style="width:100%;text-align:left;padding:7px 12px">',
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:7px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
-        'Download as CSV</button>',
-      '<button class="pm" id="expPng" style="width:100%;text-align:left;padding:7px 12px">',
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:7px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
-        'Screenshot (PNG)</button>'
-    ].join(''), function (el) {
-      if (el.id === 'expCsv' || el.closest && el.closest('#expCsv')) {
-        closePop();
+    if (pop.style.display === 'block' && popAnchor === btn) { closePop(); return; }
+    var onCal = state.tab === 'calendar';
+    var items = '<button class="pm" data-exp="csv">CSV</button>' +
+                (onCal ? '<button class="pm" data-exp="png">Screenshot (PNG)</button>' : '');
+    openPop(btn, 'Export', items, function (e) {
+      var t = e.target.closest ? e.target.closest('[data-exp]') : e.target;
+      if (!t) return;
+      closePop();
+      if (t.dataset.exp === 'csv') {
         var inV = computeInView();
         if (!inV.length) return;
         var rows = [['Event','Section','Start','End','Days']].concat(
@@ -2146,11 +2146,11 @@
           return r.map(function(c) { return '"' + String(c).replace(/"/g,'""') + '"'; }).join(',');
         }).join('\n');
         downloadText(csv, 'bigfarm-events.csv');
-      } else if (el.id === 'expPng' || el.closest && el.closest('#expPng')) {
-        closePop();
+      } else if (t.dataset.exp === 'png') {
         exportTimelineScreenshot();
       }
     });
+    btn.classList.add('open');
   });
 
   function exportTimelineScreenshot() {
