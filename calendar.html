@@ -2169,7 +2169,8 @@
     var cs = getComputedStyle(document.documentElement);
     function cv(n) { return cs.getPropertyValue(n).trim(); }
     var C = {
-      bg:      cv('--card'),
+      bg:      cv('--bg'),    /* lane / body background — matches the actual page */
+      card:    cv('--card'),  /* header / sticky-label background */
       ink:     cv('--ink'),
       muted:   cv('--muted'),
       line:    cv('--line'),
@@ -2213,8 +2214,8 @@
     ctx.fillStyle = C.bg;
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-    /* ── date header ── */
-    ctx.fillStyle = C.bg;
+    /* ── date header (uses card bg like the sticky .tl-head) ── */
+    ctx.fillStyle = C.card;
     ctx.fillRect(0, 0, CANVAS_W, HDR_H);
 
     /* month / day cells */
@@ -2384,8 +2385,8 @@
         });
       });
 
-      /* sticky lane label */
-      ctx.fillStyle = C.bg;
+      /* sticky lane label (uses card bg like .lane-label) */
+      ctx.fillStyle = C.card;
       ctx.fillRect(0, yOff, LANE_W, laneH);
       ctx.strokeStyle = C.line;
       ctx.lineWidth = 1;
@@ -2449,7 +2450,8 @@
     var cs = getComputedStyle(document.documentElement);
     function cv(n) { return cs.getPropertyValue(n).trim(); }
     var C = {
-      bg:    cv('--card'),
+      bg:    cv('--bg'),
+      card:  cv('--card'),
       ink:   cv('--ink'),
       muted: cv('--muted'),
       line:  cv('--line'),
@@ -2457,17 +2459,52 @@
       onAcc: cv('--on-accent')
     };
 
-    var inV = computeInView();
-    var PAD = 16, ROW_H = 36, HDR_H = 40, COL_DOT = 20;
+    /* ── collect only the rows visible inside the scroll container ── */
+    var pane = $('#pane-list');
+    var lb = pane && pane.querySelector('.list-body');
+    var isAna = state.listFormat === 'analytical';
+
+    /* visible events: only those whose DOM row is inside the viewport */
+    var visEvs = [];
+    if (lb) {
+      var lbRect = lb.getBoundingClientRect();
+      /* analytical view: <tr data-id> in tbody */
+      if (isAna) {
+        var rows = lb.querySelectorAll('tbody tr[data-id]');
+        rows.forEach(function(tr) {
+          var r = tr.getBoundingClientRect();
+          if (r.bottom > lbRect.top && r.top < lbRect.bottom) {
+            var id = +tr.dataset.id;
+            var ev = filtered.find(function(e) { return e.id === id; });
+            if (ev) visEvs.push(ev);
+          }
+        });
+      } else {
+        /* informal view: .lrow elements */
+        var lrows = lb.querySelectorAll('.lrow[data-id]');
+        lrows.forEach(function(row) {
+          var r = row.getBoundingClientRect();
+          if (r.bottom > lbRect.top && r.top < lbRect.bottom) {
+            var id = +row.dataset.id;
+            var ev = filtered.find(function(e) { return e.id === id; });
+            if (ev) visEvs.push(ev);
+          }
+        });
+      }
+    }
+    /* fallback: use all in-view events if DOM walk found nothing */
+    if (!visEvs.length) visEvs = computeInView();
+
+    var PAD = 16, ROW_H = 36, COL_HDR_H = 32, TITLE_H = 36, COL_DOT = 20;
     var cols = [
-      { label: 'Event',   w: 220 },
-      { label: 'Section', w: 160 },
-      { label: 'Start',   w: 100 },
-      { label: 'End',     w: 100 },
-      { label: 'Days',    w: 60  }
+      { label: 'Event',   w: 240 },
+      { label: 'Section', w: 150 },
+      { label: 'Start',   w: 108 },
+      { label: 'End',     w: 108 },
+      { label: 'Days',    w: 56  }
     ];
     var totalW = PAD * 2 + cols.reduce(function(a,c){return a+c.w;},0);
-    var totalH = HDR_H + inV.length * ROW_H + PAD;
+    var totalH = TITLE_H + COL_HDR_H + visEvs.length * ROW_H + PAD;
 
     var DPR = window.devicePixelRatio || 1;
     var canv = document.createElement('canvas');
@@ -2480,61 +2517,81 @@
     ctx.fillStyle = C.bg;
     ctx.fillRect(0, 0, totalW, totalH);
 
-    /* range label header */
+    /* title bar (card bg like the list-head) */
+    ctx.fillStyle = C.card;
+    ctx.fillRect(0, 0, totalW, TITLE_H);
     ctx.fillStyle = C.ink;
-    ctx.font = '700 14px system-ui,sans-serif';
+    ctx.font = '700 13px system-ui,sans-serif';
     ctx.textBaseline = 'middle';
     var rangeStr = fmtListRange() || rangeLabel();
-    ctx.fillText('Bigfarm Calendar — ' + rangeStr, PAD, HDR_H / 2);
+    ctx.fillText('Bigfarm Calendar — ' + rangeStr, PAD, TITLE_H / 2);
+    ctx.strokeStyle = C.line;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, TITLE_H); ctx.lineTo(totalW, TITLE_H); ctx.stroke();
 
     /* column headers */
-    var hdrY = HDR_H;
+    var hdrY = TITLE_H;
+    ctx.fillStyle = C.card;
+    ctx.fillRect(0, hdrY, totalW, COL_HDR_H);
     ctx.fillStyle = C.muted;
-    ctx.font = '600 10px system-ui,sans-serif';
+    ctx.font = '700 10px system-ui,sans-serif';
     ctx.textBaseline = 'middle';
     var cx = PAD;
     cols.forEach(function(col) {
-      ctx.fillText(col.label.toUpperCase(), cx, hdrY + ROW_H / 2);
+      ctx.fillText(col.label.toUpperCase(), cx, hdrY + COL_HDR_H / 2);
       cx += col.w;
     });
-
-    /* header bottom line */
     ctx.strokeStyle = C.line;
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(PAD, hdrY + ROW_H); ctx.lineTo(totalW - PAD, hdrY + ROW_H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, hdrY + COL_HDR_H); ctx.lineTo(totalW, hdrY + COL_HDR_H); ctx.stroke();
 
-    /* rows */
-    inV.forEach(function(ev, i) {
-      var rowY = hdrY + ROW_H + i * ROW_H;
+    /* data rows */
+    var dataY = hdrY + COL_HDR_H;
+    visEvs.forEach(function(ev, i) {
+      var rowY = dataY + i * ROW_H;
+
       /* alternating stripe */
-      if (i % 2 === 0) {
+      if (i % 2 !== 0) {
         ctx.fillStyle = C.line;
-        ctx.globalAlpha = 0.3;
-        ctx.fillRect(PAD, rowY, totalW - PAD * 2, ROW_H);
+        ctx.globalAlpha = 0.18;
+        ctx.fillRect(0, rowY, totalW, ROW_H);
         ctx.globalAlpha = 1;
       }
-      var col = barColor(ev);
-      /* color dot */
-      ctx.fillStyle = col;
-      ctx.beginPath(); ctx.arc(PAD + 8, rowY + ROW_H / 2, 4, 0, Math.PI * 2); ctx.fill();
 
-      ctx.fillStyle = C.ink;
-      ctx.font = '500 12px system-ui,sans-serif';
-      ctx.textBaseline = 'middle';
-      var vals = [ev.name, ev.section, isoOf(ev.start), isoOf(ev.end), String(ev.days)];
+      /* color dot */
+      var col = barColor(ev);
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.arc(PAD + 7, rowY + ROW_H / 2, 4, 0, Math.PI * 2); ctx.fill();
+
+      /* text columns */
+      var vals = [ev.name, ev.section, fmtD(ev.start), fmtD(ev.end), String(ev.days)];
       var rx = PAD;
       cols.forEach(function(c, ci) {
-        ctx.save();
-        ctx.beginPath(); ctx.rect(rx + (ci === 0 ? COL_DOT : 0), rowY, c.w - 4, ROW_H); ctx.clip();
-        ctx.fillText(vals[ci], rx + (ci === 0 ? COL_DOT : 0), rowY + ROW_H / 2);
-        ctx.restore();
+        var tx = rx + (ci === 0 ? COL_DOT : 0);
+        var avail = c.w - (ci === 0 ? COL_DOT : 0) - 8;
+        ctx.fillStyle = (ci === 0) ? C.ink : C.muted;
+        ctx.font = (ci === 0 ? '500' : '400') + ' 12px system-ui,sans-serif';
+        if (ci === cols.length - 1) {
+          /* Days: right-align */
+          ctx.textAlign = 'right';
+          ctx.fillText(vals[ci], rx + c.w - 8, rowY + ROW_H / 2);
+          ctx.textAlign = 'left';
+        } else {
+          ctx.save();
+          ctx.beginPath(); ctx.rect(tx, rowY, avail, ROW_H); ctx.clip();
+          ctx.textBaseline = 'middle';
+          ctx.fillText(vals[ci], tx, rowY + ROW_H / 2);
+          ctx.restore();
+        }
         rx += c.w;
       });
 
       /* row divider */
       ctx.strokeStyle = C.line;
       ctx.lineWidth = 0.5;
-      ctx.beginPath(); ctx.moveTo(PAD, rowY + ROW_H); ctx.lineTo(totalW - PAD, rowY + ROW_H); ctx.stroke();
+      ctx.globalAlpha = 0.5;
+      ctx.beginPath(); ctx.moveTo(0, rowY + ROW_H); ctx.lineTo(totalW, rowY + ROW_H); ctx.stroke();
+      ctx.globalAlpha = 1;
     });
 
     canv.toBlob(function(blob) {
