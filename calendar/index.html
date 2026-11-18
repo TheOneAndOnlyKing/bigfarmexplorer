@@ -2368,7 +2368,7 @@
           var ey  = yOff + ev.row * rowH + (rowH - barH) / 2;
           var col = barColor(ev);
           ctx.fillStyle = col;
-          roundRect(ctx, ex1, ey, ew, barH, 4);
+          roundRect(ctx, ex1 + 1, ey, Math.max(ew - 2, 2), barH, 4);
           ctx.fill();
           /* label inside bar if wide enough */
           if (ew >= 40) {
@@ -2456,55 +2456,53 @@
       muted: cv('--muted'),
       line:  cv('--line'),
       accent: cv('--accent'),
-      onAcc: cv('--on-accent')
+      onAcc: cv('--on-accent'),
+      serif: cv('--f-serif') || 'Georgia,serif'
     };
 
-    /* ── collect only the rows visible inside the scroll container ── */
-    var pane = $('#pane-list');
-    var lb = pane && pane.querySelector('.list-body');
     var isAna = state.listFormat === 'analytical';
 
-    /* visible events: only those whose DOM row is inside the viewport */
-    var visEvs = [];
+    /* ── collect visible DOM rows, preserving order and group headers ── */
+    var pane = $('#pane-list');
+    var lb = pane && pane.querySelector('.list-body');
+
+    /* items: { type:'ev', ev } or { type:'grp', label, count } */
+    var items = [];
     if (lb) {
       var lbRect = lb.getBoundingClientRect();
-      /* analytical view: <tr data-id> in tbody */
       if (isAna) {
-        var rows = lb.querySelectorAll('tbody tr[data-id]');
-        rows.forEach(function(tr) {
+        lb.querySelectorAll('tbody tr[data-id]').forEach(function(tr) {
           var r = tr.getBoundingClientRect();
           if (r.bottom > lbRect.top && r.top < lbRect.bottom) {
-            var id = +tr.dataset.id;
-            var ev = filtered.find(function(e) { return e.id === id; });
-            if (ev) visEvs.push(ev);
+            var ev = filtered.find(function(e) { return e.id === +tr.dataset.id; });
+            if (ev) items.push({ type: 'ev', ev: ev });
           }
         });
       } else {
-        /* informal view: .lrow elements */
-        var lrows = lb.querySelectorAll('.lrow[data-id]');
-        lrows.forEach(function(row) {
-          var r = row.getBoundingClientRect();
-          if (r.bottom > lbRect.top && r.top < lbRect.bottom) {
-            var id = +row.dataset.id;
-            var ev = filtered.find(function(e) { return e.id === id; });
-            if (ev) visEvs.push(ev);
+        lb.querySelectorAll('.lg-head, .lrow[data-id]').forEach(function(el) {
+          var r = el.getBoundingClientRect();
+          if (r.bottom <= lbRect.top || r.top >= lbRect.bottom) return;
+          if (el.classList.contains('lg-head')) {
+            var span = el.querySelector('span');
+            items.push({ type: 'grp', label: el.firstChild.textContent.trim(), count: span ? span.textContent.trim() : '' });
+          } else {
+            var ev = filtered.find(function(e) { return e.id === +el.dataset.id; });
+            if (ev) items.push({ type: 'ev', ev: ev });
           }
         });
       }
     }
-    /* fallback: use all in-view events if DOM walk found nothing */
-    if (!visEvs.length) visEvs = computeInView();
+    if (!items.length) computeInView().forEach(function(ev) { items.push({ type: 'ev', ev: ev }); });
 
-    var PAD = 16, ROW_H = 36, COL_HDR_H = 32, TITLE_H = 36, COL_DOT = 20;
-    var cols = [
-      { label: 'Event',   w: 240 },
-      { label: 'Section', w: 150 },
-      { label: 'Start',   w: 108 },
-      { label: 'End',     w: 108 },
-      { label: 'Days',    w: 56  }
-    ];
+    /* ── layout constants ── */
+    var PAD = 16, ROW_H = 36, GRP_H = 32, COL_HDR_H = 30, TITLE_H = 36, COL_DOT = 20;
+    var cols = isAna
+      ? [{ label:'Event', w:240 }, { label:'Section', w:148 }, { label:'Start', w:108 }, { label:'End', w:108 }, { label:'Days', w:56 }]
+      : [{ label:'Event', w:260 }, { label:'Section', w:148 }, { label:'Range', w:200 }, { label:'Days', w:56 }];
     var totalW = PAD * 2 + cols.reduce(function(a,c){return a+c.w;},0);
-    var totalH = TITLE_H + COL_HDR_H + visEvs.length * ROW_H + PAD;
+
+    var contentH = items.reduce(function(h, it) { return h + (it.type === 'grp' ? GRP_H : ROW_H); }, 0);
+    var totalH = TITLE_H + (isAna ? COL_HDR_H : 0) + contentH + PAD;
 
     var DPR = window.devicePixelRatio || 1;
     var canv = document.createElement('canvas');
@@ -2513,85 +2511,136 @@
     var ctx = canv.getContext('2d');
     ctx.scale(DPR, DPR);
 
-    /* background */
+    /* ── helpers ── */
+    function clipText(text, x, y, maxW) {
+      ctx.save();
+      ctx.beginPath(); ctx.rect(x, y - ROW_H / 2, maxW, ROW_H); ctx.clip();
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    /* ── background ── */
     ctx.fillStyle = C.bg;
     ctx.fillRect(0, 0, totalW, totalH);
 
-    /* title bar (card bg like the list-head) */
+    /* ── title bar ── */
     ctx.fillStyle = C.card;
     ctx.fillRect(0, 0, totalW, TITLE_H);
     ctx.fillStyle = C.ink;
     ctx.font = '700 13px system-ui,sans-serif';
     ctx.textBaseline = 'middle';
-    var rangeStr = fmtListRange() || rangeLabel();
-    ctx.fillText('Bigfarm Calendar — ' + rangeStr, PAD, TITLE_H / 2);
+    ctx.fillText('Bigfarm Calendar — ' + (fmtListRange() || rangeLabel()), PAD, TITLE_H / 2);
     ctx.strokeStyle = C.line;
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(0, TITLE_H); ctx.lineTo(totalW, TITLE_H); ctx.stroke();
 
-    /* column headers */
-    var hdrY = TITLE_H;
-    ctx.fillStyle = C.card;
-    ctx.fillRect(0, hdrY, totalW, COL_HDR_H);
-    ctx.fillStyle = C.muted;
-    ctx.font = '700 10px system-ui,sans-serif';
-    ctx.textBaseline = 'middle';
-    var cx = PAD;
-    cols.forEach(function(col) {
-      ctx.fillText(col.label.toUpperCase(), cx, hdrY + COL_HDR_H / 2);
-      cx += col.w;
-    });
-    ctx.strokeStyle = C.line;
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(0, hdrY + COL_HDR_H); ctx.lineTo(totalW, hdrY + COL_HDR_H); ctx.stroke();
+    var y = TITLE_H;
 
-    /* data rows */
-    var dataY = hdrY + COL_HDR_H;
-    visEvs.forEach(function(ev, i) {
-      var rowY = dataY + i * ROW_H;
-
-      /* alternating stripe */
-      if (i % 2 !== 0) {
-        ctx.fillStyle = C.line;
-        ctx.globalAlpha = 0.18;
-        ctx.fillRect(0, rowY, totalW, ROW_H);
-        ctx.globalAlpha = 1;
-      }
-
-      /* color dot */
-      var col = barColor(ev);
-      ctx.fillStyle = col;
-      ctx.beginPath(); ctx.arc(PAD + 7, rowY + ROW_H / 2, 4, 0, Math.PI * 2); ctx.fill();
-
-      /* text columns */
-      var vals = [ev.name, ev.section, fmtD(ev.start), fmtD(ev.end), String(ev.days)];
-      var rx = PAD;
-      cols.forEach(function(c, ci) {
-        var tx = rx + (ci === 0 ? COL_DOT : 0);
-        var avail = c.w - (ci === 0 ? COL_DOT : 0) - 8;
-        ctx.fillStyle = (ci === 0) ? C.ink : C.muted;
-        ctx.font = (ci === 0 ? '500' : '400') + ' 12px system-ui,sans-serif';
+    /* ── column headers (analytical only) ── */
+    if (isAna) {
+      ctx.fillStyle = C.card;
+      ctx.fillRect(0, y, totalW, COL_HDR_H);
+      ctx.fillStyle = C.muted;
+      ctx.font = '700 10px system-ui,sans-serif';
+      ctx.textBaseline = 'middle';
+      var cx = PAD;
+      cols.forEach(function(col, ci) {
         if (ci === cols.length - 1) {
-          /* Days: right-align */
           ctx.textAlign = 'right';
-          ctx.fillText(vals[ci], rx + c.w - 8, rowY + ROW_H / 2);
+          ctx.fillText(col.label.toUpperCase(), cx + col.w - 8, y + COL_HDR_H / 2);
           ctx.textAlign = 'left';
         } else {
-          ctx.save();
-          ctx.beginPath(); ctx.rect(tx, rowY, avail, ROW_H); ctx.clip();
-          ctx.textBaseline = 'middle';
-          ctx.fillText(vals[ci], tx, rowY + ROW_H / 2);
-          ctx.restore();
+          ctx.fillText(col.label.toUpperCase(), cx, y + COL_HDR_H / 2);
         }
-        rx += c.w;
+        cx += col.w;
       });
-
-      /* row divider */
       ctx.strokeStyle = C.line;
-      ctx.lineWidth = 0.5;
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath(); ctx.moveTo(0, rowY + ROW_H); ctx.lineTo(totalW, rowY + ROW_H); ctx.stroke();
-      ctx.globalAlpha = 1;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, y + COL_HDR_H); ctx.lineTo(totalW, y + COL_HDR_H); ctx.stroke();
+      y += COL_HDR_H;
+    }
+
+    /* ── rows ── */
+    var rowIdx = 0;
+    items.forEach(function(it) {
+      if (it.type === 'grp') {
+        /* group header — serif bold like .lg-head */
+        ctx.fillStyle = C.bg;
+        ctx.fillRect(0, y, totalW, GRP_H);
+        ctx.fillStyle = C.ink;
+        ctx.font = '600 14px ' + C.serif;
+        ctx.textBaseline = 'middle';
+        ctx.fillText(it.label, PAD, y + GRP_H / 2);
+        if (it.count) {
+          ctx.fillStyle = C.muted;
+          ctx.font = '400 10.5px system-ui,sans-serif';
+          ctx.fillText(it.count, PAD + ctx.measureText(it.label + ' ').width + 4, y + GRP_H / 2);
+        }
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 0.5;
+        ctx.globalAlpha = 0.5;
+        ctx.beginPath(); ctx.moveTo(0, y + GRP_H); ctx.lineTo(totalW, y + GRP_H); ctx.stroke();
+        ctx.globalAlpha = 1;
+        y += GRP_H;
+      } else {
+        var ev = it.ev;
+        /* alternating stripe */
+        if (rowIdx % 2 !== 0) {
+          ctx.fillStyle = C.line;
+          ctx.globalAlpha = 0.18;
+          ctx.fillRect(0, y, totalW, ROW_H);
+          ctx.globalAlpha = 1;
+        }
+        rowIdx++;
+
+        /* color dot */
+        var col = barColor(ev);
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.arc(PAD + 7, y + ROW_H / 2, 4, 0, Math.PI * 2); ctx.fill();
+
+        ctx.textBaseline = 'middle';
+        var rx = PAD;
+        if (isAna) {
+          var vals = [ev.name, ev.section, fmtD(ev.start), fmtD(ev.end), String(ev.days)];
+          cols.forEach(function(c, ci) {
+            ctx.fillStyle = ci === 0 ? C.ink : C.muted;
+            ctx.font = (ci === 0 ? '600' : '400') + ' 12px system-ui,sans-serif';
+            if (ci === cols.length - 1) {
+              ctx.textAlign = 'right';
+              ctx.fillText(vals[ci], rx + c.w - 8, y + ROW_H / 2);
+              ctx.textAlign = 'left';
+            } else {
+              var tx = rx + (ci === 0 ? COL_DOT : 0);
+              clipText(vals[ci], tx, y + ROW_H / 2, c.w - (ci === 0 ? COL_DOT : 0) - 8);
+            }
+            rx += c.w;
+          });
+        } else {
+          /* informal: name | section | range | days */
+          var iVals = [ev.name, ev.section, fmtRange(ev), ev.days + 'd'];
+          cols.forEach(function(c, ci) {
+            ctx.fillStyle = ci === 0 ? C.ink : C.muted;
+            ctx.font = (ci === 0 ? '600' : '400') + ' 12px system-ui,sans-serif';
+            if (ci === cols.length - 1) {
+              ctx.textAlign = 'right';
+              ctx.fillText(iVals[ci], rx + c.w - 8, y + ROW_H / 2);
+              ctx.textAlign = 'left';
+            } else {
+              var itx = rx + (ci === 0 ? COL_DOT : 0);
+              clipText(iVals[ci], itx, y + ROW_H / 2, c.w - (ci === 0 ? COL_DOT : 0) - 8);
+            }
+            rx += c.w;
+          });
+        }
+
+        /* row divider */
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 0.5;
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath(); ctx.moveTo(0, y + ROW_H); ctx.lineTo(totalW, y + ROW_H); ctx.stroke();
+        ctx.globalAlpha = 1;
+        y += ROW_H;
+      }
     });
 
     canv.toBlob(function(blob) {
