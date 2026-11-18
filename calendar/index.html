@@ -432,9 +432,10 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           <span id="copyUrlLbl">Share</span>
         </button>
-        <button class="ghostbtn" id="exportTableBtn" title="Export visible events as CSV">
+        <button class="ghostbtn" id="exportBtn" title="Export options">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Table
+          Export
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:1px"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
       </div>
     </div>
@@ -2124,17 +2125,313 @@
   });
 
   /* ── Export visible events as CSV ── */
-  $('#exportTableBtn').addEventListener('click', function () {
-    var inV = computeInView();
-    if (!inV.length) { return; }
-    var rows = [['Event','Section','Start','End','Days']].concat(
-      inV.map(function(ev) { return [ev.name, ev.section, isoOf(ev.start), isoOf(ev.end), ev.days]; })
-    );
-    var csv = rows.map(function(r) {
-      return r.map(function(c) { return '"' + String(c).replace(/"/g,'""') + '"'; }).join(',');
-    }).join('\n');
-    downloadText(csv, 'bigfarm-events.csv');
+  $('#exportBtn').addEventListener('click', function (e) {
+    var btn = this;
+    openPop(btn, 'Export', [
+      '<button class="pm" id="expCsv" style="width:100%;text-align:left;padding:7px 12px">',
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:7px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+        'Download as CSV</button>',
+      '<button class="pm" id="expPng" style="width:100%;text-align:left;padding:7px 12px">',
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:7px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+        'Screenshot (PNG)</button>'
+    ].join(''), function (el) {
+      if (el.id === 'expCsv' || el.closest && el.closest('#expCsv')) {
+        closePop();
+        var inV = computeInView();
+        if (!inV.length) return;
+        var rows = [['Event','Section','Start','End','Days']].concat(
+          inV.map(function(ev) { return [ev.name, ev.section, isoOf(ev.start), isoOf(ev.end), ev.days]; })
+        );
+        var csv = rows.map(function(r) {
+          return r.map(function(c) { return '"' + String(c).replace(/"/g,'""') + '"'; }).join(',');
+        }).join('\n');
+        downloadText(csv, 'bigfarm-events.csv');
+      } else if (el.id === 'expPng' || el.closest && el.closest('#expPng')) {
+        closePop();
+        exportTimelineScreenshot();
+      }
+    });
   });
+
+  function exportTimelineScreenshot() {
+    /* read live CSS variables from the document root */
+    var cs = getComputedStyle(document.documentElement);
+    function cv(n) { return cs.getPropertyValue(n).trim(); }
+    var C = {
+      bg:      cv('--card'),
+      ink:     cv('--ink'),
+      muted:   cv('--muted'),
+      line:    cv('--line'),
+      accent:  cv('--accent'),
+      onAcc:   cv('--on-accent'),
+      we:      cv('--we') || (state.theme === 'dark' ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.04)')
+    };
+
+    var LANE_W = laneW();
+    var rowH   = state.density === 'compact' ? 24 : 34;
+    var barH   = rowH - 12;
+    var HDR_H  = 36; /* date header height */
+    var PAD    = 2;
+
+    /* which sections are visible? */
+    var visSecs = sections.filter(function(s) { return state.hiddenSecs.indexOf(s) < 0; });
+
+    /* total canvas height: header + all section rows */
+    var totalRows = 0;
+    visSecs.forEach(function(s) { totalRows += Math.max((laneRows.get(s)||[]).length, 1); });
+    var CANVAS_H = HDR_H + totalRows * rowH + PAD * 2;
+
+    /* visible date range in pixels */
+    var viewStart = dateAtLeft();
+    var viewMs    = chartViewMs();
+    var viewEnd   = viewStart + viewMs;
+    var CHART_W   = Math.round(viewMs / MS * dayW);
+    var CANVAS_W  = LANE_W + CHART_W;
+
+    var DPR = window.devicePixelRatio || 1;
+    var cv2 = document.createElement('canvas');
+    cv2.width  = CANVAS_W * DPR;
+    cv2.height = CANVAS_H * DPR;
+    var ctx = cv2.getContext('2d');
+    ctx.scale(DPR, DPR);
+
+    /* helpers */
+    function xOf(t) { return LANE_W + (t - viewStart) / MS * dayW; }
+
+    /* background */
+    ctx.fillStyle = C.bg;
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+    /* ── date header ── */
+    ctx.fillStyle = C.bg;
+    ctx.fillRect(0, 0, CANVAS_W, HDR_H);
+
+    /* month / day cells */
+    var todayT2 = todayUTC();
+    var showDays2 = dayW >= 16, showWD2 = dayW >= 24;
+
+    if (!showDays2) {
+      /* month-only header */
+      for (var t2 = viewStart; t2 < viewEnd; t2 = monthAddT(t2, 1)) {
+        var d2 = new Date(t2 < viewStart ? viewStart : t2);
+        var mo2 = new Date(t2);
+        var x2 = Math.max(xOf(t2), LANE_W);
+        var moEnd = monthAddT(t2, 1);
+        var x2e = Math.min(xOf(moEnd), LANE_W + CHART_W);
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x2, 0); ctx.lineTo(x2, HDR_H); ctx.stroke();
+        ctx.fillStyle = C.ink;
+        ctx.font = '600 11px system-ui,sans-serif';
+        ctx.textBaseline = 'middle';
+        var lb2 = (x2e - x2 > 78 ? M_L[mo2.getUTCMonth()] : M_S[mo2.getUTCMonth()]);
+        if (mo2.getUTCMonth() === 0) lb2 += ' ' + mo2.getUTCFullYear();
+        ctx.fillText(lb2, x2 + 8, HDR_H / 2);
+      }
+    } else {
+      /* day cells */
+      var totalDays2 = Math.ceil(viewMs / MS) + 1;
+      var startDay = new Date(viewStart);
+      var wd0c = startDay.getUTCDay();
+      for (var di2 = 0; di2 < totalDays2; di2++) {
+        var ts2 = viewStart + di2 * MS;
+        if (ts2 >= viewEnd) break;
+        var dd2 = new Date(ts2);
+        var wd2 = (wd0c + di2) % 7;
+        var isWe = wd2 === 0 || wd2 === 6;
+        var cellX = xOf(ts2);
+        var cellW = dayW;
+        if (isWe) {
+          ctx.fillStyle = C.we;
+          ctx.fillRect(cellX, 0, cellW, HDR_H);
+        }
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cellX, 0); ctx.lineTo(cellX, HDR_H); ctx.stroke();
+        /* month label on 1st */
+        var dn2 = dd2.getUTCDate();
+        if (dn2 === 1) {
+          var mi2 = dd2.getUTCMonth(), yr2 = dd2.getUTCFullYear();
+          var ml2 = (dayW >= 32 ? M_L[mi2] : M_S[mi2]) + (mi2 === 0 || di2 === 0 ? ' ' + yr2 : '');
+          ctx.fillStyle = C.ink;
+          ctx.font = '700 9px system-ui,sans-serif';
+          ctx.textBaseline = 'top';
+          ctx.fillText(ml2, cellX + 3, 3);
+        } else if (showWD2) {
+          ctx.fillStyle = isWe ? C.muted : C.muted;
+          ctx.font = '400 8px system-ui,sans-serif';
+          ctx.textBaseline = 'top';
+          ctx.fillText(WD[wd2], cellX + cellW / 2 - 3, 3);
+        }
+        /* day number */
+        ctx.fillStyle = isWe ? C.muted : C.ink;
+        ctx.font = '600 11px system-ui,sans-serif';
+        ctx.textBaseline = 'bottom';
+        ctx.textAlign = 'center';
+        ctx.fillText(dn2, cellX + cellW / 2, HDR_H - 4);
+        ctx.textAlign = 'left';
+      }
+    }
+
+    /* today marker line in header */
+    if (todayT2 >= viewStart && todayT2 < viewEnd) {
+      var txH = xOf(todayT2) + dayW / 2;
+      ctx.fillStyle = C.accent;
+      ctx.fillRect(txH - 1, 0, 2, HDR_H);
+      /* "Today" pill */
+      ctx.font = '600 8px system-ui,sans-serif';
+      ctx.textBaseline = 'top';
+      var tw = ctx.measureText('Today').width + 10;
+      ctx.fillStyle = C.accent;
+      var pillX = txH - tw / 2;
+      roundRect(ctx, pillX, 4, tw, 14, 7);
+      ctx.fill();
+      ctx.fillStyle = C.onAcc;
+      ctx.textAlign = 'center';
+      ctx.fillText('Today', txH, 7);
+      ctx.textAlign = 'left';
+    }
+
+    /* header / chart divider */
+    ctx.strokeStyle = C.line;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, HDR_H); ctx.lineTo(CANVAS_W, HDR_H); ctx.stroke();
+
+    /* ── section lanes ── */
+    var yOff = HDR_H + PAD;
+    var half = dayW / 2;
+
+    visSecs.forEach(function(sec) {
+      var rows2 = laneRows.get(sec) || [];
+      var nRows2 = Math.max(rows2.length, 1);
+      var laneH  = nRows2 * rowH;
+
+      /* lane background + weekend stripes */
+      ctx.fillStyle = C.bg;
+      ctx.fillRect(0, yOff, CANVAS_W, laneH);
+      if (state.weekends && dayW >= 7) {
+        ctx.fillStyle = C.we;
+        for (var di3 = 0; di3 < Math.ceil(viewMs / MS) + 1; di3++) {
+          var ts3 = viewStart + di3 * MS;
+          if (ts3 >= viewEnd) break;
+          var wd3 = new Date(ts3).getUTCDay();
+          if (wd3 === 6 || wd3 === 0) ctx.fillRect(xOf(ts3), yOff, dayW, laneH);
+        }
+      }
+
+      /* vertical grid lines */
+      ctx.strokeStyle = C.line;
+      ctx.lineWidth = 0.5;
+      if (dayW >= 7) {
+        for (var di4 = 0; di4 < Math.ceil(viewMs / MS) + 1; di4++) {
+          var ts4 = viewStart + di4 * MS;
+          if (ts4 >= viewEnd) break;
+          var gx = xOf(ts4);
+          ctx.beginPath(); ctx.moveTo(gx, yOff); ctx.lineTo(gx, yOff + laneH); ctx.stroke();
+        }
+      }
+
+      /* month boundary lines */
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = C.line;
+      for (var t3 = viewStart; t3 < viewEnd; t3 = monthAddT(t3, 1)) {
+        var mx = xOf(t3);
+        ctx.beginPath(); ctx.moveTo(mx, yOff); ctx.lineTo(mx, yOff + laneH); ctx.stroke();
+      }
+
+      /* today line */
+      if (todayT2 >= viewStart && todayT2 < viewEnd) {
+        var txL = xOf(todayT2) + dayW / 2;
+        ctx.fillStyle = C.accent;
+        ctx.fillRect(txL - 1, yOff, 2, laneH);
+      }
+
+      /* event bars */
+      rows2.forEach(function(row) {
+        row.evs.forEach(function(ev) {
+          if (ev.end < viewStart || ev.start >= viewEnd) return;
+          var ex1 = Math.max(xOf(ev.start) + half, LANE_W);
+          var ex2 = Math.min(xOf(ev.end) + half, LANE_W + CHART_W);
+          var ew  = Math.max(ex2 - ex1, 2);
+          var ey  = yOff + ev.row * rowH + (rowH - barH) / 2;
+          var col = barColor(ev);
+          ctx.fillStyle = col;
+          roundRect(ctx, ex1, ey, ew, barH, 4);
+          ctx.fill();
+          /* label inside bar if wide enough */
+          if (ew >= 40) {
+            ctx.fillStyle = textColorFor(col);
+            ctx.font = '500 11px system-ui,sans-serif';
+            ctx.textBaseline = 'middle';
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(ex1 + 6, ey, ew - 10, barH);
+            ctx.clip();
+            ctx.fillText(ev.name, ex1 + 6, ey + barH / 2);
+            ctx.restore();
+          }
+        });
+      });
+
+      /* sticky lane label */
+      ctx.fillStyle = C.bg;
+      ctx.fillRect(0, yOff, LANE_W, laneH);
+      ctx.strokeStyle = C.line;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(LANE_W, yOff); ctx.lineTo(LANE_W, yOff + laneH); ctx.stroke();
+
+      /* section dot */
+      var dotCol = sectionColor(sec);
+      ctx.fillStyle = dotCol;
+      ctx.beginPath(); ctx.arc(18, yOff + laneH / 2, 5, 0, Math.PI * 2); ctx.fill();
+
+      /* section name */
+      ctx.fillStyle = C.ink;
+      ctx.font = '600 12px system-ui,sans-serif';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(sec, 30, yOff + laneH / 2);
+
+      /* count badge */
+      var cnt = secCounts.get(sec) || 0;
+      ctx.fillStyle = C.muted;
+      ctx.font = '400 10px system-ui,sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(cnt, LANE_W - 8, yOff + laneH / 2);
+      ctx.textAlign = 'left';
+
+      /* lane divider */
+      ctx.strokeStyle = C.line;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, yOff + laneH); ctx.lineTo(CANVAS_W, yOff + laneH); ctx.stroke();
+
+      yOff += laneH;
+    });
+
+    /* outer border */
+    ctx.strokeStyle = C.line;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0.5, 0.5, CANVAS_W - 1, CANVAS_H - 1);
+
+    /* download */
+    cv2.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'bigfarm-calendar.png';
+      a.click();
+      setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+    }, 'image/png');
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
   $('#todayBtn').addEventListener('click', function () {
     if (state.tab === 'list') {
       var n = new Date();
