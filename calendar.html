@@ -23,7 +23,7 @@
     --bg:#F2F0E8; --card:#FBFAF5; --ink:#22251E; --muted:#6C6F63;
     --line:#E3E0D4; --line2:#D2CEBF; --dayline:rgba(34,37,30,.08);
     --accent:#3E6B35; --on-accent:#F6F4EB; --accent-soft:rgba(62,107,53,.09);
-    --wknd:rgba(62,80,50,.065); --warn:#A66A21;
+    --wknd:rgba(62,80,50,.065); --warn:#A66A21; --exp-item-bg:rgba(34,37,30,.06);
     --shadow:0 1px 2px rgba(30,30,20,.05), 0 10px 30px rgba(30,30,20,.06);
     --tipbg:#22251E; --tipink:#F2F0E8;
     --bar-0:#C25B3C; --bar-1:#6D8A56; --bar-2:#D19E3A; --bar-3:#5B7BA6;
@@ -33,7 +33,7 @@
     --bg:#C8C8C1; --card:#D4D4CC; --ink:#26261F; --muted:#5E5E55;
     --line:#B8B8AE; --line2:#A6A69A; --dayline:rgba(38,38,31,.09);
     --accent:#37552E; --on-accent:#EDEBE0; --accent-soft:rgba(55,85,46,.12);
-    --wknd:rgba(30,35,25,.07); --warn:#8A5A1C;
+    --wknd:rgba(30,35,25,.07); --warn:#8A5A1C; --exp-item-bg:rgba(38,38,31,.09);
     --shadow:0 1px 2px rgba(30,30,20,.08), 0 10px 30px rgba(30,30,20,.1);
     --tipbg:#26261F; --tipink:#D4D4CC;
     --bar-0:#A34A2E; --bar-1:#546F3F; --bar-2:#A87E2A; --bar-3:#425F8A;
@@ -44,7 +44,7 @@
     --bg:#141711; --card:#1B1E17; --ink:#EAE9DF; --muted:#9AA092;
     --line:#2A2D22; --line2:#3A3E2C; --dayline:rgba(234,233,223,.06);
     --accent:#9CCB7E; --on-accent:#141B0C; --accent-soft:rgba(156,203,126,.12);
-    --wknd:rgba(255,255,255,.035); --warn:#D9A253;
+    --wknd:rgba(255,255,255,.035); --warn:#D9A253; --exp-item-bg:rgba(255,255,255,.07);
     --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.35);
     --tipbg:#EAE9DF; --tipink:#1B1E17;
     --bar-0:#E07850; --bar-1:#93BE74; --bar-2:#E5BC58; --bar-3:#8FA9DA;
@@ -321,6 +321,7 @@
   .pgrid.y { grid-template-columns: repeat(4, 56px); }
   .pm { padding: 7px 4px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--muted); text-align: center; }
   .pm:hover { background: var(--accent-soft); color: var(--ink); }
+  .exp-item:hover { background: var(--accent-soft) !important; color: var(--ink); }
   .pm.on { background: var(--accent); color: var(--on-accent); }
   .poptitle { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 2px 2px 8px; }
   .pseclist { display: flex; flex-direction: column; min-width: 210px; max-height: 62vh; overflow: auto; }
@@ -434,7 +435,7 @@
         </button>
         <button class="ghostbtn" id="exportBtn" title="Export options">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export
+          Save
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:1px"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
       </div>
@@ -1769,7 +1770,8 @@
   var pop = $('#pop');
   var popAnchor = null, popHandler = null;
   function openPop(anchor, title, html, handler) {
-    pop.innerHTML = '<div class="poptitle">' + title + '</div>' + html;
+    var trimmed = title.replace(/​/g, '').trim();
+    pop.innerHTML = (trimmed ? '<div class="poptitle">' + title + '</div>' : '') + html;
     popHandler = handler;
     popAnchor = anchor;
     pop.style.display = 'block';
@@ -2132,11 +2134,10 @@
     var btn = this;
     if (pop.style.display === 'block' && popAnchor === btn) { closePop(); return; }
     var items =
-      '<button class="pm exp-item" data-exp="csv" style="display:block;width:100%;text-align:left;padding:7px 10px;border-radius:8px">Download as CSV</button>' +
-      '<div style="border-top:1px solid var(--line);margin:4px 0"></div>' +
-      '<button class="pm exp-item" data-exp="png" style="display:block;width:100%;text-align:left;padding:7px 10px;border-radius:8px">Screenshot (PNG)</button>';
+      '<button class="pm exp-item" data-exp="csv" style="display:block;width:100%;text-align:left;padding:7px 10px;border-radius:8px;background:var(--exp-item-bg)">Download as CSV</button>' +
+      '<button class="pm exp-item" data-exp="png" style="display:block;width:100%;text-align:left;padding:7px 10px;border-radius:8px;margin-top:5px;background:var(--exp-item-bg)">Screenshot (PNG)</button>';
     /* open with blank title so the poptitle div is empty; we hide it via style */
-    openPop(btn, '​', '<div style="min-width:140px">' + items + '</div>', function (e) {
+    openPop(btn, '​', '<div style="min-width:148px">' + items + '</div>', function (e) {
       var t = e.target.closest('[data-exp]');
       if (!t) return;
       closePop();
