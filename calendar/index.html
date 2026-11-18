@@ -498,8 +498,8 @@
   var LS_KEY = 'bigfarm-calendar-v1';
   var MS = 86400000;
   var DATA_FILES = ['../events.jsonl', '../Events Machine.txt', '../Events Machine.jsonl'];
-  var TEMPLATE_FILE = 'defaultcolourtemplate.json';
-  var EVENTLINKS_FILE = 'eventlinks.json';
+  var TEMPLATE_FILE = '../defaultcolourtemplate.json';
+  var EVENTLINKS_FILE = '../eventlinks.json';
 
   var SECTION_ORDER = [
     { name: 'Weekly events', cap: 0, events: ['Village Fair', 'Fishing Hard Worker Event', 'Hard Worker Event', 'Cooperative Hard Worker Event', 'Cooperative Championship'] },
@@ -808,7 +808,7 @@
   /* ── event icons (icons/<event name>.png, optional per event) ── */
   var iconCache = new Map();
   var iconRerenderTimer = 0;
-  function iconURL(base) { return 'icons/' + encodeURIComponent(base) + '.png'; }
+  function iconURL(base) { return '../icons/' + encodeURIComponent(base) + '.png'; }
   function hasIcon(base) { return iconCache.get(base) === true; }
   function iconHTML(base) {
     return hasIcon(base) ? '<img class="evico" src="' + iconURL(base) + '" alt="" draggable="false">' : '';
