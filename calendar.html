@@ -2134,8 +2134,8 @@
     var btn = this;
     if (pop.style.display === 'block' && popAnchor === btn) { closePop(); return; }
     var items =
-      '<button class="pm exp-item" data-exp="csv" style="display:block;width:100%;text-align:left;padding:7px 10px;border-radius:8px;background:var(--exp-item-bg)">Download as CSV</button>' +
-      '<button class="pm exp-item" data-exp="png" style="display:block;width:100%;text-align:left;padding:7px 10px;border-radius:8px;margin-top:5px;background:var(--exp-item-bg)">Screenshot (PNG)</button>';
+      '<button class="pm exp-item" data-exp="csv" style="display:block;width:100%;text-align:center;padding:7px 10px;border-radius:8px;background:var(--exp-item-bg)">Download as CSV</button>' +
+      '<button class="pm exp-item" data-exp="png" style="display:block;width:100%;text-align:center;padding:7px 10px;border-radius:8px;margin-top:5px;background:var(--exp-item-bg)">Screenshot (PNG)</button>';
     /* open with blank title so the poptitle div is empty; we hide it via style */
     openPop(btn, '​', '<div style="min-width:148px">' + items + '</div>', function (e) {
       var t = e.target.closest('[data-exp]');
