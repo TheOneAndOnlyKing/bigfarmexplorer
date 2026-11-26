@@ -3112,7 +3112,6 @@
     if (d) { state.density = d.dataset.density; applyDensity(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
     var sw = e.target.closest('[data-cname]');
     if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
-    /* toggle switches handled in the change listener below */
     if (e.target.closest('#resetBtn')) {
       if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(function () { resetArmed = false; }, 3000); }
       else { try { localStorage.removeItem(LS_KEY); } catch (e2) {} location.reload(); }
@@ -3131,16 +3130,14 @@
     }
     if (e.target.id === 'wkndSw') {
       state.weekends = e.target.checked; applyWeekends(); save();
-      /* defer refresh so the pane isn't wiped before the change event completes */
-      setTimeout(function () { refresh(); }, 0); return;
+      if (state.tab === 'calendar') renderTimeline(); return;
     }
     if (e.target.id === 'lblSw') {
       state.labels = e.target.checked; save();
-      setTimeout(function () { refresh(); }, 0); return;
+      if (state.tab === 'calendar') renderTimeline(); return;
     }
     if (e.target.id === 'flSw') {
-      state.showFLBtn = e.target.checked; applyFLBtn(); save();
-      setTimeout(function () { refresh(); }, 0); return;
+      state.showFLBtn = e.target.checked; applyFLBtn(); save(); return;
     }
   });
   $('#pane-themes').addEventListener('keydown', function (e) {
