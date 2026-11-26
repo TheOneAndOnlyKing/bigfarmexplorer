@@ -8,17 +8,31 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%233E6B35'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23F7F4EA' text-anchor='middle'>BE</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Nunito:ital,wght@0,300..800;1,300..800&family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Space+Grotesk:wght@300..700&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Syne:wght@400..800&display=swap">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --f-sans: 'Instrument Sans', system-ui, sans-serif;
     --f-serif: 'Fraunces', Georgia, serif;
     --f-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --f-dm: 'DM Sans', system-ui, sans-serif;
+    --f-lora: 'Lora', Georgia, serif;
+    --f-nunito: 'Nunito', system-ui, sans-serif;
+    --f-playfair: 'Playfair Display', Georgia, serif;
+    --f-grotesk: 'Space Grotesk', system-ui, sans-serif;
+    --f-crimson: 'Crimson Pro', Georgia, serif;
+    --f-syne: 'Syne', system-ui, sans-serif;
   }
-  body[data-font="sans"]  { --ui: var(--f-sans); }
-  body[data-font="serif"] { --ui: var(--f-serif); }
-  body[data-font="mono"]  { --ui: var(--f-mono); }
+  body[data-font="sans"]     { --ui: var(--f-sans); }
+  body[data-font="serif"]    { --ui: var(--f-serif); }
+  body[data-font="mono"]     { --ui: var(--f-mono); }
+  body[data-font="dm"]       { --ui: var(--f-dm); }
+  body[data-font="lora"]     { --ui: var(--f-lora); }
+  body[data-font="nunito"]   { --ui: var(--f-nunito); }
+  body[data-font="playfair"] { --ui: var(--f-playfair); }
+  body[data-font="grotesk"]  { --ui: var(--f-grotesk); }
+  body[data-font="crimson"]  { --ui: var(--f-crimson); }
+  body[data-font="syne"]     { --ui: var(--f-syne); }
   body[data-theme="light"] {
     --bg:#F2F0E8; --card:#FBFAF5; --ink:#22251E; --muted:#6C6F63;
     --line:#E3E0D4; --line2:#D2CEBF; --dayline:rgba(34,37,30,.08);
@@ -122,6 +136,7 @@
   .hday b { font-size: 11px; font-weight: 500; }
   .hday.we b, .hday.we i { color: var(--muted); }
   .hday.we { background: var(--wknd); }
+  body[data-weekends="off"] .hday.we { background: none; }
   .hflag { position: absolute; top: 4px; transform: translateX(-50%); z-index: 2; background: var(--accent); color: var(--on-accent); font-family: var(--f-mono); font-size: 8.5px; letter-spacing: .1em; padding: 1px 6px; border-radius: 99px; }
   .tl-lanewrap { position: relative; }
   .tl-grid { position: absolute; top: 0; bottom: 0; pointer-events: none; z-index: 0; }
@@ -180,6 +195,7 @@
   .lg-head { display: flex; align-items: baseline; gap: 10px; padding: 14px 18px 6px; font-family: var(--f-serif); font-weight: 600; font-size: 14px; }
   .lg-head span { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
   .lrow { width: 100%; display: grid; grid-template-columns: 14px 1fr auto auto 44px; align-items: center; gap: 12px; text-align: left; padding: 8px 18px; border-radius: 10px; }
+  body[data-density="compact"] .lrow { padding-top: 4px; padding-bottom: 4px; }
   .lrow:hover { background: var(--accent-soft); }
   .ldot { width: 10px; height: 10px; border-radius: 50%; }
   .ln { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -218,7 +234,7 @@
   .set-group h3 { font-family: var(--f-serif); font-size: 15px; font-weight: 600; display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
   .set-group h3 .h-note { font-family: var(--ui); font-size: 11.5px; font-weight: 400; color: var(--muted); }
   .fontopts { display: flex; gap: 10px; flex-wrap: wrap; }
-  .fontopt { flex: 1; min-width: 200px; text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .fontopt { flex: 1; min-width: 155px; max-width: 220px; text-align: left; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
   .fontopt:hover { border-color: var(--line2); }
   .fontopt.on { border-color: var(--accent); background: var(--accent-soft); }
   .fontopt .fprev { font-size: 19px; font-weight: 600; }
@@ -626,7 +642,7 @@
     theme: 'dark', font: 'sans', zoom: 1,
     anchor: { y: now0.getFullYear(), m: now0.getMonth() },
     tab: 'calendar', density: 'comfortable', weekends: true, labels: true,
-    sort: 'date', scale: 1, showFL: false,
+    sort: 'date', scale: 1, showFL: false, showFLBtn: true,
     listFormat: 'informal', tsort: { col: 'start', dir: 'asc' },
     listFrom: null, listTo: null,
     drawerW: null, vHeight: null,
@@ -654,7 +670,7 @@
     try { localStorage.setItem(LS_KEY, JSON.stringify({
       theme: state.theme, font: state.font, zoom: state.zoom, tab: state.tab,
       anchor: state.anchor, density: state.density, weekends: state.weekends,
-      labels: state.labels, sort: state.sort, scale: state.scale, showFL: state.showFL,
+      labels: state.labels, sort: state.sort, scale: state.scale, showFL: state.showFL, showFLBtn: state.showFLBtn,
       listFormat: state.listFormat, tsort: state.tsort,
       listFrom: state.listFrom, listTo: state.listTo,
       drawerW: state.drawerW, vHeight: state.vHeight,
@@ -690,7 +706,7 @@
     try {
       var s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
       if (s.theme === 'light' || s.theme === 'grey' || s.theme === 'dark') state.theme = s.theme;
-      if (['sans','serif','mono'].includes(s.font)) state.font = s.font;
+      if (['sans','serif','mono','dm','lora','nunito','playfair','grotesk','crimson','syne'].includes(s.font)) state.font = s.font;
       if ([7,1,3,6,12].includes(s.zoom)) state.zoom = s.zoom;
       if (['calendar','list','themes'].includes(s.tab)) state.tab = s.tab;
       if (['comfortable','compact'].includes(s.density)) state.density = s.density;
@@ -699,6 +715,7 @@
       if (['date','name','section'].includes(s.sort)) state.sort = s.sort;
       if (typeof s.scale === 'number') state.scale = Math.min(3, Math.max(0.4, s.scale));
       if (typeof s.showFL === 'boolean') state.showFL = s.showFL;
+      if (typeof s.showFLBtn === 'boolean') state.showFLBtn = s.showFLBtn;
       if (s.listFormat === 'informal' || s.listFormat === 'analytical') state.listFormat = s.listFormat;
       if (s.tsort && ['event','section','start','end','days'].includes(s.tsort.col))
         state.tsort = { col: s.tsort.col, dir: s.tsort.dir === 'desc' ? 'desc' : 'asc' };
@@ -1506,9 +1523,16 @@
   /* ── themes pane ── */
   function renderThemes() {
     var fonts = [
-      ['sans', 'Instrument Sans', 'clean sans — the default'],
-      ['serif', 'Fraunces', 'bookish serif'],
-      ['mono', 'IBM Plex Mono', 'technical mono']
+      ['sans',     'Instrument Sans',   'clean geometric sans'],
+      ['dm',       'DM Sans',           'friendly rounded sans'],
+      ['grotesk',  'Space Grotesk',     'sharp modern sans'],
+      ['syne',     'Syne',              'wide display sans'],
+      ['nunito',   'Nunito',            'soft rounded sans'],
+      ['serif',    'Fraunces',          'bookish optical serif'],
+      ['lora',     'Lora',              'refined text serif'],
+      ['playfair', 'Playfair Display',  'elegant high-contrast serif'],
+      ['crimson',  'Crimson Pro',       'warm editorial serif'],
+      ['mono',     'IBM Plex Mono',     'technical monospace']
     ];
     var c = state.colors;
     var loNames = Object.keys(state.loadouts).sort(function (a, b) { return a.localeCompare(b); });
@@ -1544,14 +1568,14 @@
         }).join('') + '</div>' +
       '</div>' +
       '<div class="set-group"><h3>Display</h3>' +
-        '<div class="setrow"><span class="lab">Row density<small>how tall each event line is</small></span>' +
+        '<div class="setrow"><span class="lab">Size of event rows<small>height of each row in the Calendar and List tabs</small></span>' +
           '<div class="seg"><button data-density="comfortable" class="' + (state.density === 'comfortable' ? 'on' : '') + '">Comfortable</button><button data-density="compact" class="' + (state.density === 'compact' ? 'on' : '') + '">Compact</button></div></div>' +
-        '<div class="setrow"><span class="lab">Weekend shading<small>faint tint on Sat/Sun when zoomed in</small></span>' +
+        '<div class="setrow"><span class="lab">Weekend shading<small>distinct colour for Sat/Sun columns</small></span>' +
           '<label class="sw"><input type="checkbox" id="wkndSw"' + (state.weekends ? ' checked' : '') + '><i></i></label></div>' +
-        '<div class="setrow"><span class="lab">Event labels<small>on the bars when they fit, beside them when they don\'t</small></span>' +
+        '<div class="setrow"><span class="lab">Event labels<small>display names of events on their bars</small></span>' +
           '<label class="sw"><input type="checkbox" id="lblSw"' + (state.labels ? ' checked' : '') + '><i></i></label></div>' +
-        '<div class="setrow"><span class="lab">FL highlighting<small>the FL button on the Calendar &amp; List tabs</small></span>' +
-          '<label class="sw"><input type="checkbox" id="flSw"' + (state.showFL ? ' checked' : '') + '><i></i></label></div>' +
+        '<div class="setrow"><span class="lab">Farmer\'s League button<small>visibility of FL button</small></span>' +
+          '<label class="sw"><input type="checkbox" id="flSw"' + (state.showFLBtn ? ' checked' : '') + '><i></i></label></div>' +
       '</div>' +
       '<div class="set-group">' +
         '<h3>Colours <button class="mini2" id="resetColours" style="margin-left:auto" title="Return to the Default layout">Reset colours</button></h3>' +
@@ -2097,6 +2121,17 @@
     syncLogo();
   }
   function applyFont() { document.body.dataset.font = state.font; }
+  function applyDensity() { document.body.dataset.density = state.density; }
+  function applyWeekends() { document.body.dataset.weekends = state.weekends ? 'on' : 'off'; }
+  function applyFLBtn() {
+    var btn = $('#flBtn');
+    btn.style.display = state.showFLBtn ? '' : 'none';
+    if (!state.showFLBtn) {
+      state.showFL = false;
+      btn.classList.remove('on');
+      btn.setAttribute('aria-pressed', 'false');
+    }
+  }
 
   $('#prevBtn').addEventListener('click', function () { step(-1); });
   $('#nextBtn').addEventListener('click', function () { step(1); });
@@ -3019,7 +3054,7 @@
     var f = e.target.closest('.fontopt');
     if (f) { state.font = f.dataset.font; applyFont(); renderPane('themes'); refresh(); save(); return; }
     var d = e.target.closest('[data-density]');
-    if (d) { state.density = d.dataset.density; renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
+    if (d) { state.density = d.dataset.density; applyDensity(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
     var sw = e.target.closest('[data-cname]');
     if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
     if (e.target.closest('#resetBtn')) {
@@ -3038,9 +3073,9 @@
       }
       return;
     }
-    if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; save(); if (state.tab === 'calendar') renderTimeline(); }
+    if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; applyWeekends(); save(); if (state.tab === 'calendar') renderTimeline(); }
     if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); if (state.tab === 'calendar') renderTimeline(); }
-    if (e.target.id === 'flSw') { state.showFL = e.target.checked; $('#flBtn').classList.toggle('on', state.showFL); refresh(); save(); }
+    if (e.target.id === 'flSw') { state.showFLBtn = e.target.checked; applyFLBtn(); refresh(); save(); }
   });
   $('#pane-themes').addEventListener('keydown', function (e) {
     if (e.target.id === 'loName' && e.key === 'Enter') { e.preventDefault(); $('#loConfirm').click(); }
@@ -3136,8 +3171,10 @@
   })();
   applyTheme();
   applyFont();
+  applyDensity();
+  applyWeekends();
+  applyFLBtn();
   $('#flBtn').classList.toggle('on', state.showFL);
-  $('#flBtn').setAttribute('aria-pressed', state.showFL);
   document.querySelectorAll('#zoomSeg button').forEach(function (b) { b.classList.toggle('on', +b.dataset.z === state.zoom); });
   updateScaleUI();
   refitDayW();
