@@ -1185,8 +1185,8 @@
   /* ── timeline ── */
   function renderTimeline() {
     var LANE_W = laneW();
-    var rowH = state.density === 'compact' ? 20 : 34;
-    var barH = rowH - 8;
+    var rowH = state.density === 'compact' ? 16 : 34;
+    var barH = state.density === 'compact' ? 10 : 24;
     var totalDays = Math.round((bufEndT - bufStartT) / MS);
     var chartW = Math.round(totalDays * dayW);
     function xOf(t) { return (t - bufStartT) / MS * dayW; }
@@ -2170,8 +2170,9 @@
     var btn = this;
     if (pop.style.display === 'block' && popAnchor === btn) { closePop(); return; }
     var items =
-      '<button class="pm exp-item" data-exp="csv" style="display:block;width:100%;text-align:center;padding:7px 10px;border-radius:8px;background:var(--exp-item-bg)">Download as CSV</button>' +
-      '<button class="pm exp-item" data-exp="png" style="display:block;width:100%;text-align:center;padding:7px 10px;border-radius:8px;margin-top:5px;background:var(--exp-item-bg)">Screenshot (PNG)</button>';
+      '<button class="pm exp-item" data-exp="png" style="display:block;width:100%;text-align:center;padding:7px 10px;border-radius:8px;background:var(--exp-item-bg)">Screenshot (PNG)</button>' +
+      '<button class="pm exp-item" data-exp="pdf" style="display:block;width:100%;text-align:center;padding:7px 10px;border-radius:8px;margin-top:5px;background:var(--exp-item-bg)">Download as PDF</button>' +
+      '<button class="pm exp-item" data-exp="csv" style="display:block;width:100%;text-align:center;padding:7px 10px;border-radius:8px;margin-top:5px;background:var(--exp-item-bg)">Download as CSV</button>';
     /* open with blank title so the poptitle div is empty; we hide it via style */
     openPop(btn, '​', '<div style="min-width:148px">' + items + '</div>', function (e) {
       var t = e.target.closest('[data-exp]');
@@ -2189,6 +2190,8 @@
         downloadText(csv, 'bigfarm-events.csv');
       } else if (t.dataset.exp === 'png') {
         exportTimelineScreenshot();
+      } else if (t.dataset.exp === 'pdf') {
+        exportAsPDF();
       }
     });
     /* re-centre pop on the button after it's been sized */
@@ -2199,8 +2202,15 @@
     btn.classList.add('open');
   });
 
+  function exportTimelineScreenshotCanvas(cb) {
+    /* shared rendering — calls cb(canvas) instead of downloading */
+    _doTimelineRender(cb);
+  }
   function exportTimelineScreenshot() {
     if (state.tab === 'list') { exportListScreenshot(); return; }
+    _doTimelineRender(null);
+  }
+  function _doTimelineRender(cb) {
     /* read live CSS variables from body (vars are set on body[data-theme]) */
     palCache = {};
     var cs = getComputedStyle(document.body);
@@ -2217,8 +2227,8 @@
     };
 
     var LANE_W = laneW();
-    var rowH   = state.density === 'compact' ? 20 : 34;
-    var barH   = rowH - 8;
+    var rowH   = state.density === 'compact' ? 16 : 34;
+    var barH   = state.density === 'compact' ? 10 : 24;
     var HDR_H  = 36; /* date header height */
     var PAD    = 2;
 
@@ -2461,7 +2471,8 @@
     ctx.lineWidth = 1;
     ctx.strokeRect(0.5, 0.5, CANVAS_W - 1, CANVAS_H - 1);
 
-    /* download */
+    /* download or return canvas */
+    if (cb) { cb(cv2); return; }
     cv2.toBlob(function(blob) {
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
@@ -2482,7 +2493,49 @@
     ctx.closePath();
   }
 
+  function exportAsPDF() {
+    /* Render the same canvas as the PNG screenshot, then embed it in a PDF via jsPDF */
+    function doExport(canvas) {
+      var iw = canvas.width  / (window.devicePixelRatio || 1);
+      var ih = canvas.height / (window.devicePixelRatio || 1);
+      var imgData = canvas.toDataURL('image/png');
+      /* Use jsPDF: landscape if wider than tall, portrait otherwise */
+      var orient = iw >= ih ? 'landscape' : 'portrait';
+      /* jsPDF works in mm; 1px ≈ 0.2646mm at 96dpi */
+      var pxToMm = 25.4 / 96;
+      var pw = iw * pxToMm;
+      var ph = ih * pxToMm;
+      var pdf = new window.jspdf.jsPDF({ orientation: orient, unit: 'mm', format: [pw, ph] });
+      pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
+      pdf.save('bigfarm-events.pdf');
+    }
+    /* Load jsPDF lazily then render */
+    function runWithJsPDF(cb) {
+      if (window.jspdf) { cb(); return; }
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload = cb;
+      document.head.appendChild(s);
+    }
+    if (state.tab === 'list') {
+      /* Reuse list screenshot canvas */
+      runWithJsPDF(function() {
+        exportListScreenshotCanvas(function(canvas) { doExport(canvas); });
+      });
+    } else {
+      runWithJsPDF(function() {
+        exportTimelineScreenshotCanvas(function(canvas) { doExport(canvas); });
+      });
+    }
+  }
+
+  function exportListScreenshotCanvas(cb) {
+    _doListRender(cb);
+  }
   function exportListScreenshot() {
+    _doListRender(null);
+  }
+  function _doListRender(cb) {
     palCache = {};
     var cs = getComputedStyle(document.body);
     function cv(n) { return cs.getPropertyValue(n).trim(); }
@@ -2680,6 +2733,7 @@
       }
     });
 
+    if (cb) { cb(canv); return; }
     canv.toBlob(function(blob) {
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
@@ -3058,6 +3112,17 @@
     if (d) { state.density = d.dataset.density; applyDensity(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
     var sw = e.target.closest('[data-cname]');
     if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
+    /* toggle switches — handle in click so they fire reliably */
+    var chk = e.target.closest('.sw');
+    if (chk) {
+      var inp = chk.querySelector('input[type="checkbox"]');
+      if (!inp) return;
+      /* browser has already toggled inp.checked before the click bubbles here */
+      var id = inp.id;
+      if (id === 'wkndSw') { state.weekends = inp.checked; applyWeekends(); save(); refresh(); return; }
+      if (id === 'lblSw')  { state.labels  = inp.checked; save(); refresh(); return; }
+      if (id === 'flSw')   { state.showFLBtn = inp.checked; applyFLBtn(); refresh(); save(); return; }
+    }
     if (e.target.closest('#resetBtn')) {
       if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(function () { resetArmed = false; }, 3000); }
       else { try { localStorage.removeItem(LS_KEY); } catch (e2) {} location.reload(); }
