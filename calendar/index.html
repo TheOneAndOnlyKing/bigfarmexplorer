@@ -1137,6 +1137,7 @@
     $('#copyUrlBtn').style.display = onList ? 'none' : '';
     $('#prevBtn').style.display = onList ? 'none' : '';
     $('#nextBtn').style.display = onList ? 'none' : '';
+    $('#flBtn').style.display = state.showFLBtn ? '' : 'none';
     var n;
     if (onList) {
       /* update the visible nav-label button text */
@@ -1184,8 +1185,8 @@
   /* ── timeline ── */
   function renderTimeline() {
     var LANE_W = laneW();
-    var rowH = state.density === 'compact' ? 24 : 34;
-    var barH = rowH - 12;
+    var rowH = state.density === 'compact' ? 20 : 34;
+    var barH = rowH - 8;
     var totalDays = Math.round((bufEndT - bufStartT) / MS);
     var chartW = Math.round(totalDays * dayW);
     function xOf(t) { return (t - bufStartT) / MS * dayW; }
@@ -2216,8 +2217,8 @@
     };
 
     var LANE_W = laneW();
-    var rowH   = state.density === 'compact' ? 24 : 34;
-    var barH   = rowH - 12;
+    var rowH   = state.density === 'compact' ? 20 : 34;
+    var barH   = rowH - 8;
     var HDR_H  = 36; /* date header height */
     var PAD    = 2;
 
@@ -3073,8 +3074,8 @@
       }
       return;
     }
-    if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; applyWeekends(); save(); if (state.tab === 'calendar') renderTimeline(); }
-    if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); if (state.tab === 'calendar') renderTimeline(); }
+    if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; applyWeekends(); save(); refresh(); }
+    if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); refresh(); }
     if (e.target.id === 'flSw') { state.showFLBtn = e.target.checked; applyFLBtn(); refresh(); save(); }
   });
   $('#pane-themes').addEventListener('keydown', function (e) {
