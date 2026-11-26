@@ -3112,16 +3112,15 @@
     if (d) { state.density = d.dataset.density; applyDensity(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
     var sw = e.target.closest('[data-cname]');
     if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
-    /* toggle switches — handle in click so they fire reliably */
-    var chk = e.target.closest('.sw');
-    if (chk) {
-      var inp = chk.querySelector('input[type="checkbox"]');
-      if (!inp) return;
-      /* browser has already toggled inp.checked before the click bubbles here */
-      var id = inp.id;
-      if (id === 'wkndSw') { state.weekends = inp.checked; applyWeekends(); save(); refresh(); return; }
-      if (id === 'lblSw')  { state.labels  = inp.checked; save(); refresh(); return; }
-      if (id === 'flSw')   { state.showFLBtn = inp.checked; applyFLBtn(); refresh(); save(); return; }
+    /* toggle switches: only handle when the click lands on the <input> itself.
+       The label click causes a synthetic second click on the input, so we skip
+       label clicks entirely to avoid double-toggling state. */
+    if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox' && e.target.closest('.sw')) {
+      var id = e.target.id;
+      /* inp.checked is already toggled by browser at this point */
+      if (id === 'wkndSw') { state.weekends = e.target.checked; applyWeekends(); save(); refresh(); return; }
+      if (id === 'lblSw')  { state.labels   = e.target.checked; save(); refresh(); return; }
+      if (id === 'flSw')   { state.showFLBtn = e.target.checked; applyFLBtn(); refresh(); save(); return; }
     }
     if (e.target.closest('#resetBtn')) {
       if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(function () { resetArmed = false; }, 3000); }
@@ -3139,9 +3138,7 @@
       }
       return;
     }
-    if (e.target.id === 'wkndSw') { state.weekends = e.target.checked; applyWeekends(); save(); refresh(); }
-    if (e.target.id === 'lblSw') { state.labels = e.target.checked; save(); refresh(); }
-    if (e.target.id === 'flSw') { state.showFLBtn = e.target.checked; applyFLBtn(); refresh(); save(); }
+    /* wkndSw / lblSw / flSw handled in click handler above */
   });
   $('#pane-themes').addEventListener('keydown', function (e) {
     if (e.target.id === 'loName' && e.key === 'Enter') { e.preventDefault(); $('#loConfirm').click(); }
