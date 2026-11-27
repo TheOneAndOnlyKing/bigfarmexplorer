@@ -3108,7 +3108,7 @@
     if (ssw) { openColorPop('section', ssw.dataset.secname, ssw); return; }
     var f = e.target.closest('.fontopt');
     if (f) { state.font = f.dataset.font; applyFont(); renderPane('themes'); refresh(); save(); return; }
-    var d = e.target.closest('[data-density]');
+    var d = e.target.closest('button[data-density]');
     if (d) { state.density = d.dataset.density; applyDensity(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
     var sw = e.target.closest('[data-cname]');
     if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
