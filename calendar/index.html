@@ -3112,6 +3112,17 @@
     if (d) { state.density = d.dataset.density; applyDensity(); renderPane('themes'); if (state.tab === 'calendar') renderTimeline(); save(); return; }
     var sw = e.target.closest('[data-cname]');
     if (sw) { openColorPop('event', sw.dataset.cname, sw); return; }
+    /* toggle switches — handle in click so they fire reliably */
+    var chk = e.target.closest('.sw');
+    if (chk) {
+      var inp = chk.querySelector('input[type="checkbox"]');
+      if (!inp) return;
+      /* browser has already toggled inp.checked before the click bubbles here */
+      var id = inp.id;
+      if (id === 'wkndSw') { state.weekends = inp.checked; applyWeekends(); save(); if (state.tab === 'calendar') renderTimeline(); return; }
+      if (id === 'lblSw')  { state.labels  = inp.checked; save(); if (state.tab === 'calendar') renderTimeline(); return; }
+      if (id === 'flSw')   { state.showFLBtn = inp.checked; applyFLBtn(); save(); return; }
+    }
     if (e.target.closest('#resetBtn')) {
       if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(function () { resetArmed = false; }, 3000); }
       else { try { localStorage.removeItem(LS_KEY); } catch (e2) {} location.reload(); }
