@@ -3124,7 +3124,7 @@
       if (id === 'flSw')   { state.showFLBtn = inp.checked; applyFLBtn(); save(); return; }
     }
     if (e.target.closest('#resetBtn')) {
-      if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(function () { resetArmed = false; }, 3000); }
+      if (!resetArmed) { resetArmed = true; renderPane('themes'); setTimeout(function () { resetArmed = false; renderPane('themes'); }, 3000); }
       else { try { localStorage.removeItem(LS_KEY); } catch (e2) {} location.reload(); }
     }
   });
